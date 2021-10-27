@@ -7,7 +7,7 @@ function err = avpcmpplot(avp0, varargin)
 %         varargin - the last input parameter may be comparison type or by
 %                    default value
 %          
-% See also  avpcmp, inserrplot, kfplot, gpsplot, imuplot, avperrstd, errstplot.
+% See also  avpcmp, posflucmpplot, inserrplot, kfplot, gpsplot, imuplot, avperrstd, errstplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -137,6 +137,21 @@ global glv
                 subplot(324), hold on, plot(t, err(:,4:6), strk, 'LineWidth',2); xygo('dV'); mylegend('dVE','dVN','dVU');
                 subplot(326), hold on, plot(t, [[err(:,7),err(:,8)*cos(avp(1,7))]*glv.Re,err(:,9)], strk, 'LineWidth',2); xygo('dP'); mylegend('dlat','dlon','dH');
             end
+        case 'avpdist',  % subplot(326), pos_err vs. distance
+            avp = varargin{1};
+            close(gcf);
+            err = avpcmpplot(avp0, avp, phi_mu);
+            pos = avp(:,[7:9,end]);
+            [RMh, clRNh] = RMRN(pos);
+            dpos = [zeros(1,3);diff(pos(:,1:3))];
+            dxyz = [dpos(:,2).*clRNh, dpos(:,1).*RMh, dpos(:,3)];
+            dist = cumsum(normv(dxyz));
+            dist = interp1(pos(:,end), dist, err(:,end));
+            t1 = get(gca,'xlim');
+            subplot(326), hold off, plot(dist/1000, [[err(:,7),err(:,8)*cos(avp(1,7))]*glv.Re,err(:,9)]); xygo('dist / km', 'dP');
+            x1 = (t1(1)-err(1,end))/(err(1,end)-err(end,end))*(dist(1,1)-dist(end,1))+dist(1,1);
+            x2 = (t1(end)-err(1,end))/(err(1,end)-err(end,end))*(dist(1,1)-dist(end,1))+dist(1,1);
+            xlim([x1,x2]/1000);
         case 'vp',
             for k=1:kk
                 strk = str(k*2-1:k*2);
@@ -212,5 +227,5 @@ global glv
                 subplot(211), hold on, plot(t, avp(:,end-6:end-4)/glv.dph, strk, 'LineWidth',2); xygo('eb');
                 subplot(212), hold on, plot(t, avp(:,end-3:end-1)/glv.ug, strk, 'LineWidth',2); xygo('db');
             end
-end
+    end
     

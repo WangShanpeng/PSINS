@@ -9,7 +9,7 @@ function [inst, kod] = drcalibrate(pos0, pos1Real, pos1DR, distance)
 % Output: inst - ints=[dpitch;0;dyaw] for OD installation error angles(in rad)
 %         kod - odometer scale factor in meter/pulse.
 %
-% See also  drinit, drupdate.
+% See also  drinit, drupdate, drrectify.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

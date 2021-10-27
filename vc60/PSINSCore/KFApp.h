@@ -21,10 +21,6 @@ public:
 
 	CKFApp(double ts);
 	virtual void Init(const CSINS &sins0, int grade=-1);
-	virtual void SetHk(int nnq=15) {};
-	virtual void SetMeas(void) {};
-	virtual void SetMeas(const CVect3 &pgps, const CVect3 &vgps);
-	int Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts);
 };
 
 typedef struct {

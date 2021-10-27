@@ -13,8 +13,8 @@ function avp = avpinterp1(avp, t, method)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 13/11/2019
     if ~exist('method', 'var'), method = 'linear'; end
-    i1 = find(t>avp(1,end),1,'first');
-    i2 = find(t<avp(end,end),1,'last');
+    i1 = find(t>=avp(1,end),1,'first');
+    i2 = find(t<=avp(end,end),1,'last');
     t = t(i1:i2);
     avp(:,1:3) = att2c(avp(:,1:3));
     avp = [interp1(avp(:,end), avp(:,1:end-1), t, method), t];

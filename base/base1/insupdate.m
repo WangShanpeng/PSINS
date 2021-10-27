@@ -29,7 +29,7 @@ function ins = insupdate(ins, imu)
     %% (1)velocity updating
     ins.fn = qmulv(ins.qnb, ins.fb);
 %     ins.an = qmulv(rv2q(-ins.eth.wnin*nts2),ins.fn) + ins.eth.gcc;
-    ins.an = rotv(-ins.eth.wnin*nts2, ins.fn) + ins.eth.gcc;
+    ins.an = rotv(-ins.eth.wnin*nts2, ins.fn) + ins.eth.gcc;  ins.anbar = 0.9*ins.anbar + 0.1*ins.an;
     vn1 = ins.vn + ins.an*nts;
     %% (2)position updating
 %     ins.Mpv = [0, 1/ins.eth.RMh, 0; 1/ins.eth.clRNh, 0, 0; 0, 0, 1];

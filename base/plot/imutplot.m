@@ -6,7 +6,7 @@ function imut = imutplot(imut, n)
 %         n - mean count
 % Output: imut - cumsum IMU & mean Temp oputput
 %
-% See also  imuplot, imumeanplot, templot.
+% See also  imuplot, imumeanplot, imutemplot, templot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

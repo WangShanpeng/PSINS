@@ -1,15 +1,16 @@
-function [att0, attk, xkpk] = alignfn(imu, qnb, pos, phi0, imuerr, ts)
+function [att0, attk, xkpk] = alignfn(imu, qnb, pos, phi0, imuerr, isfig)
 % SINS initial align uses Kalman filter with fn as measurement.
 % Kalman filter states: [phiE, phiN, phiU, eby, ebz]'.
 %
-% Prototype: [att0, attk, xkpk] = alignfn(imu, qnb, pos, phi0, imuerr, ts)
+% Prototype: [att0, attk, xkpk] = alignfn(imu, qnb, pos, phi0, imuerr, isfig)
 % Inputs: imu - IMU data
 %         qnb - coarse attitude quaternion (or att)
 %         pos - position
 %         phi0 - initial misalignment angles estimation
 %         imuerr - IMU error setting
-%         ts - IMU sampling interval
-% Output: att0 - attitude align result
+%         isfig - figure flag
+% Outputs: att0 - attitude align result
+%         attk, xkpk - for debug
 %
 % See also  alignfn9, alignvn, aligncmps, aligni0, alignWahba, alignsb.
 
@@ -17,9 +18,9 @@ function [att0, attk, xkpk] = alignfn(imu, qnb, pos, phi0, imuerr, ts)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/06/2011
 global glv
-    if nargin<6,  ts = imu(2,7)-imu(1,7);  end
+    if nargin<6,  isfig = 1;  end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
-    nn = 2; nts = nn*ts;
+    [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos);  Cnn = rv2m(-eth.wnie*nts/2);
     kf = afnkfinit(nts, pos, phi0, imuerr); 
@@ -39,7 +40,7 @@ global glv
     attk(ki:end,:) = []; xkpk(ki:end,:) = [];
     att0 = attk(end,:)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
-    afnplot(nts, attk, xkpk);
+    if isfig, afnplot(nts, attk, xkpk); end
 
 function kf = afnkfinit(nts, pos, phi0, imuerr)
     eth = earth(pos);

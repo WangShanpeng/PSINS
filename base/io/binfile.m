@@ -11,12 +11,12 @@ function data1 = binfile(fname, data, row0, row1)
 %    Save: binfile(fname, data)
 %    Read: data1 = binfile(fname, column)
 %
-% See also  imufile, avpfile, kffile, matbinfile, importdata.
+% See also  imufile, avpfile, kffile, matbinfile, importdata, ld2528.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 20/02/2013, 30/03/2015
-    fname = fnamechk(fname, 'bin');
+    %fname = fnamechk(fname, 'bin');
     if length(data)==1 % load: data1 = binfile(fname, columns)
         if nargin<3, row0=0; row1=inf; end
         if nargin==3, row1=row0; row0=0; end

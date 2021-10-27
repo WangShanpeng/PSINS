@@ -9,7 +9,7 @@ function x1 = replaceby(x1, x2, clm, method)
 % Output: x1 - new data x1 output
 %
 % Example:
-%    x1 = [randn(10,2),(1:10)'];  x2 = [randn(10,2),(5.1:15)']; 
+%    x1 = [randn(10,2),(1:10)'];  x2 = [randn(20,2),(5.1:25)']; 
 %    x1new = replaceby(x1, x2);
 %    myfig; plot(x1(:,end),x1(:,1:2), x2(:,end),x2(:,1:2), x1new(:,end),x1new(:,1:2)); grid on;
 %    
@@ -25,5 +25,5 @@ function x1 = replaceby(x1, x2, clm, method)
     ns = find(x1(:,end)>ts,1,'first'); ne = find(x1(:,end)<te,1,'last');
     t = x1(ns:ne,end);
     for k=1:length(clm)
-        x1(ns:ne,clm(k)) = interp1(x2(:,end), x2(:,k), t, method);  % x2(:,k) -> x1(:,clm(k))
+        x1(ns:ne,clm(k)) = interp1(x2(:,end), x2(:,clm(k)), t, method);  % x2(:,clm(k)) -> x1(:,clm(k))
     end

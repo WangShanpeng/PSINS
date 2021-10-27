@@ -10,7 +10,7 @@ function avp = avplever(avp, lever, tDelay)
 % Example:
 %    avp1 = avplever(avp, xkpk(end,16:18)', xkpk(end,19));
 %
-% See also  inslever.
+% See also  pp2lever, inslever.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

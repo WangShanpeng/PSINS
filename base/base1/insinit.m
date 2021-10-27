@@ -50,4 +50,4 @@ global glv
 	ins.tDelay = 0; % time delay
     ins.openloop = 0;
     glv.wm_1 = zeros(3,1)';  glv.vm_1 = zeros(3,1)';  % for 'single sample+previous sample' coning algorithm
-    ins.an0 = zeros(3,1);
+    ins.an0 = zeros(3,1);  ins.anbar = ins.an0;

@@ -7,12 +7,12 @@
 glvs
 trj = trjfile('trj10ms.mat');
 [nn, ts, nts] = nnts(2, trj.ts);
-inst = [3;60;10];  kod = 1;  qe = 0; dT = 0;  % od parameters
+inst = [3;60;10]*glv.min;  kod = 1;  qe = 0; dT = 0;  % od parameters
 trjod = odsimu(trj, inst, kod, qe, dT, 0);
 imuerr = imuerrset(0.01, 50, 0.001, 5);
 imu = imuadderr(trjod.imu, imuerr);
 davp = avperrset([60;0;60], 0, 0);
-dinst = [15;0;10]*0; dkod = 0.05;
+dinst = [15;0;10]*glv.min; dkod = 0.05;
 dr = drinit(avpadderr(trjod.avp0,davp), inst+dinst, kod*(1+dkod), ts); % DR init
 len = length(imu); avp = prealloc(fix(len/nn), 10);
 ki = timebar(nn, len, 'DR simulation.');

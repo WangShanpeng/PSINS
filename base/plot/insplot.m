@@ -5,7 +5,7 @@ function insplot(avp, ptype, varargin)
 % Inputs: avp - may be [att], [att,vn] or [att,vn,pos]
 %         ptype - plot type define
 %          
-% See also  miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, pos2dxyz.
+% See also  miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, addyawplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

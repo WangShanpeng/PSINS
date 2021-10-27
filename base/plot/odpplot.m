@@ -1,10 +1,10 @@
 function odpplot(odp)
 % Odometer parameter plot.
 %
-% Prototype: sv = odplot(od, nsmooth, isplot)
+% Prototype: odpplot(odp)
 % Input: odp - Odometer parameter = [dpitch, Kod, dyaw, t] array.
 %
-% See also  odplot.
+% See also  odplot, lvtplot, xpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

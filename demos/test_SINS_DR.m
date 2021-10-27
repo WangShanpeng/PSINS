@@ -8,13 +8,13 @@ glvs
 psinstypedef('test_SINS_DR_def');
 trj = trjfile('trj10ms.mat');
 [nn, ts, nts] = nnts(2, trj.ts);
-inst = [3;60;6];  kod = 1;  qe = 0; dT = 0.01; % od parameters
+inst = [3;60;6]*glv.min;  kod = 1;  qe = 0; dT = 0.01; % od parameters
 trjod = odsimu(trj, inst, kod, qe, dT, 0); % od simulation
 imuerr = imuerrset(0.01, 50, 0.001, 5);
 imu = imuadderr(trjod.imu, imuerr);
 davp = avperrset([30;30;10], 0, 10);
 ins = insinit(avpadderr(trjod.avp0,davp), ts); % SINS init
-dinst = [15;0;10]; dkod = 0.01;
+dinst = [15;0;10]*glv.min; dkod = 0.01;
 dr = drinit(avpadderr(trjod.avp0,davp), d2r((inst+dinst)/60), kod*(1+dkod), ts); % DR init
 kf = kfinit(nts, davp, imuerr, dinst, dkod, dT); % kf init
 len = length(imu); 

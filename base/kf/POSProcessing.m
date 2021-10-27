@@ -23,7 +23,7 @@ function [ps, psf] = POSProcessing(kf, ins, imu, vpGPS, fbstr, ifbstr)
 %     psinstypedef(346);
 %     davp0 = avperrset([30;-30;30], [0.01;0.01;0.03], [0.01;0.01;0.03]);
 %     lever = [0.; 0; 0]; dT = 0.0; r0 = davp0(4:9)';
-%     imuerr = imuerrset(0.01,100,0.001,1, 0,0,0,0, [0;0;1000],0,[0;0;0;0;10;10],0););
+%     imuerr = imuerrset(0.01,100,0.001,1, 0,0,0,0, [0;0;1000],0,[0;0;0;0;10;10],0);
 %     ins = insinit([att; pos], ts);
 %     kf = kfinit(ins, davp0, imuerr, lever, dT, r0);
 %     ps = POSProcessing(kf, ins, imu, vpGPS, 'avped', 'avp');
@@ -43,8 +43,8 @@ function [ps, psf] = POSProcessing(kf, ins, imu, vpGPS, fbstr, ifbstr)
     ts = ins.ts; nts = kf.nts; nn = round(nts/ts);
     dKga = zeros(15,1);
     %% forward navigation
-	[avp, xkpk] = prealloc(ceil(len/nn), kf.n+1, 2*kf.n+1); ki = 1;
-    Qk = zeros(length(vpGPS), kf.n+1);  Rk = zeros(length(vpGPS), 8);  kki = 1;
+	[avp, xkpk, zkrk] = prealloc(ceil(len/nn), kf.n+1, 2*kf.n+1, 2*kf.m+1); ki = 1;
+    Qk = zeros(length(vpGPS), kf.n+1);  Rk = zeros(length(vpGPS), 8);  kki = 1;  zk = zeros(size(kf.Hk,1),1);
     timebar(nn, len, 'SINS/GPS POS forward processing.');
     for k=1:nn:(len-nn+1)
         k1 = k+nn-1; wvm = imu(k:k1,1:6); t = imu(k1,7);
@@ -69,15 +69,16 @@ function [ps, psf] = POSProcessing(kf, ins, imu, vpGPS, fbstr, ifbstr)
         dKg = ins.Kg-eye(3); dKa = ins.Ka-eye(3);
         dKga = [dKg(:,1);dKg(:,2);dKg(:,3); dKa(:,1);dKa(2:3,2);dKa(3,3)];
         avp(ki,:) = [ins.avpL; ins.eb; ins.db; ins.lever; ins.tDelay; dKga; t]';
-        xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t]';  ki = ki+1;
+        xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t]';
+        zkrk(ki,:) = [zk; diag(kf.Rk); t]'; ki = ki+1;
         timebar;
     end
-    avp(ki:end,:)=[]; xkpk(ki:end,:)=[]; Qk(kki:end,:)=[];  Rk(kki:end,:)=[];
-    ps.avp = avp; ps.xkpk = xkpk; ps.Qk = [sqrt(Qk(:,1:end-1)),Qk(:,end)];  ps.Rk = [sqrt(Rk(:,1:6)),Rk(:,7:8)];
+    avp(ki:end,:)=[]; xkpk(ki:end,:)=[]; zkrk(ki:end,:)=[]; Qk(kki:end,:)=[];  Rk(kki:end,:)=[];
+    ps.avp = avp; ps.xkpk = xkpk; ps.zkrk = zkrk; ps.Qk = [sqrt(Qk(:,1:end-1)),Qk(:,end)];  ps.Rk = [sqrt(Rk(:,1:6)),Rk(:,7:8)];
     if ~ischar(ifbstr), return; end
     %% reverse navigation
     [ikf, iins, idx] = POSReverse(kf, ins);
-    [iavp, ixkpk] = prealloc(ceil(len/nn), kf.n+1, 2*kf.n+1); ki = 1;
+    [iavp, ixkpk, izkrk] = prealloc(ceil(len/nn), kf.n+1, 2*kf.n+1, 2*kf.m+1); ki = 1;
     timebar(nn, len, 'SINS/GPS POS reverse processing.');
     for k=k1:-nn:(1+nn)
         ik1 = k-nn+1; wvm = imu(k:-1:ik1,1:6); wvm(:,1:3) = -wvm(:,1:3); t = imu(ik1-1,7);
@@ -100,13 +101,14 @@ function [ps, psf] = POSProcessing(kf, ins, imu, vpGPS, fbstr, ifbstr)
         dKg = iins.Kg-eye(3); dKa = iins.Ka-eye(3);
         dKga = [dKg(:,1);dKg(:,2);dKg(:,3); dKa(:,1);dKa(2:3,2);dKa(3,3)];
         iavp(ki,:) = [iins.avpL; iins.eb; iins.db; iins.lever; iins.tDelay; dKga; t]';
-        ixkpk(ki,:) = [ikf.xk; diag(ikf.Pxk); t]';  ki = ki+1;
+        ixkpk(ki,:) = [ikf.xk; diag(ikf.Pxk); t]';
+        izkrk(ki,:) = [zk; diag(ikf.Rk); t]';     ki = ki+1;
         timebar;
     end
-    iavp(ki:end,:)=[]; ixkpk(ki:end,:)=[];  
-    iavp = flipud(iavp); ixkpk = flipud(ixkpk); % reverse inverse sequence
+    iavp(ki:end,:)=[]; ixkpk(ki:end,:)=[]; izkrk(ki:end,:)=[];  
+    iavp = flipud(iavp); ixkpk = flipud(ixkpk); izkrk = flipud(izkrk); % reverse inverse sequence
     iavp(:,idx) = -iavp(:,idx);  ixkpk(:,idx) = -ixkpk(:,idx);
-    ps.avp = avp; ps.xkpk = xkpk; ps.iavp = iavp; ps.ixkpk = ixkpk;
+    ps.iavp = iavp; ps.ixkpk = ixkpk; ps.izkrk = izkrk;
     if nargout==2
         psf = POSFusion(ps.avp, ps.xkpk, ps.iavp, ps.ixkpk);
     end

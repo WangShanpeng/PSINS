@@ -1,11 +1,11 @@
-function [att0, attk] = alignWahba(imu, pos, ts)
+function [att0, attk] = alignWahba(imu, pos, isfig)
 % SINS initial align based on inertial frame and Wahba method. In the Wahba
 % problem, it is solved by SVD & QUEST method (equivalent).
 %
-% Prototype: [att0, attk] = alignWahba(imu, pos, ts)
+% Prototype: [att0, attk] = alignWahba(imu, pos, isfig)
 % Inputs: imu - IMU data
 %         pos - position
-%         ts - IMU sampling interval
+%         isfig - figure flag
 % Output: att0 - attitude align result
 %
 % Example1:
@@ -25,8 +25,8 @@ function [att0, attk] = alignWahba(imu, pos, ts)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 29/06/2012, 20/01/2021
 global glv
-    if nargin<3,  ts = imu(2,7)-imu(1,7);  end
-	nn = 2; nts = nn*ts;
+    if nargin<3,  isfig = 1; end
+	[nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     len = fix(length(imu)/nn)*nn;
 	eth = earth(pos);   g0 = -eth.gn(3);
     qib0b = [1; 0; 0; 0];
@@ -61,8 +61,10 @@ global glv
     att0 = attk(end,1:3)';
     t = attk(:,end);
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
-    insplot(attk);
-    subplot(211), plot(t, attk_SVD(:,1:2)/glv.deg, 'm');
-    subplot(212), plot(t, attk_SVD(:,3)/glv.deg, 'm');
-    legend('QUEST Wahba', 'SVD Wahba');
-%     mysemilogy(testA(1:ki,end), testA(1:ki,1:2));
+    if isfig
+        insplot(attk);
+        subplot(211), plot(t, attk_SVD(:,1:2)/glv.deg, 'm');
+        subplot(212), plot(t, attk_SVD(:,3)/glv.deg, 'm');
+        legend('QUEST Wahba', 'SVD Wahba');
+    %     mysemilogy(testA(1:ki,end), testA(1:ki,1:2));
+    end

@@ -1,17 +1,17 @@
-function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, ts)
+function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 % SINS initial align uses Kalman filter with vn as measurement.
 % Kalman filter states: 
 %    [phiE,phiN,phiU, dvE,dvN,dvU, ebx,eby,ebz, dbx,dby,dbz]'.
 %
-% Prototype: [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, ts)
+% Prototype: [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 % Inputs: imu - IMU data
 %         qnb - coarse attitude quaternion
 %         pos - position
 %         phi0 - initial misalignment angles estimation
 %         imuerr - IMU error setting
 %         wvn - velocity measurement noise (3x1 vector)
-%         ts - IMU sampling interval
-% Output: att0 - attitude align result
+%         isfig - figure flag
+% Outputs: att0 - attitude align result
 %         attk, xkpk - for debug
 %
 % Example:
@@ -30,10 +30,10 @@ function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, ts)
 global glv
     if nargin<4,  phi0 = [1.5; 1.5; 3]*glv.deg;  end
     if nargin<5,  imuerrset(0.01, 100, 0.001, 1);  end
-    if nargin<6,  wvn = [0.01; 0.01; 0.01];  end
-    if nargin<7,  ts = imu(2,7)-imu(1,7);  end
+    if nargin<6,  wvn = 0.01;  end;  if length(wvn)==1, wvn=repmat(wvn,3,1); end
+    if nargin<7,  isfig = 1; end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
-    nn = 2; nts = nn*ts;
+    [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos); vn = zeros(3,1); Cnn = rv2m(-eth.wnie*nts/2);
     kf = avnkfinit(nts, pos, phi0, imuerr, wvn);
@@ -60,14 +60,14 @@ global glv
     attk(ki:end,:) = []; xkpk(ki:end,:) = [];
     att0 = attk(end,1:3)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
-    avnplot(attk, xkpk);
+    if isfig, avnplot(attk, xkpk); end
     
 function kf = avnkfinit(nts, pos, phi0, imuerr, wvn)
     eth = earth(pos); wnie = eth.wnie;
     kf = []; kf.s = 1; kf.nts = nts;
 	kf.Qk = diag([imuerr.web; imuerr.wdb; zeros(6,1)])^2*nts;
     kf.Gammak = 1;
-	kf.Rk = diag(wvn)^2;
+	kf.Rk = diag(wvn)^2/nts;
 	kf.Pxk = diag([phi0; [1;1;1]; imuerr.eb; imuerr.db])^2;
 	Ft = zeros(12); Ft(1:3,1:3) = askew(-wnie); kf.Phikk_1 = eye(12)+Ft*nts;
 	kf.Hk = [zeros(3),eye(3),zeros(3,6)];

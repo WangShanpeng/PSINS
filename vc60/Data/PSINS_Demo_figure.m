@@ -1,7 +1,7 @@
 % Figure for C++ processing results
 % Make sure Matlab/PSINS Toolbox have been initialized!
 glvs
-PSINSDemo = 7;
+PSINSDemo = 14;
 switch PSINSDemo
     case -1, %% Demo_SINS/GNSS
         ins = binfile('ins.bin', 16+3);
@@ -73,6 +73,11 @@ switch PSINSDemo
         stateplot(sk);
     case 11, %% Demo_CVCFileFind
         NA = 0;
+    case 14,
+        [imu, mag, bar, avp, gps, gs, temp] = psinsboardbin(2);
+        imuplot(imu);  magplot(mag);  baroplot(bar);
+        if ~isempty(gps), gpsplot(gps); end
+        templot(temp);
 end
 
 

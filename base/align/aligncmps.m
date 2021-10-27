@@ -1,7 +1,7 @@
-function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, ts)
+function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, isfig)
 % SINS initial align uses gyro-compass method.
 %
-% Prototype: [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, ts)
+% Prototype: [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, isfig)
 % Inputs: imu - IMU data
 %         qnb - coarse attitude quaternion
 %         pos - position
@@ -9,7 +9,7 @@ function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, ts)
 %                ctl0(2): the lasting time for level align stage
 %         ctl1 - ctl1(1): level setting time in yaw align stage
 %         ctl1 - ctl1(2): gyro-compass setting time in yaw align stage 
-%         ts - IMU sampling interval
+%         isfig - figure flag
 % Outputs: att0 - attitude align result
 %          attk - result array
 %
@@ -19,9 +19,9 @@ function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, ts)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 23/12/2012
 global glv
-    if nargin<6,  ts = imu(2,7)-imu(1,7);  end
+    if nargin<6,  isfig = 1;  end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
-    nn = 2; nts = nn*ts;
+    [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos);
     wnie = eth.wnie; wN = wnie(2); wU = wnie(3); Cnn = rv2m(-wnie*nts/2);
@@ -61,4 +61,5 @@ global glv
     end
     att0 = attk(end,:)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
-    insplot([attk, (1:length(attk))'*nts]);    
+    if isfig, insplot([attk, (1:length(attk))'*nts]);  end
+    

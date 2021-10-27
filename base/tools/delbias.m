@@ -1,4 +1,4 @@
-function [x, b1] = delbias(x, b)
+function [x, b1] = delbias(x, b, clm)
 % Delete bias.
 %
 % Prototype:  out = delbias(in, b)
@@ -12,6 +12,14 @@ function [x, b1] = delbias(x, b)
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 23/07/2016, 03/07/2018 
+    if nargin==3
+        if length(b)==0; b = mean(x(:,clm)); end    %  delbias(x, [], clm)
+        if length(b)==1; b = repmat(b,clm,1); end    %  delbias(x, b, clm)
+        for k=1:length(clm)
+            x(:,clm(k)) = x(:,clm(k)) - b(clm);
+        end
+        return;
+    end
     for k=1:size(x,2)
         if exist('b','var')
             if k<=length(b), x(:,k) = x(:,k)-b(k); end

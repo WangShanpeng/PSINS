@@ -9,7 +9,7 @@ function imu = imuresample(imu0, ts, t1, method)
 %    method - resampling interpolation method
 % Output: imu - new SIMU date with sampling interval ts
 %
-% See also  trjsimu, imufile, imuplot, insupdate.
+% See also  imu2imu1, trjsimu, imufile, imuplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China

@@ -18,24 +18,3 @@ void CKFApp::Init(const CSINS &sins0, int grade)
 	Rmax = Rt*100;  Rmin = Rt*0.01;  Rb = 0.6;
 	FBTau.Set(fXX9(0.1),  fXX6(1.0),  fINF3, INF);
 }
-
-void CKFApp::SetMeas(const CVect3 &pgps, const CVect3 &vgps)
-{
-	if(!IsZero(pgps))
-	{
-		*(CVect3*)&Zk.dd[3] = sins.pos - pgps;
-		SetMeasFlag(000070);
-	}
-	if(!IsZero(vgps))
-	{
-		*(CVect3*)&Zk.dd[0] = sins.vn - vgps;
-		SetMeasFlag(000007);
-	}
-}
-
-int CKFApp::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts)
-{
-	int res=TDUpdate(pwm, pvm, nSamples, ts, 5);
-	return res;
-}
-

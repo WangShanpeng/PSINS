@@ -1,5 +1,5 @@
 #include ".\PSINSCore\kfapp.h"
-#include ".\PSINSCore\psins_demo.h"
+#include ".\Demo\PSINS_Demo.h"
 
 void main(void)
 {
@@ -18,7 +18,7 @@ void main(void)
 		if(!fimu.load(1)) break;
 		if(pDS->gpspos.i>0.1 && !hit3(pDS->t,500,600,900,1000,2000,2100))
 		{
-			kf.SetMeas(pDS->gpspos, pDS->gpsvn);
+			kf.SetMeasGNSS(pDS->gpspos, pDS->gpsvn);
 		}
 		kf.Update(&pDS->wm, &pDS->vm, 1, TS);
 

@@ -47,7 +47,7 @@ global glv
         wb = imu(k,1:3)'/ts; fb = imu(k,4:6)'/ts;
         dwb = (imu(k,1:3)-imu(k-1,1:3))'/ts/ts;
         SS = imulvS(wb, dwb);  fL = SS*[clbt.rx;clbt.ry;clbt.rz];
-        fb = fb + fL + clbt.tGA*cross(wb,fb);
+        fb = fb - fL + clbt.tGA*cross(wb,fb);
         imu(k,4:6) = fb'*ts;
         timebar(1);
     end

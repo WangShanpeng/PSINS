@@ -5,7 +5,7 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
 % Prototype: trj = odsimu(trj, inst, kod, qe, dt, ifplot)
 % Inputs: trj - from trjsimu
 %         inst - installation error angles from odometer(vehicle) to SIMU,
-%              inst=[dpitch;droll;dyaw] in arcmin, default 0 for no 
+%              inst=[dpitch;droll;dyaw] in rad, default 0 for no 
 %              installation error
 %         kod - odometer scale factor, default 1 for no scale factor error
 %         qe - quantitative equivalent, default 0 for no quantization
@@ -28,7 +28,7 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
     if nargin<3,  kod=1;   end   % default 1 for no scale factor error
     if nargin<2,  inst=0;   end
     if length(inst)==1,  inst=[1;1;1]*inst;  end
-    Cb1b0 = a2mat(-d2r(inst/60));  Cb0b1 = Cb1b0';
+    Cb1b0 = a2mat(inst);  Cb0b1 = Cb1b0';
     % SIMU rotation
     trj.imu(:,1:6) = [trj.imu(:,1:3)*Cb1b0', trj.imu(:,4:6)*Cb1b0'];
     % attitude rotation
@@ -38,6 +38,7 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
     end
     % distance increments
     pos = [trj.avp0(7:9)'; trj.avp(:,7:9)];
+%     dS = pos2dS(pos, 10);
     [RMh, clRNh] = RMRN(pos);
     dpos = diff(pos);
     dxyz = [[RMh(1:end-1), clRNh(1:end-1)].*dpos(:,1:2), dpos(:,3)];
@@ -46,10 +47,26 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
     dS = interp1([t(1)-1;t;t(end)+1],[dS(1);dS;dS(end)], t+dt); % time delay
     dS = cumsum([0;dS]);
     if qe==0
-        dS = diff(dS*kod);
+        dS = diff(dS/kod);
         if ifplot==1,  myfigure; plot(t,dS); xygo('Odometer / m');  end
     else
-        dS = fix(diff(dS*kod/qe));
+        dS = fix(diff(dS/kod/qe));
         if ifplot==1,  myfigure; plot(t,dS); xygo('Odometer / pulse');  end
     end
     trj.od = [dS,t];
+    avpd = drpure([trj.imu(:,1:6), trj.od], trj.avp0, inst, kod);  % re-calculate INS - IMU & AVP
+    avpd = [[trj.avp0',2*avpd(1,end)-avpd(2,end)]; avpd];
+    [trj.imu, trj.avp0, trj.avp] = ap2imu(avpd(:,[1:3,7:end]), trj.ts);
+    trj.avp(1,:) = [];
+
+function dS = pos2dS(pos, intk)
+    t = 1:length(pos);  t1 = 1:1/intk:t(end);
+    for k=1:3
+        pos1(:,k) = spline(t, pos(:,k), t1);
+    end
+    [RMh, clRNh] = RMRN(pos1);
+    dpos = diff(pos1);
+    dxyz = [[RMh(1:end-1), clRNh(1:end-1)].*dpos(:,1:2), dpos(:,3)];
+    dS = sqrt(sum(dxyz.^2,2));
+    dS = sumn(dS,intk);
+

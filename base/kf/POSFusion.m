@@ -12,7 +12,7 @@ function psf = POSFusion(rf, xpf, rr, xpr, ratio)
 %         r1, p1 - forward avp & coveriance
 %         r2, p2 - backward avp & coveriance
 %
-% See also  insupdate, kfupdate, POSProcessing, posplot.
+% See also  insupdate, kfupdate, POSSmooth, POSProcessing, posplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -39,4 +39,6 @@ function psf = POSFusion(rf, xpf, rr, xpr, ratio)
     r(:,1:3) = attfusion(r10(:,1:3), p1(:,1:3), r20(:,1:3), p2(:,1:3));
     rf = [r,t]; r1 = [r10,t]; r2 = [r20,t];
     pf = [p,t]; p1 = [p1,t];  p2 = [p2,t];
+    rf(isnan(rf)) = 0;
+    pf(isnan(pf)) = 0;
     psf = varpack(rf, pf, r1, p1, r2, p2);

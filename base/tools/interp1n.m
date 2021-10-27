@@ -6,7 +6,7 @@ function varargout = interp1n(x1t1, varargin)
 %         varargin - [x2t2, x3t3, ..., xktk, t, method]
 % Output: varargout - {x1t, x2t, ... xkt]
 %
-% See also interplim.
+% See also interplim, smoothol.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

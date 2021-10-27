@@ -19,7 +19,7 @@ function sstate = stateplot(state, maxst)
         mtmp = max(tmp);
         if mtmp>0, sstate = [sstate, tmp/mtmp*(k+1)]; end
     end
-    myfigure, plot(t, sstate, '*'); xygo('Running-state');
+    myfig, plot(t, sstate, '*'); xygo('Running-state');
     maxst0 = max(max(sstate));
     if nargin<2, maxst=0; end;
     maxst = max(maxst0,maxst)+0.2;

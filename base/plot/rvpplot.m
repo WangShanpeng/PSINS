@@ -1,7 +1,7 @@
 function rvpplot(rvp, p, clm)
 % Standard deviation of Kalman vel&pos measurement noise plot.
 %
-% Prototype: rvpplot(rvp)
+% Prototype: rvpplot(rvp, p, clm)
 % Inputs: rvp - =[Zk(vel), Zk(pos), Var(vel], Var(pos), t]
 %         p - if rvp=[Zk(vel), Zk(pos), t], then p=[Var(vel], Var(pos), t] 
 %

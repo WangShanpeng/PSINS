@@ -7,7 +7,7 @@ function xpplot(x, p, clm, unt, untstr, clm1, unt1, untstr1)
 %         unt - unit
 %         untstr = unit string to show in ylabel
 %
-% See also  kfplot, inserrplot, kffile.
+% See also  dataplot, kfplot, inserrplot, kffile, rvpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -23,6 +23,53 @@ global glv
     end
     if nargin<5, untstr = '*'; end
     if nargin<4, unt = 1; end
+    if nargin<3, clm = 1:length(x)-1; end
+    if ischar(clm), untstr=clm; clm=1; end
+    if ischar(unt), untstr=unt; unt=1; end
+    if strcmp(untstr,'phi')
+        if length(clm)<1, clm=1:3; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)/glv.min); xygo('phi');
+        subplot(212), plot(t, sqrt(p(:,1:3))/glv.min); xygo('phi');
+        return
+    end
+    if strcmp(untstr,'dvn')
+        if length(clm)<1, clm=4:6; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)); xygo('V');
+        subplot(212), plot(t, sqrt(p(:,1:3))); xygo('V');
+        return
+    end
+    if strcmp(untstr,'dpos')
+        if length(clm)<1, clm=4:6; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, [x(:,1:2)*glv.Re,x(:,3)]); xygo('dP');
+        subplot(212), plot(t, [sqrt(p(:,1:2))*glv.Re,sqrt(p(:,3))]); xygo('dP');
+        return
+    end
+    if strcmp(untstr,'ebdb')
+        if length(clm)<7, clm=10:15; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(221), plot(t, x(:,1:3)/glv.dph); xygo('eb');  title('Gyro drift')
+        subplot(222), plot(t, x(:,4:6)/glv.ug); xygo('db'); title('Acc bias')
+        subplot(223), plot(t, sqrt(p(:,1:3))/glv.dph); xygo('eb'); title('Std Gyro drift')
+        subplot(224), plot(t, sqrt(p(:,4:6))/glv.ug); xygo('db'); title('Std Acc bias')
+        return
+    end
+    if strcmp(untstr,'lever')
+        if length(clm)<3, clm=16:18; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)); xygo('lever'); title('Lever arm')
+        subplot(212), plot(t, sqrt(p(:,1:3))); xygo('lever'); title('std (Lever arm)')
+        return
+    end
+    if strcmp(untstr,'dT')
+        if length(clm)<1, clm=19; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1)); xygo('dT');
+        subplot(212), plot(t, sqrt(p(:,1))); xygo('dT');
+        return
+    end
     if strcmp(untstr,'dKG')
         if length(clm)<9, clm=20:28; end
         t = p(:,end); x = x(:,clm); p = p(:,clm);
@@ -50,8 +97,15 @@ global glv
         subplot(224), plot(t, sqrt(p(:,[2:4,6:8, 11:12,14]))/glv.sec); xygo('dKij'); title('Std Non-orthodox Gyro/Acc')
         return
     end
+    if strcmp(untstr,'yaw')
+        if length(clm)<1, clm=19; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1)/glv.deg); xygo('y');
+        subplot(212), plot(t, sqrt(p(:,1))/glv.deg); xygo('y');
+        return
+    end
     if strcmp(untstr,'kappa')
-        if length(clm)<19, clm=16:18; end
+        if length(clm)<3, clm=16:18; end
         t = p(:,end); x = x(:,clm); p = p(:,clm);
         subplot(221), plot(t, x(:,[1,3])/glv.deg); xygo('dP,dY / \circ'); title('Pitch/Yaw Install Angle')
         subplot(222), plot(t, x(:,2)*1000); xygo('dKod / 0.1%'); title('OD Scale Error')

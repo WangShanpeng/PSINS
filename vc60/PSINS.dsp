@@ -97,10 +97,6 @@ SOURCE=.\Main_SinsGps.cpp
 
 SOURCE=.\PSINSCore\PSINS.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=.\PSINSCore\PSINS_Demo.cpp
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -113,9 +109,17 @@ SOURCE=.\PSINSCore\KFApp.h
 
 SOURCE=.\PSINSCore\PSINS.h
 # End Source File
+# End Group
+# Begin Group "Demo Files"
+
+# PROP Default_Filter "h;cpp"
 # Begin Source File
 
-SOURCE=.\PSINSCore\PSINS_Demo.h
+SOURCE=.\Demo\PSINS_Demo.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Demo\PSINS_Demo.cpp
 # End Source File
 # End Group
 # Begin Group "Uart Files"
@@ -129,10 +133,6 @@ SOURCE=.\Uart\SerialPort.h
 
 SOURCE=.\Uart\SerialPort.cpp
 # End Source File
-# End Group
-# Begin Group "Resource Files"
-
-# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # End Group
 # End Target
 # End Project

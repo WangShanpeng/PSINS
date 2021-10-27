@@ -5,7 +5,7 @@ function miniplot(data, str)
 % Inputs: data - data to plot, 
 %         str - flag string
 %
-% See also  insplot, labeldef, mlplot, msplot.
+% See also  dataplot, insplot, labeldef, mlplot, msplot.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

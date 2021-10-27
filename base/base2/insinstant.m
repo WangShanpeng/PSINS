@@ -1,24 +1,29 @@
-function avp1 = insinstant(imu, avp, t0, t1)
+function avp1 = insinstant(imu, avp, t0, t1, avperr, phimu)
 % Process pure INS for short time within [t0,t1].
 %
-% Prototype: avp = insinstant(imu, avp, t0, t1)
+% Prototype: avp = insinstant(imu, avp, t0, t1, avperr, phimu)
 % Inputs: imu - SIMU data array
 %         avp - AVP parameters, avp = [att,vn,pos,t]
 %         t0 - start time in second.
 %         t1 - end time in second.
+%         avperr - = [phi; dvn; dpos].
+%         phimu - in avperr, phi is phi or mu error flag.
 % Output: avp1 - navigation results, avp1 = [att,vn,pos,t]
 %
 % See also  inspure, attpure, drinstant, trjsimu, insupdate.
 
-% Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
+% Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 23/06/2017
+% 23/06/2017, 05/10.2021
 global glv
     if size(avp,2)==4, avp=[avp(:,1:3), zeros(length(avp),6), avp(:,end)]; end
     if ~exist('t0', 'var'), t0 = avp(1,end); end
     if ~exist('t1', 'var'), t1 = imu(end,end); end
+    if ~exist('avperr', 'var'), avperr = zeros(9,1); end
+    if length(avperr)==3, avperr=[avperr;zeros(6,1)]; end
+    if ~exist('phimu', 'var'), phimu = 1; end
     idx0 = find(avp(:,end)>=t0,1);
-    avp0 = avp(idx0,:)';
+    avp0 = avpadderr(avp(idx0,:)',avperr, 1, phimu);
     idx0 = find(imu(:,end)>avp(idx0,end),1);
     idx1 = find(imu(:,end)<=t1,1,'last'); 
     if length(avp0)<9, avp0 = [avp0(1:3); zeros(6,1)]; end

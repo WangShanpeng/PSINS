@@ -6,7 +6,7 @@ function xygo(xtext, ytext)
 %             but if nargin==1, then the xtext will show in y-axis  
 %             with time label shown defaultly in x-axis.
 %
-% See also  labeldef, xyygo, myfig.
+% See also  labeldef, xyygo, myfig, xlimall.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -24,7 +24,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % Rmin = vperrset(0.1, 0.3).^2;
 % [avp1, xkpk, zkrk, sk, ins1, kf] = sinsgps(imu(t0/ts:t1/ts,:), gps, ins, avperr, imuerr, rep3(1), 0.1, vperrset(0.1,10), Pmin, Rmin, 'avped');
 % 
-% See also  kfinit, kfupdate, imugpssyn, igsplot.
+% See also  kfinit, kfupdate, imugpssyn, igsplot, insupdate, posprocessing.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -85,8 +85,8 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
                 kf.Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb,-ins.Mpvvn];
             else
                 measflag = 3;
-                zk = [ins.vnL+ins.tDelay*ins.an;ins.posL+dtpos]-gps(kgps,1:6)';
-                kf.Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.an;-ins.MpvCnb,-ins.Mpvvn]];
+                zk = [ins.vnL+ins.tDelay*ins.anbar;ins.posL+dtpos]-gps(kgps,1:6)';
+                kf.Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.anbar;-ins.MpvCnb,-ins.Mpvvn]];
             end
             kf = kfupdate(kf, zk, 'M');
             zkrk(kiz,:) = [zk; diag(kf.Rk); t];  kiz = kiz+1;
@@ -101,5 +101,5 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
     insplot(avp);
     kfplot(xkpk);
     rvpplot(zkrk);
-    stateplot(sk,2);
+    stateplot(sk,length(zk)/3);
 

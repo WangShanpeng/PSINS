@@ -11,6 +11,8 @@ function xyz = pos2dplot(pos0, varargin)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 24/05/2015
+    if nargin<2, varargin{1}=0; end
+    if length(varargin{end})==1, aequal=1; varargin(end)=[]; else, aequal=0; end  % for axis equal
     if size(pos0,2)>7, pos0=pos0(:,[7:9,end]); end   % avp->pos
     for k=1:length(varargin); 
         if size(varargin{k},2)>7, varargin{k}=varargin{k}(:,[7:9,end]); end
@@ -36,4 +38,5 @@ function xyz = pos2dplot(pos0, varargin)
     end
     xygo('est', 'nth');
 	legend(sprintf('%.2f, %.2f / DMS', r2dms(lat0),r2dms(lon0)));
+    if aequal==1, axis equal; end
 

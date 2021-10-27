@@ -1,4 +1,4 @@
-function sv = odplot(od, nsmooth, isplot)
+function [sv, sumod] = odplot(od, nsmooth, isplot)
 % Odometer plot.
 %
 % Prototype: sv = odplot(od, nsmooth, isplot)
@@ -20,11 +20,12 @@ function sv = odplot(od, nsmooth, isplot)
         nv = normv(od(:,1:3));
         if isplot, plot(od(:,end), od(:,1:3)/ts); end
     else
-        nv = od(:,1);
+        nv = od(:,1:end-1);
     end
-    vel = nv/ts; sv = smooth(vel,nsmooth);
+    vel = nv/ts; sv = smooth(vel(:,1),nsmooth);
     if isplot
-        hold on, plot(od(:,end), vel, 'm', od(:,end), sv, 'b');
+        hold on, plot(od(:,end), vel, '-', od(:,end), sv, ':b');
         xygo('OD Velocity / m/s');
-        title(sprintf('Distance = %.4f (m)', sum(nv)));
+        sumod = sum(nv);
+        title(sprintf('Distance = %.4f (m) ', sumod));
     end
