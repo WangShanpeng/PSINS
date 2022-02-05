@@ -1,4 +1,4 @@
-function att = attrottt(att0, rotparas, ts)
+function att = attrottt(att0, rotparas, ts, isfig)
 % Attitude data simulation rotated by turntable.
 %
 % Prototype: att = attrottt(att0, rotparas, ts)
@@ -6,6 +6,7 @@ function att = attrottt(att0, rotparas, ts)
 %         rotparas -  tuntable rotation parameter arrays recorded as:
 %                     [k, Ubx, Uby, Ubz, angles, T, T0, T1]
 %         ts - IMU sampling interval
+%         isfig - figure flag
 % Output: att - attitude output
 %
 % Example:
@@ -23,6 +24,7 @@ function att = attrottt(att0, rotparas, ts)
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 18/04/2019
+    if nargin<4, isfig=1; end
     if size(rotparas,2)==6, rotparas(:,7)=10; end
     if size(rotparas,2)==7, rotparas(:,8)=rotparas(:,7); end
     [b, a] = ar1coefs(ts, 10*ts);
@@ -43,4 +45,4 @@ function att = attrottt(att0, rotparas, ts)
         Stage=rpi(1),
     end
     att(:,4) = (1:size(att,1))'*ts;
-    insplot(att,'a');
+    if isfig==1, insplot(att,'a'); end

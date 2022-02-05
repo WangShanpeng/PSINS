@@ -1,4 +1,5 @@
 function [Xkk_1, Phikk_1] = Jacob5(Xk_1, wnie, fn, ts)
+% Ref. Yan's Post-doctoral research report Eq.(4-23).
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 05/09/2013

@@ -1,4 +1,4 @@
-function [kf, ins] = kffeedback(kf, ins, T_fb, fbstr)
+function [kf, ins, xfb_tmp] = kffeedback(kf, ins, T_fb, fbstr)
 % Kalman filter state estimation feedback to SINS.
 %
 % Prototype: [kf, ins] = kffeedback(kf, ins, T_fb)

@@ -14,7 +14,7 @@ function [sigma, tau, Err] = avar(y0, tau0, str, isfig)
 %     y = randn(100000,1) + 0.00001*[1:100000]';
 %     [sigma, tau, Err] = avar(y, 0.1, 2);
 %
-% See also  avarsimu, avarfit, avar2, avars, meann, sumn.
+% See also  avarsimu, avarfit, avar2, avars, oavar, meann, sumn.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -33,7 +33,7 @@ function [sigma, tau, Err] = avar(y0, tau0, str, isfig)
     end
     if nargin<4, isfig=1; end
     if nargin<3, str=[]; end
-    if isnumeric(str), isfig=str; str=[]; end
+    if isnumeric(str), isfig=str; str=[]; end  % avar(y0, tau0, 1)
     if isfig
         figure('Color','White');
         if isempty(str), str = '\itx \rm/ ( (\circ) / h )'; end

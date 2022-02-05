@@ -65,6 +65,14 @@ switch(psinsdef.kfinit)
         kf.Rk = diag(r0)^2;
         kf.Pxk = diag([davp; imuerr.eb; imuerr.db; lever; dT]*1.0)^2;
         kf.Hk = zeros(6,19);
+    case psinsdef.kfinit331,
+        psinsdef.kffk = 33;  psinsdef.kfhk = 331;  psinsdef.kfplot = 33;
+        [davp, imuerr, r0] = setvals(varargin);
+        kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(9+15+3,1)])^2;
+        kf.Rk = diag(r0)^2;
+        kf.Pxk = diag([davp; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.KA2])^2;
+        kf.Hk = kfhk(ins);
+        kf.xtau(1:psinsdef.kffk,1) = 0;
     case psinsdef.kfinit346,
         psinsdef.kffk = 34;  psinsdef.kfhk = 346;  psinsdef.kfplot = 34;
         [davp, imuerr, lever, dT, r0] = setvals(varargin);

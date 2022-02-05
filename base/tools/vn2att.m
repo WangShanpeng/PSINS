@@ -28,7 +28,7 @@ global glv
     idx = vl<th;
     att(idx,1:3) = 0;
     if isfig==1
-        myfigure
+        myfig;
         subplot(211), plot(vn(:,end), vn(:,1:3)); xygo('V');
         subplot(212), plot(att(:,end), att(:,1:3)/glv.deg); xygo('att');
     end

@@ -8,9 +8,16 @@ function [data, idx] = datacut(data0, t1, t2)
 %
 % See also  datadel, getat, combinet.
 
-% Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
+% Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 17/09/2014
+% 17/09/2014, 12/11/2021
+    if length(t1)>1
+        data = [];
+        for k=1:length(t1)
+            data = [data; datacut(data0, t1(k), t2(k))];
+        end
+        return;
+    end
     if nargin<3, t2=data0(end,end); end
     i1 = find(data0(:,end)>=t1, 1, 'first');
     i2 = find(data0(:,end)<=t2, 1, 'last');

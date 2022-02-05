@@ -6,7 +6,9 @@
 
 initfile = dir('psinsinit.m');
 if isempty(initfile) % ~strcmp(initfile.name,'psinsinit.m')
-    error('Please set the current working directory to PSINS.'); 
+%     error('Please set the current working directory to PSINS.'); 
+    uiwait(warndlg('Initialization failure!!! Please set Matlab current working directory to PSINS.','PSINS','modal'));
+    return;
 end
 %% Remove old PSINS path from search path.
 pp = [';',path,';'];

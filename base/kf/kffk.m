@@ -1,14 +1,13 @@
 function [Fk, Ft] = kffk(ins, varargin)
-% Establish Kalman filter system transition matrix.
+% Create Kalman filter system transition matrix.
 %
-% Prototype: [Fk, Ft] = kffk(ins, fkno, varargin)
+% Prototype: [Fk, Ft] = kffk(ins, varargin)
 % Inputs: ins - SINS structure array, if not struct then nts=ins;
-%         fkno - type NO. to get Ft, but fkno=0 for specific demand
 %         varargin - if any other parameters
-% Outputs: Fk - discrete-time transition matrix
+% Outputs: Fk - discrete-time transition matrix, = Phikk_1
 %          Ft - continuous-time transition matirx
 %
-% See also  kfhk, kfinit, kfupdate, kfc2d, insupdate, etm, psinstypedef.
+% See also  kfhk, kfinit, kfupdate, kfc2d, insupdate, etm, psinstypedef, ekffk.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -24,6 +23,12 @@ global psinsdef
         case {18,19} % psinsdef.kffkxx, xx=18,19
             Ft = etm(ins);
             Ft(psinsdef.kffk, psinsdef.kffk) = 0;
+        case {33}
+            Ft = etm(ins);
+            Ft(psinsdef.kffk,psinsdef.kffk) = 0;
+            % 15+dKg(9)+dKa(6)+KA2(3)
+            Ft(1:3,16:24) = [-ins.wib(1)*ins.Cnb, -ins.wib(2)*ins.Cnb, -ins.wib(3)*ins.Cnb];
+            Ft(4:6,25:33) = [ins.fb(1)*ins.Cnb, ins.fb(2)*ins.Cnb(:,2:3), ins.fb(3)*ins.Cnb(:,3), ins.Cnb*diag(ins.fb.^2)];
         case {34, 37}
             Ft = etm(ins);
             Ft(psinsdef.kffk,psinsdef.kffk) = 0;

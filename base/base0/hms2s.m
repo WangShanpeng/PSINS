@@ -8,7 +8,7 @@ function s = hms2s(hhmmss)
 %    s = hms2s(123456.78);  % or  s = hms2s([12 ,34, 56.78]);      
 %       >>  s = 45296.78
 %
-% See also  dms2r.
+% See also  s2hms, dms2r.
 
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

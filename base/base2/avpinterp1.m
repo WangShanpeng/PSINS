@@ -3,7 +3,7 @@ function avp = avpinterp1(avp, t, method)
 %
 % Prototype: avp = avpinterp1(avp, t, method)
 % Inputs: avp - input avp
-%         t - time tag
+%         t - time tag, or sampling interval ts
 %         method - 'nearest'/'linear' etc, see interp1
 % Output: avp - interpolated avp
 %
@@ -13,6 +13,7 @@ function avp = avpinterp1(avp, t, method)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 13/11/2019
     if ~exist('method', 'var'), method = 'linear'; end
+    if length(t)==1; t = (avp(1,end):t:avp(end,end))'; end
     i1 = find(t>=avp(1,end),1,'first');
     i2 = find(t<=avp(end,end),1,'last');
     t = t(i1:i2);

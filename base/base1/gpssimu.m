@@ -51,8 +51,12 @@ global glv
     gpsVnPos = zeros(length(idx),7); kk=1;
     for k=1:length(idx) % lever arm + time delay
         ik = idx(k);
+        if k==395
+            aa = 1;
+        end
         avpi = avpinterp(avp(ik,1:9),avp(ik+1,1:9),rt(k)/ts)';
-        wnb = a2cwa(avp(ik+1,1:3)')*(avp(ik+1,1:3)-avp(ik,1:3))'/ts; % wnb~=web
+%         wnb = a2cwa(avp(ik+1,1:3)')*(avp(ik+1,1:3)-avp(ik,1:3))'/ts; % wnb~=web
+        wnb = m2rv(a2mat(avp(ik,1:3)')'*a2mat(avp(ik+1,1:3)'))/ts;
         vngps = avpi(4:6)+a2mat(avpi(1:3)')*cros(wnb,lever);
         gpsVnPos(kk,:) = [vngps; avpi(7:9)+la2dpos(avpi, lever); round(avp(ik,end))]';  kk = kk+1;
     end

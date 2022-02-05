@@ -33,7 +33,7 @@ global glv
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos); vn = zeros(3,1); Cnn = rv2m(-eth.wnie*nts/2);
     kf = avnkfinit(nts, pos, phi0, imuerr, wvn);
-    [attk, xkpk] = prealloc(fix(len/nn), 4, 2*kf.n+1);
+    [attk, xkpk] = prealloc(fix(len/nn), 7, 2*kf.n+1);
     ki = timebar(nn, len, 'Initial align using vn as meas (STEKF).');
     for k=1:nn:len-nn+1
         wvm = imu(k:k+nn-1,1:6);  t = imu(k+nn-1,end);
@@ -44,14 +44,14 @@ global glv
         qnb = qupdt2(qnb, phim, eth.wnin*nts);
         Fev = [0 -1.0/eth.RMh 0;  1.0/eth.RNh 0 0;  tan(eth.pos(1))/eth.RNh 0 0];  %vvv
         kf.Ft(1:3,1:9) = [-askew(eth.wnin)+Fev*askew(vn), Fev, -Cnb];  
-        kf.Ft(4:6,1:12) = [-askew(eth.gn)-askew(vn)*askew(eth.wnie), -askew(2*eth.wnie+eth.wnen), askew(vn), Cnb]; 
+        kf.Ft(4:6,1:12) = [-askew(eth.gn)-askew(vn)*askew(eth.wnie), -askew(2*eth.wnie+eth.wnen), askew(vn)*Cnb, Cnb]; 
         kf.Phikk_1 = kf.I + kf.Ft * nts;
         kf.Hk(:,1:3) = askew(vn);
         kf = kfupdate(kf, vn);
         qnb = qdelphi(qnb, kf.xk(1:3)); kf.xk(1:3) = 0*kf.xk(1:3);
         deta_v = kf.xk(4:6)+askew(vn)*kf.xk(1:3);
         vn = vn-deta_v;  kf.xk(4:6) = 0*kf.xk(4:6);          %^^^
-        attk(ki,:) = [q2att(qnb)', t];
+        attk(ki,:) = [q2att(qnb)', vn', t];
         xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t];
         ki = timebar;
     end

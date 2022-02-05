@@ -37,6 +37,10 @@ global psinsdef
                 end
             end
             inserrplot([sqrt(xkpk(:,psinsdef.kfplot+1:end-1)),xkpk(:,end)]);
+        case 30
+            inserrplot(xkpk(:,[1:15,end]));
+            inserrplot(xkpk(:,[16:30,end]),'kgka');
+            inserrplot([sqrt(xkpk(:,31:60)),xkpk(:,end)]);
         case 34
             inserrplot(xkpk(:,[1:19,end]));
             if nargin>1, trueplot19(varargin); end

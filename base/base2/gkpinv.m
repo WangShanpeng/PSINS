@@ -7,7 +7,7 @@ function BL = gkpinv(gk, xy, lgiCenter)
 %         lgiCenter - central meridian in rad
 % Output: BL - [latitude; longitude] in rad
 %
-% See also  gkpinit, gkprj.
+% See also  gkpinit, gkprj, gkpinvBatch.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

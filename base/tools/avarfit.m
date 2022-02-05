@@ -38,7 +38,7 @@ global gtau hls ys mkva1 mkvb1 mkva2 mkvb2 htext
     ys(:,6) = ararmkv(mkva1,mkvb1);
     ys(:,7) = ararmkv(mkva2,mkvb2);
     ys(:,8) = normv(ys(:,1:7),2);
-    myfig; hls(8)=loglog(tau, ys(:,8), '-g', 'linewidth',2); xygo('\tau / s', '\sigma_A / ( \circ / h )');
+    myfig; hls(8)=loglog(tau, ys(:,8), '-g', 'linewidth',2); xygo('\it\tau\rm / s', '\it\sigma\rm_A / ( ( \circ ) / h )');
     hls(9)=loglog(tau, sigma, '-m*', 'linewidth',2);  legend('AVAR fitted', 'AVAR original');
     str = ['Q '; 'N '; 'B '; 'K '; 'R '; 'M1'; 'M2'];
     for k=1:7

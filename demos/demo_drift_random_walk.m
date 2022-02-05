@@ -6,8 +6,8 @@ glvs
 ts = 0.1;
 t = 1*3600;
 len = fix(t/ts);
-imuerr = imuerrset(0, 0, 0.01, 10);
-imu = imuadderr(zeros(len,6), imuerr, ts);
+imuerr = imuerrset(0, 0, 0.01, 100);
+imu = imuadderr([zeros(len,6),(1:len)'*ts], imuerr);
 imu = cumsum(imu, 1);  % accumulate
 myfigure;
 tt = (1:len)'*ts; 

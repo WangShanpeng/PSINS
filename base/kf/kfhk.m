@@ -1,5 +1,5 @@
 function Hk = kfhk(ins, varargin)
-% Establish Kalman filter measurement matrix.
+% Create Kalman filter measurement matrix.
 %
 % Prototype: Hk = kfhk(ins, varargin)
 % Inputs: ins - SINS structure array from function 'insinit'
@@ -15,20 +15,22 @@ global psinsdef
     switch(psinsdef.kfhk)
         case 153,
             Hk = [zeros(3,6), eye(3), zeros(3,6)];
+        case 156
+            Hk = [zeros(6,3), eye(6), zeros(6,6)];
         case 183 % glv.psinsdef.kfhkxx3
             Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb];
+        case 186
+            Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW;-ins.MpvCnb]];
         case 193 % glv.psinsdef.kfhkxx3
             Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb, -ins.Mpvvn];
+        case 196
+            Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.an;-ins.MpvCnb,-ins.Mpvvn]];
+        case 331
+            Hk = zeros(1,33);
         case 343 % glv.psinsdef.kfhkxx3
             Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb, -ins.Mpvvn, zeros(3,15)];
         case 373
             Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb, -ins.Mpvvn, zeros(3,18)];
-        case 156
-            Hk = [zeros(6,3), eye(6), zeros(6,6)];
-        case 186
-            Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW;-ins.MpvCnb]];
-        case 196
-            Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.an;-ins.MpvCnb,-ins.Mpvvn]];
         case 346
             Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.an;-ins.MpvCnb,-ins.Mpvvn], zeros(6,15)];
         case 376

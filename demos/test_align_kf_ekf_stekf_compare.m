@@ -5,15 +5,16 @@
 % 26/10/2021
 glvs;
 ts = 0.02; 
-attr = [1;2;10]*glv.deg;  pos0 = glv.pos0;
+attr = [0;0;20]*glv.deg;  pos0 = glv.pos0;
 imuerr = imuerrset(0.03, 100, 0.001, 1);
-imu = imustatic([attr;pos0], ts, 300, imuerr);  % imuplot(imu);
+imu = imustatic([attr;pos0], ts, 600, imuerr);  % imuplot(imu);
 %%
-phi = -1.0*[3; 3; 18]*glv.deg;      % Please modify here, '0.1*, 1.0*, or 10.0*'
+phi = 1*[2; 3; 18]*glv.deg;      % Please modify here, '0.1*, 1.0*, 5.0* or 10.0*'
 att = qaddafa(a2qua(attr),phi);
 phi0 = [5; 5; 30]*glv.deg; wvm = 0.01; isfig = 0;
 [att0, attk, xkpk] = alignvn(imu, att, pos0, phi0, imuerr, wvm, isfig);
 [att1, attk1, xkpk1] = alignvn_ekf(imu, att, pos0, phi0, imuerr, wvm, isfig);
+% [att1, attk1, xkpk1] = alignvn_stekf0(imu, att, pos0, phi0, imuerr, wvm, isfig); xkpk1=xkpk1(:,[1:5,13:17,end]);
 [att2, attk2, xkpk2] = alignvn_stekf(imu, att, pos0, phi0, imuerr, wvm, isfig);
 %%
 myfig,

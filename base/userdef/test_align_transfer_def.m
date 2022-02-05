@@ -1,5 +1,5 @@
 function out = test_align_transfer_def(tag, varargin)
-% See also  kfinit, kffk, kfhk, kfplot.
+% See also  test_align_transfer, kfinit, kffk, kfhk, kfplot.
 global glv psinsdef
 switch tag
 	case psinsdef.kfinittag,
@@ -14,6 +14,7 @@ switch tag
                     [10;10;10]*glv.deg; [1;1;1]*glv.deg; [10;10;10]*glv.dps])^2;
         out = kf;
     case psinsdef.kffktag,
+        % 21-states: phi(3), dV(3), eb(3), db(3), mu(3), theta(3), w(3)
     case psinsdef.kfhktag,
     case psinsdef.kfplottag,
         [xkpk, res, imuerr, mub, thetak, omegak] = setvals(varargin);

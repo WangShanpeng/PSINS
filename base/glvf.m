@@ -30,12 +30,14 @@ global glv
     glv.mg = 1.0e-3*glv.g0;         % milli g
     glv.ug = 1.0e-6*glv.g0;         % micro g
     glv.mGal = 1.0e-3*0.01;         % milli Gal = 1cm/s^2 ~= 1.0E-6*g0
+    glv.uGal = glv.mGal/1000;       % micro Gal
     glv.ugpg2 = glv.ug/glv.g0^2;    % ug/g^2
     glv.ws = 1/sqrt(glv.Re/glv.g0); % Schuler frequency
     glv.ppm = 1.0e-6;               % parts per million
     glv.deg = pi/180;               % arcdeg
     glv.min = glv.deg/60;           % arcmin
     glv.sec = glv.min/60;           % arcsec
+    glv.mas = glv.sec/1000;         % milli arcsec
     glv.hur = 3600;                 % time hour (1hur=3600second)
     glv.dps = pi/180/1;             % arcdeg / second
     glv.dph = glv.deg/glv.hur;      % arcdeg / hour
@@ -71,6 +73,7 @@ global glv
     glv.eth = []; glv.eth = earth(glv.pos0);
     glv.t0 = 0;
     glv.tscale = 1;  % =1 for second, =60 for minute, =3600 for hour, =24*3600 for day
+    glv.isfig = 1;
     %%
     [glv.rootpath, glv.datapath, glv.mytestflag] = psinsenvi;
     glv1 = glv;

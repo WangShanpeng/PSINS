@@ -6,7 +6,7 @@ function wvm = imurot(wvm0, rot)
 %         rot - rot=[rotX; rotY; rotZ] are usually small angles 
 % Output: wvm - SIMU data output after rotation
 %
-% See also  imurfu, avprot, imuresample, imuadderr, insupdate, trjsimu.
+% See also  imurfu, avprot, apmove, imuresample, imuadderr, insupdate, trjsimu.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

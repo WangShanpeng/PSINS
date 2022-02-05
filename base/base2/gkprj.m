@@ -1,13 +1,13 @@
 function xy = gkprj(gk, BL, lgiCenter)
 % Gauss-Kruger projection.
 %
-% Prototype: gk = gkprj(gk, BL)
+% Prototype: gk = gkprj(gk, BL, lgiCenter)
 % Inputs: gk - Gauss-Kruger projection initialization array using gkpinit()
 %         BL - [latitude; longitude] in rad
 %         lgiCenter - central meridian in rad
 % Output: xy - xy coordinate
 %
-% See also  gkpinit, gkpinv.
+% See also  gkpinit, gkpinv, gkprjBatch, gkpinvBatch.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

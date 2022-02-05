@@ -7,7 +7,7 @@ clear all
 glvs
 ts = 0.01;
 vel0 = 180;
-avp0 = avpset([0;0;-30], vel0, [34;108;380+1000]);
+avp0 = avpset([0;0;0], vel0, [34;108;380+1]);
 roll_f = 0.5;  % roll frequency
 t = (0:ts:0.5/roll_f)';
 roll = 20*glv.deg * [cos(2*pi*roll_f*t)-1; 

@@ -61,7 +61,8 @@ global glv
     att0 = attk(end,1:3)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
     avnplot(attk, xkpk);
-    kfs = kfstat(kfs, kf);
+    kfs = kfstat(kfs);
+    kfsplot(kfs, 0);
     
 function kf = avnkfinit(nts, pos, phi0, imuerr, wvn)
     eth = earth(pos); wnie = eth.wnie;
@@ -92,3 +93,23 @@ global glv
 	subplot(424); plot(t, sqrt(xkpk(:,16:18))); xygo('dV');
 	subplot(426); plot(t, sqrt(xkpk(:,19:21))/glv.dph); xygo('eb');
  	subplot(428); plot(t, sqrt(xkpk(:,22:24))/glv.ug); xygo('db');   
+    
+function kfsplot(kfs, ispercent)
+global glv
+    myfigure, % mesh(repmat((1:n)',1,2*n+m),repmat(1:2*n+m,n,1),kfs.pqr);
+    if ispercent==1
+        pqr = [kfs.p, kfs.q, kfs.r]*100;
+        subplot(221), bar(pqr(1:3,:)'); title('( a )'); xygo('j', 'Percentage'); legend('\phi_E', '\phi_N', '\phi_U')
+        subplot(222), bar(pqr(4:6,:)'); title('( b )'); xygo('j', 'Percentage'); legend('\deltav^n_E', '\deltav^n_N', '\deltav^n_U')
+        subplot(223), bar(pqr(7:9,:)'); title('( c )'); xygo('j', 'Percentage'); legend('\epsilon^b_x', '\epsilon^b_y', '\epsilon^b_z')
+        subplot(224), bar(pqr(10:12,:)'); title('( d )'); xygo('j', 'Percentage'); legend('\nabla^b_x', '\nabla^b_y', '\nabla^b_z')
+    else  % ?
+        pqr = sqrt([kfs.p, kfs.q, kfs.r]); Pii = diag(kfs.Pk);  % 12+6+3
+        for k=1:length(pqr), pqr(:,k)=sqrt(pqr(:,k).*Pii); end
+        subplot(221), bar(pqr(1:3,:)'/glv.min); xygo('j', 'phi');  legend('\phi_E', '\phi_N', '\phi_U')
+        subplot(222), bar(pqr(4:6,:)'); xygo('j', 'dV'); legend('\deltav^n_E', '\deltav^n_N', '\deltav^n_U')
+        subplot(223), bar(pqr(7:9,:)'/glv.dph); xygo('j', 'eb'); legend('\epsilon^b_x', '\epsilon^b_y', '\epsilon^b_z')
+        subplot(224), bar(pqr(10:12,:)'/glv.ug); xygo('j', 'db'); legend('\nabla^b_x', '\nabla^b_y', '\nabla^b_z')
+    end
+
+

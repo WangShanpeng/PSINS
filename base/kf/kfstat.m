@@ -3,7 +3,7 @@ function kfs = kfstat(kfs, kf, flag)
 % Ref. 'Yan G. Error Distribution Method and Analysis of Observability Degree 
 %      Based on the Covariances in Kalman Filter, CCC2018'.
 %
-% See also  alignvn_kfs, kfupdate.
+% See also  alignvn_kfs, tbinseval, kfupdate, sinsgps.
 
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -55,42 +55,24 @@ global glv
             end
             kfs.Pk = Bkk_1*kfs.Pk*Bkk_1'+kf.Kk*kf.Rk*kf.Kk';
         end         
-    elseif nargin==2 && ~isempty(kfs)   %  plot,   kfs = kfstat(kfs, kf)
-        n = length(kfs.P0); m = length(kfs.Rsk);
-        p = zeros(n); q = zeros(n,kf.l); r = zeros(n,m);
+    else   %  plot,   kfs = kfstat(kfs)
+        n = length(kfs.P0); kfl = length(kfs.Qjk); m = length(kfs.Rsk);
+        p = zeros(n); q = zeros(n,kfl); r = zeros(n,m);
         kfs.Pk0 = kfs.Ak0*kfs.P0*kfs.Ak0';
         for ll=1:n
-%             Pkll = 1;
             Pkll = kfs.Pk(ll,ll)+eps*eps;
             for jj=1:n
                 p(ll,jj) = kfs.Ak0(ll,jj)*kfs.P0(jj,jj)*kfs.Ak0(ll,jj)/Pkll;
             end
-            for jj=1:kf.l
+            
+            for jj=1:kfl
                 q(ll,jj) = kfs.Qjk{jj}(ll,ll)/Pkll;
             end
             for ss=1:m
                 r(ll,ss) = kfs.Rsk{ss}(ll,ll)/Pkll;
             end
         end
-        kfs.p = p; kfs.q = q; kfs.r = r;
-        kfs.err = [sum([p, q, r],2) - diag(kfs.Pk)];
-%         for ll=1:2*n+m, kfs.pqr(:,ll) = kfs.pqr(:,ll)/max(abs(kfs.pqr(:,ll))); end
-%         for ll=1:n, kfs.pqr(ll,:) = kfs.pqr(ll,:)/max(abs(kfs.pqr(ll,:))); end
-        myfigure,% mesh(repmat((1:n)',1,2*n+m),repmat(1:2*n+m,n,1),kfs.pqr);
-        if Pkll==1
-            kfs.pqr = sqrt([p, q, r]);
-            subplot(321), bar(kfs.pqr(1:3,:)'/glv.min); grid on
-            subplot(322), bar(kfs.pqr(4:6,:)'); grid on
-            subplot(323), bar([kfs.pqr(7:8,:)'*glv.Re,kfs.pqr(9,:)']); grid on
-            subplot(324), bar(kfs.pqr(10:12,:)'/glv.dph); grid on
-            subplot(325), bar(kfs.pqr(13:15,:)'/glv.ug); grid on
-            subplot(326), bar(kfs.pqr(16:18,:)'); grid on
-        else
-            kfs.pqr = [p, q, r]*100;
-            subplot(221), bar(kfs.pqr(1:3,:)'); title('( a )'); xygo('j', 'Percentage'); legend('\phi_E', '\phi_N', '\phi_U')
-            subplot(222), bar(kfs.pqr(4:6,:)'); title('( b )'); xygo('j', 'Percentage'); legend('\deltav^n_E', '\deltav^n_N', '\deltav^n_U')
-            subplot(223), bar(kfs.pqr(7:9,:)'); title('( c )'); xygo('j', 'Percentage'); legend('\epsilon^b_x', '\epsilon^b_y', '\epsilon^b_z')
-            subplot(224), bar(kfs.pqr(10:12,:)'); title('( d )'); xygo('j', 'Percentage'); legend('\nabla^b_x', '\nabla^b_y', '\nabla^b_z')
-        end
+        kfs.p = p; kfs.q = q; kfs.r = r;  % p,q,r in Percentage
+        kfs.err = sqrt(sum([p, q, r],2)) - 1;
     end
         

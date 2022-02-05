@@ -5,7 +5,7 @@ function avp = gps2avp(gps, isfig)
 % Input: gps - GNSS vel/pos array
 % Output: avp - tracking attitude, vn and pos
 %
-% See also  vn2att.
+% See also  vn2att, pp2vn.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -16,7 +16,7 @@ function avp = gps2avp(gps, isfig)
         avp = gps2avp([vn(:,1:3), gps]);
         if isfig, insplot(avp); end
     elseif size(gps,2)==7  % gps=[vn,pos,t]
-        att = vn2att(gps(:,[1:3,end]));
+        att = vn2att(gps(:,[1:3,end]),0.3);
         avp = [att(:,1:3), gps];
         if isfig, insplot(avp); end
     end

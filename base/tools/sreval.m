@@ -11,7 +11,7 @@ function err = sreval(errs, t, dvel_dyaw, dK_roll, isfig)
 % Example:
 %    err = sreval([10, 1, 0.2, 0.3, 10], 60, [100, 1], [2, 100]);
 %
-% See also  N/A.
+% See also  tbinseval, kfstat.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -1247,8 +1247,11 @@ void CSerialPort::ReceiveStr(CSerialPort* port)
 		commInfo.bytesRead = BytesRead;
 		// notify parent that some byte was received
 //		::SendMessage((port->m_pOwner), WM_COMM_RXSTR, (WPARAM)RXBuff, (LPARAM)&commInfo);
+
+#ifdef PSINS_CONSOLE_UART
 extern CUartPP *pUart;
 pUart->push((const unsigned char*)RXBuff, commInfo.bytesRead);
+#endif // PSINS_CONSOLE_UART
 		
 #endif
 

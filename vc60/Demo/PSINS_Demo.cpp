@@ -1,10 +1,25 @@
 #include "PSINS_Demo.h"
 
 #ifdef  PSINSDemo
+double data[][2] =
+{
+	{-100, 1}, 
+	{1,2},
+	{2,3},
+	{100,5},
+};
 
 void Demo_User(void)
 {
-	CVect3 att = sv2att(CVect3(2,3,1), 0.0, CVect3(1,2,3))/DEG;
+//	CInterp int1(data, 4, 2);
+	CInterp int1("D:\\ygm2021\\小论文\\惯性天文误差分析\\dut1.bin", 2);
+	FILE *f=fopen("D:\\ygm2021\\小论文\\惯性天文误差分析\\int.txt", "wt");
+	for(int k=1; k<100; k++) {
+		double t = 2000 + k/10.0 + randn(0,1)/10;
+		double d = int1.Interp(t);
+		fprintf(f, "%f, %f \n", t, d);
+	}
+	fclose(f);
 }
 
 void Demo_CIIRV3(void)
@@ -74,15 +89,26 @@ void Demo_CRAvar(void)
 void Demo_CSINS_static(void)
 {
 	CFileRdWt::Dir("..\\Data\\", ".\\Data\\");;	CFileRdWt fins("ins.bin");
-	double ts=1, t;
+	double ts=1.0;
 	CVect3 att0=PRY(1,1.01,3), vn0=O31, pos0=LLH(34,0,0);
 	CVect3 wm[2], vm[2];
 	IMUStatic(wm[0], vm[0], att0, pos0, ts); wm[1]=wm[0]; vm[1]=vm[0]; // static IMU simuation
-	CSINS sins(a2qua(att0)+CVect3(0,0,1)*glv.min, O31, pos0);
-	for(t=0.0; t<24*3600.0; t+=2*ts)
+	CSINS sins(a2qua(att0)+CVect3(0,0,0)*glv.min, O31, pos0);
+	CCNS cns; double jd=cns.JD(2021,11,1); cns.GetCie(jd,0); CMat3 NP0=cns.CN*cns.CP;
+	for(int i=0; i<1*24*3600; i+=2)
 	{
-		sins.Update(wm, vm, 2, ts);  sins.pos.k = pos0.k;
-		fins<<sins;
+		sins.Update(wm, vm, 2, ts);  sins.vn.k=0; sins.pos.k = pos0.k;
+		if(i%36000==0) {
+			double T1 = cns.TT + i/(3600*24*36525.0);
+			cns.Precmat(T1), cns.Nutmat(T1);
+			CMat3 NP = cns.CN*cns.CP;
+			CVect3 rv = q2rv(m2qua(NP0*(~NP)));  NP0=NP;
+			wm[1] = wm[0]+rv;
+			fins<<sins;
+		}
+		else
+			wm[1]=wm[0];
+		disp(i,1,3600);
 	}
 }
 
@@ -231,6 +257,44 @@ void Demo_POS618(void)
 	pos.Process("posres.bin");
 }
 
+void Demo_CNS_PrecNut(void)
+{
+	FILE *f = fopen("D:\\psins211118\\cns\\sofapn0.txt", "w");
+	CCNS cns;
+	for(int i=-1000; i<=1000; i++)
+	{
+		double jd2000 = i*3.6525;
+		double T = jd2000/36525;
+		cns.Precmat(T); cns.Nutmat(T);
+		CVect3 ap=m2att(~cns.CP),  an=m2att(~cns.CN);
+		fprintf(f, "%e, %e, %e, %e, %e, %e, %e, %e, %e, %e \n", 2000+jd2000/365.25, ap.i, ap.j, ap.k, an.i, an.j, an.k);
+	}
+	fclose(f);
+}
+
+void Demo_SINSCNS(void)
+{
+	CFileRdWt::Dir("D:\\ygm2021\\中科华芯\\空工大惯导\\跑车数据20211109\\"); // test_SINS_CNS_to_from_VC60.m
+	CFileRdWt fimu("imucns.bin",-11); CFileRdWt fins("ins.bin"), fkf("kf.bin");
+	CVect3 *pwm=(CVect3*)&fimu.buff[0], *pvm=(CVect3*)&fimu.buff[3], *pqis=(CVect3*)&fimu.buff[7]; 
+	double *pt=&fimu.buff[6], ts=0.01;
+	CSINSGNSSCNS kf(ts);
+	fimu.load(0);
+	kf.SetCNS(2021,11,22,12*3600, -0.1,37);
+	kf.Init(CSINS(CVect3(0.01,0.02,0.3)*glv.deg,O31,CVect3(0.59770629,1.9008322240407,380),0.0),0);
+	for(int i=0; i<5000*100; i++)
+	{
+		if(!fimu.load(1)) break;
+		kf.Update(pwm, pvm, 1, ts);  kf.sins.pos.k=380;
+		if(norm(*pqis)>1e-6)
+			kf.SetMeasCNS(*pqis);
+		if(i%20==0 || norm(*pqis)>1e-6)
+			fins<<kf.sins;
+		if(i%20==0) fkf<<kf;
+		disp(i, 100, 100);
+	}
+}
+
 void Demo_CVCFileFind(void)
 {
 #ifdef PSINS_VC_AFX_HEADER
@@ -273,10 +337,10 @@ void Demo_DSP_main(void)
 	}*/
 }
 
-#ifdef PSINS_CONSOLE_UART
 
 void Demo_CONSOLE_UART(void)
 {
+#ifdef PSINS_CONSOLE_UART
 	FILE *f;
 	if(!(f=fopen(".\\Data\\pbcomsetting.txt","rt"))) {
 		printf("未找到配置文件 .\\Data\\pbcomsetting.txt！"); getch(); exit(0);	}
@@ -304,8 +368,8 @@ void Demo_CONSOLE_UART(void)
 			if(i%100==0&&fmh.rwf) fflush(fmh.rwf);
 		}
 	}
+#endif // PSINS_CONSOLE_UART
 }
 
-#endif // PSINS_CONSOLE_UART
 
 #endif  // PSINSDemo

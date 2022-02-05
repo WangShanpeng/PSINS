@@ -12,7 +12,7 @@
 
 #include "..\PSINSCore\PSINS.h"
 
-#define PSINSDemo 13
+#define PSINSDemo 0
 
 #define psinsdemo()  \
 	switch(PSINSDemo)\
@@ -32,9 +32,11 @@
 	case 11: Demo_CSINSGNSSDR(); break;\
 	case 12: Demo_SINSOD(); break;\
 	case 13: Demo_POS618(); break;\
-	case 14: Demo_CVCFileFind(); break;\
-	case 15: Demo_DSP_main(); break; \
-	case 16: Demo_CONSOLE_UART(); break; \
+	case 14: Demo_CNS_PrecNut(); break;\
+	case 15: Demo_SINSCNS(); break;\
+	case 16: Demo_CVCFileFind(); break;\
+	case 17: Demo_DSP_main(); break; \
+	case 18: Demo_CONSOLE_UART(); break; \
 	}
 void Demo_User(void);
 void Demo_CIIRV3(void);
@@ -50,6 +52,8 @@ void Demo_CSINSGNSS(void);
 void Demo_CSINSGNSSDR(void);
 void Demo_SINSOD(void);
 void Demo_POS618(void);
+void Demo_CNS_PrecNut(void);
+void Demo_SINSCNS(void);
 void Demo_CVCFileFind(void);
 void Demo_DSP_main(void);
 void Demo_CONSOLE_UART(void);

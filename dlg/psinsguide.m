@@ -76,6 +76,8 @@ elseif get(handles.sinsgps186,'value')
 else
     opru('test_SINS_GPS_193.m');
 end
+function sinscns_Callback(hObject, eventdata, handles)
+opru('test_SINS_CNS_184.m');
 function alignsimulate_Callback(hObject, eventdata, handles)
 opru('test_align_methods_compare.m');
 function alignrealdata_Callback(hObject, eventdata, handles)
@@ -108,3 +110,4 @@ function postrj_Callback(hObject, eventdata, handles)
 opru('test_POS_trj.m');
 function posfusion_Callback(hObject, eventdata, handles)
 opru('test_POS_fusion.m');
+

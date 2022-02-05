@@ -11,10 +11,10 @@ function [imu, eth] = imustatic(avp0, ts, T, imuerr)
 %
 % Example:
 %   imuerr = imuerrset(0.01,100,0.001,10, 0.001,1000,10,1000, 10,10,10,10);
-%   avp0 = avpset([0;0;0], zeros(3,1), glv.pos0);
+%   avp0 = avpset([0;0;0]*glv.deg, 0, glv.pos0, 0);
 %   imu = imustatic(avp0, 1, 300, imuerr);
 %
-% See also  imusway, imuerrset, trjsimu, trjunilat, insupdate.
+% See also  imustatictp, imusway, imuerrset, trjsimu, trjunilat, insupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -30,7 +30,8 @@ global glv;
     if nargin<3,  T = ts;  end
     len = round(T/ts);
     imu = repmat(imu*ts, len, 1);
-    if nargin==4
-        imu = imuadderr(imu, imuerr, ts);
-    end
     imu(:,7) = (1:len)'*ts;
+    if nargin==4
+        imu = imuadderr(imu, imuerr);
+    end
+

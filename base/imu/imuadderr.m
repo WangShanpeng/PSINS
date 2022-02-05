@@ -1,11 +1,10 @@
-function imu = imuadderr(imu, imuerr, ts)
+function imu = imuadderr(imu, imuerr)
 % SIMU outputs adding errors simulation, denoted as:
 %    imu = K*imu + drift error.
 %
 % Prototype: imu = imuadderr(imu, imuerr, ts)
 % Inputs: imu - raw SIMU data
 %         imuerr - SIMU error struture array
-%         ts - SIMU sample interval
 % Output: imu - output SIMU data added errors
 %
 % See also  imuerrset, imuclbt, imudeldrift, imuasyn, imugsensi, avperrset, trjsimu, insupdate.
@@ -13,7 +12,7 @@ function imu = imuadderr(imu, imuerr, ts)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 11/09/2013, 06/03/2014, 21/07/2015, 17/08/2016, 24/02/2017, 24/07/2020
-    if nargin<3,  ts = imu(2,7)-imu(1,7);  end  % the last column implies sampling interval
+    ts = imu(2,end)-imu(1,end);  % the last column implies sampling interval
     if isfield(imuerr, 'rx')  % inner-lever-arm effect for accelerometers
         wb = imu(:,1:3)/ts;
         dotwf = imudot(imu, 5.0);

@@ -13,7 +13,7 @@ fprintf(fid, '%.8f %.8f %.3f\n', [pos(:,2)/glv.deg, pos(:,1)/glv.deg, pos(:,3)]'
 fclose(fid);
 
 %% (2) run egmcal.exe
-%goto run 'exedir\egmcal.exe'
+% goto run 'exedir\egmcal.exe' ...
 
 %% (3) plot gn
 gndata = load([exedir,'gndata.txt']);

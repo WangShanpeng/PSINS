@@ -1,5 +1,5 @@
 function out = test_align_ukf_def(tag, varargin)
-% See also  kfinit, kffk, kfhk, kfplot.
+% See also  test_align_ukf, kfinit, kffk, kfhk, kfplot.
 global glv psinsdef
 switch tag
 	case psinsdef.kfinittag,

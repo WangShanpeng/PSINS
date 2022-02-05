@@ -6,7 +6,7 @@ function dxyz = pos2dxyz(pos, pos0)
 %         pos0 - see as original position
 % Output: dxyz - [dx/East, dy/North, dz/Up] , Cartesian coordinates(E-N-U in meters) relative to pos0
 %
-% See also  dxyz2pos, RMRN, pos2dplot, pos3vplot.
+% See also  dxyz2pos, RMRN, pos2dplot, pos3vplot, dpos2dxyz.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

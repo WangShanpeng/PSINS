@@ -8,12 +8,13 @@ function  ap = apmove(ap0, pos0, yaw0)
 %         yaw0 - new initial yaw
 % Output: ap - att&pos after linear translation % angular rotation 
 %
-% See also  ap2imu, avp2imu, posstatic, trjsimu, insupdate.
+% See also  apscale, ap2imu, avp2imu, posstatic, trjsimu, insupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 16/03/2014
     if nargin<3,  yaw0=ap0(1,3);  end
+    if isempty(pos0),  pos0=ap0(1,end-3:end-1)';  end
     ap = ap0; 
     % rotate
     dyaw = yaw0 - ap0(1,3);

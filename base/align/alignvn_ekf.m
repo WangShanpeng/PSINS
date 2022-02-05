@@ -40,8 +40,8 @@ global glv
         [kf.xkk_1, kf.Phikk_1] = Jacob5(kf.xk, eth.wnie, dvn/nts, nts);
         kf.ykk_1 = kf.Hk*kf.xkk_1;
         kf = ekf(kf, vn(1:2));
-        qnb = qdelafa(qnb, 0.1*kf.xk(1:3)); kf.xk(1:3) = 0.9*kf.xk(1:3);
-        vn(1:2) = vn(1:2)-0.1*kf.xk(4:5);  kf.xk(4:5) = 0.9*kf.xk(4:5);
+        qnb = qdelafa(qnb, 0.91*kf.xk(1:3)); kf.xk(1:3) = 0.09*kf.xk(1:3);
+        vn(1:2) = vn(1:2)-0.91*kf.xk(4:5);  kf.xk(4:5) = 0.09*kf.xk(4:5);
         attk(ki,:) = [q2att(qnb)', t];
         xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t];
         ki = timebar;

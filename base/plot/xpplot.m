@@ -114,4 +114,4 @@ global glv
         return
     end
     subplot(211), plot(x(:,end), scaleclm(x(:,clm),1./unt)); xygo(sprintf('x / %s',untstr));
-    subplot(212), plot(p(:,end), sqrt(scaleclm(p(:,clm),1./unt))); xygo(sprintf('std(x) / %s',untstr));
+    subplot(212), plot(p(:,end), scaleclm(sqrt(p(:,clm)),1./unt)); xygo(sprintf('std(x) / %s',untstr));

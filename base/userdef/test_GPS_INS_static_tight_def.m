@@ -1,5 +1,5 @@
 function out = test_GPS_INS_static_tight_def(tag, varargin)
-% See also  kfinit, kffk, kfhk, kfplot.
+% See also  test_GPS_INS_static_tight, kfinit, kffk, kfhk, kfplot.
 global glv psinsdef
 switch tag
 	case psinsdef.kfinittag,

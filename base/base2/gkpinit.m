@@ -4,7 +4,7 @@ function gk = gkpinit()
 % Prototype: gk = gkpinit()
 % Output: gk - initialization array
 %
-% See also  gkprj, gkpinv.
+% See also  gkprj, gkpinv, pkprjBatch, gkpinvBatch.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

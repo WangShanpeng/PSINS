@@ -1,4 +1,4 @@
-function avp = avpset(att, vn, pos)
+function avp = avpset(att, vn, pos, isdeg)
 % avp=[attitude; velocity; position] setting.
 %
 % Prototype: avp = avpset(att, vn, pos)
@@ -6,6 +6,7 @@ function avp = avpset(att, vn, pos)
 %        vn - velocity in m/s
 %        pos - postion=[lat;lon;height] with lat and lon in deg,
 %              while heigth in m. see posset.
+%        isdeg - unit deg flag
 % Output: avp=[attitude; velocity; position]
 % 
 % See also  posset, avpchk, avperrset, avpadderr, insupdate.
@@ -14,6 +15,7 @@ function avp = avpset(att, vn, pos)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 08/03/2014, 22/01/2021
 global glv
+    if nargin<4, isdeg=1; end  % avp = avpset(att, pos);
     if nargin==2, pos=vn; vn=zeros(3,1); end  % avp = avpset(att, pos);
     if length(att)==1,  att = [att; att; att];  end
     if length(vn)==1,   % vn is scalar, representing the forward velocity
@@ -21,5 +23,9 @@ global glv
         vn = a2mat(d2r(att(:)))*vb;
     end
     if length(pos)==1; pos=[pos;0;0]; end
-    avp = avpchk([att(:)*glv.deg; vn(:); pos(1:2)*glv.deg; pos(3)]);
+    if isdeg==1
+        avp = avpchk([att(:)*glv.deg; vn(:); pos(1:2)*glv.deg; pos(3)]);
+    else
+        avp = avpchk([att(:); vn(:); pos(1:2); pos(3)]);
+    end
     

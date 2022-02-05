@@ -8,7 +8,7 @@ glvs
 % avp0 = avpset([0;0;0], [660;0;0], [30;108;0]);
 % trj = trjEast(avp0, 1, 100, 0.01, ts, 3600); % analytical east-west trajectory
 avp0 = avpset([0;0;0], [0;1000;0], [30;108;0]);
-glvf([],0); trj = trjNorth(avp0, ts, 3600); % analytical east-west trajectory
+glvf([],0); trj = trjNorth(avp0, ts, 3600); % analytical east-west/south-north trajectory
 % imuplot(trj.imu); insplot(trj.avp);
 ins = insinit(avp0, ts);  ins.an = qmulv(ins.qnb,trj.imu(1,4:6)'/ts) + ins.eth.gcc;
 len = length(trj.imu); avp = zeros(len/nn,10);

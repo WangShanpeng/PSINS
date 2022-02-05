@@ -2,14 +2,15 @@ function ap = apscale(ap, idx, ratio)
 % Enlage trajectory ap0(idx(1):idx(2),4:7), including position and time
 % scale by ratio.
 %
-% See also  apmove, avp2imu.
+% See also  apmove, ap2avp, avp2imu.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/03/2014
     ap(:,1:3) = att2c(ap(:,1:3));
-    if length(idx)==2,  idx = (idx(1):idx(2))';  end
-    ts = ap(idx(1)+1,7) - ap(idx(1),7);
+    if isempty(idx), idx = (1:length(ap))';
+    elseif length(idx)==2,  idx = (idx(1):idx(2))';  end
+    ts = ap(idx(1)+1,end) - ap(idx(1),end);
     len = length(idx);
     ratio = fix(len*ratio)/len;
     rts = ratio*ts;

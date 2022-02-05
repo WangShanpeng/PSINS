@@ -1,4 +1,4 @@
-function [imu, eb, db] = imudeldrift(imu, t0, t1, avp)
+function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
 % For MEMS-grade IMU and using static-base condition within time interval
 % [t0,t1], correct the gyro output by deleting their bias.
 %
@@ -13,6 +13,13 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp)
 % Northwestern Polytechnical University, Xi'an, P.R.China
 % 25/06/2017, 30/11/2020
     ts = diff(imu(1:2,end));
+    if nargin>4   % [imu, eb] = imudeldrift(imu, t0, t1, pos, yaw0);
+        pos = avp;
+        att = alignsb(datacut(imu,t0,t1),pos,0);
+        avp = [att(1:2);yaw0; zeros(3,1); pos];
+        wbib = imustatic(avp, 1, 1);
+        wbib = wbib(1,1:3)'*ts;
+    end
     if nargin>3  % [imu, eb] = imudeldrift(imu, t0, t1, avp);
         if size(avp,2)>1,  avp = getat(avp,t0);   end
         wbib = imustatic(avp, 1, 1);

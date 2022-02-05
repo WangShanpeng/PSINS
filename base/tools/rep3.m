@@ -12,6 +12,7 @@ function v31 = rep3(vxx)
 % 06/02/2021
     v31 = vxx(:);
     len = length(v31);
+    if len>3; return; end
     if len==1,      v31 = [v31;v31;v31];
     elseif len==2   v31 = [v31(1);v31(1);v31(2)];  end
     v31 = v31(1:3);

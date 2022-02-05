@@ -23,7 +23,7 @@ seg = trjsegment(seg, 'uniform',      100);
 seg = trjsegment(seg, 'deaccelerate', 5,  xxx, 2);
 seg = trjsegment(seg, 'uniform',      100);
 % generate, save & plot
-trj = trjsimu(avp0, seg.wat, ts, 2);
+trj = trjsimu(avp0, seg.wat, ts, 1);
 trjfile('trj10ms.mat', trj);
 insplot(trj.avp);
 imuplot(trj.imu);

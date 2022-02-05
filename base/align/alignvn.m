@@ -22,14 +22,14 @@ function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 %	wvn = [0.01; 0.01; 0.01];
 %	[att0, attk, xkpk] = alignvn(imu, avp0(1:3)', avp0(7:9)', phi, imuerr, wvn);
 %
-% See also  alignfn, alignfn9, aligncmps, aligni0, alignWahba, alignsb, insupdate, etm.
+% See also  alignfn, aligngps, alignfn9, aligncmps, aligni0, alignWahba, alignsb, insupdate, etm.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/06/2011
 global glv
     if nargin<4,  phi0 = [1.5; 1.5; 3]*glv.deg;  end
-    if nargin<5,  imuerrset(0.01, 100, 0.001, 1);  end
+    if nargin<5,  imuerr = imuerrset(0.01, 100, 0.001, 1);  end
     if nargin<6,  wvn = 0.01;  end;  if length(wvn)==1, wvn=repmat(wvn,3,1); end
     if nargin<7,  isfig = 1; end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
@@ -51,8 +51,8 @@ global glv
         kf.Phikk_1(4:6,1:3) = askew(dvn);
             kf.Phikk_1(1:3,7:9) = -Cnbts; kf.Phikk_1(4:6,10:12) = Cnbts;
         kf = kfupdate(kf, vn);
-        qnb = qdelphi(qnb, 0.1*kf.xk(1:3)); kf.xk(1:3) = 0.9*kf.xk(1:3);
-        vn = vn-0.1*kf.xk(4:6);  kf.xk(4:6) = 0.9*kf.xk(4:6);
+        qnb = qdelphi(qnb, 0.91*kf.xk(1:3)); kf.xk(1:3) = 0.09*kf.xk(1:3);
+        vn = vn-0.91*kf.xk(4:6);  kf.xk(4:6) = 0.09*kf.xk(4:6);
         attk(ki,:) = [q2att(qnb)', t];
         xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t];
         ki = timebar;

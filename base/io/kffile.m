@@ -17,7 +17,7 @@ function [xk, pk, zk, rk, sk] = kffile(kfres, q, r, t0)
 %     rvpplot(zk,rk);
 %     stateplot(sk);
 % 
-% See also  kfplot, rvpplot, stateplot, binfile.
+% See also  psinstypedef, kfplot, rvpplot, stateplot, binfile.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

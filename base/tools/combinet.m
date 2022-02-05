@@ -15,7 +15,7 @@ function  [i1, i2, dt] = combinet(t1, t2)
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 03/01/2020
-    ti = interp1(t1, t1, t2, 'nearst');
+    ti = interp1(t1, t1, t2, 'nearest');
     [na, i1, i2] = intersect(t1, ti);
     dt = t1(i1)-t2(i2);
 %     figure, plot(t1, t1*0, '-', t2, t2*0+1, '--', t1(i1), dt+0.5, 'o');  xygo('dt');
