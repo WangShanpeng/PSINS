@@ -4,7 +4,7 @@ function [qt0, iter] = qtaylor(Wt, T, tol)
 % Prototype: [qt0, iter] = qtaylor(Wt, T, tol)
 % Inputs: Wt - 3xn angluar rate coefficients of the polynomial in 
 %                 descending powers
-%         T - one step forward for time 0 to T
+%         T - one step forward from time 0 to T
 %         tol - error tolerance
 % Outputs: qt0 - output quaternion at time ts
 %          iter - iteration count

@@ -25,7 +25,7 @@ function trj = trjsimu(avp0, wat, ts, repeats)
 global glv
     if nargin<4, repeats = 1; end
     wat1 = repmat(wat, repeats, 1);
-    damping = 1-exp(-ts/5.0); damping=0;
+    damping = 1-exp(-ts/5.0); % damping=0;
     att = avp0(1:3); vn = avp0(4:6); pos = avp0(7:9);
     eth = earth(pos, vn);  Cbn_1 = a2mat(att)';  wm_1 = [0;0;0]; ts2 = ts/2;
 %     Mpv = [0, 1/eth.RMh, 0; 1/eth.clRNh, 0, 0; 0, 0, 1];

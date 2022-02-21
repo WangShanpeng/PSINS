@@ -6,8 +6,8 @@ function avpn = avpli2n(pos0, yaw0, avpi, t)
 %         yaw0 - launch initial yaw angle, positive for counter-clockwise
 %         avpi - =[att;vel;pos] in launch-inertial frame,
 %              att=[pitch;roll;yaw] in Pitch/Yaw/Roll rotation sequence;
-%              vel=[Vx-forward;Vy-up;Vz-right], in m/s;
-%              pos=[X-forward;Y-up;Z-right], in meter
+%              vel=[Vx-front;Vy-up;Vz-right], in m/s;
+%              pos=[X-front;Y-up;Z-right], in meter
 %         t - avpi at launch epoch time t
 % output: avpn=[Pitch;Roll;Yaw; VE;VN;VU; lat;lon;hgt], where Euler angles in
 %              Yaw/Pitch/Roll rotation sequence, and lat/lon/hgt in rad/rad/m. 

@@ -14,8 +14,7 @@ load([glv.datapath,'imu_transfer.mat']);  % imuplot(trj.imu); insplot(trj.avp);
 ts = trj.ts;
 qnbs = a2qua(trj.avp0(1:3)); vns = trj.avp0(4:6); % slave INS init
 ckf = kfinit(ts, imuerr);
-% fkf = fkfinit(ckf, {[1:15],[1:15]}, {1:3, 4:6}, [1/2; 1/2], 1);
-fkf = fkfinit(ckf, {[1:6,13:15],[1:12]}, {1:3, 4:6}, [50/100; 50/100], 3);
+fkf = fkfinit(ckf, {[1:6,13:15],[1:12]}, {1:3, 4:6}, [50/100; 50/100], 0, 3);
 len = 30/ts; length(trj.imu);
 [res, xkpk, xkpk1, xkpk2, xkpkf] = prealloc(len, 7, 2*ckf.n+1, 2*fkf{1}.n,2*fkf{2}.n,2*fkf{3}.n);
 timebar(1, len, 'Federated KF transfer alignment simulaton.');

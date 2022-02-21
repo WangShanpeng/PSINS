@@ -4,7 +4,7 @@ function rod = rodpicard(Wt, T, iter0)
 % Prototype: rod = rodpicard(Wt, T, iter0)
 % Inputs: Wt - 3xn angluar rate coefficients of the polynomial in 
 %              descending powers
-%         T - one step forward for time 0 to T
+%         T - one step forward from time 0 to T
 %         iter0 - iteration count
 % Outputs: rod - output Rodrigues parameters
 %

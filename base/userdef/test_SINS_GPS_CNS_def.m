@@ -5,7 +5,7 @@ switch tag
 	case psinsdef.kfinittag,
         psinsdef.kffk = 21;  psinsdef.kfhk = 219;  psinsdef.kfplot = 219;
         [ins, davp, imuerr, rk, lv, mu] = setvals(varargin);
-        kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(9+6,1)])^2;
+        kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(9+6,1)])^2;  kf.Qk = kf.Qt*ins.nts; kf.Phikk_1 = eye(21);
         kf.Rk = diag(rk)^2;
         kf.Pxk = diag([davp; imuerr.eb; imuerr.db; lv; mu]*1.0)^2;
         kf.Hk = [ zeros(6,3), eye(6), zeros(6,12); ...    % SINS/GPS Hk
@@ -20,6 +20,7 @@ switch tag
     case psinsdef.kfhktag,
         % Measments: m2rv(Cnb(INS)*Csn(CNS))(3)
         ins = setvals(varargin);
+        Hk(1:6,16:18) = [-fins.CW;-fins.MpvCnb];
         Hk(7:9,:) = [eye(3), zeros(3,15), ins.Cnb];  Hk(7,7)=1;
         Hk(8:9,8) = -[ins.eth.cl;ins.eth.sl];
         out = Hk;

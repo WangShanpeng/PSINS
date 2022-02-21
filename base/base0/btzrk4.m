@@ -3,7 +3,7 @@ function rv = btzrk4(wm, T)
 % 
 % Prototype: rv = btzrk4(wm, T)
 % Inputs: wm - angular increment
-%         T - one step forward for time 0 to T
+%         T - one step forward from time 0 to T
 % Output: rv - rotation vector at time T
 % 
 % See also  qrk4, qpicard, qtaylor, wm2wtcoef.

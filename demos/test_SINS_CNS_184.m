@@ -1,4 +1,4 @@
-% SINS/CNS intergrated navigation simulation unsing kalman filter.
+% SINS/CNS intergrated navigation simulation using kalman filter.
 % Please run 'test_SINS_trj.m' to generate 'trj10ms.mat' beforehand!!!
 % See also  test_SINS_trj, test_SINS, test_SINS_GPS_153.
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.

@@ -5,7 +5,7 @@
 % 30/08/2013
 ggpsvars
 len = 2000;
-% [eph, obs, ot] = rnx210('abpo0080.15n', len);
+[eph, obs, ot] = rnx210('abpo0080.15n', len);
 [eph, obs, ot] = rnx210('01.15n', len);
 tp = unique(obs(:,ot.tp));
 len = length(tp);

@@ -2,7 +2,7 @@ function vb = vnplot(av, thvel, thdyaw)
 % DVL or OD plot.
 %
 % Prototype: dvlplot(dvl)
-% Inputs: dvl - [vb_right, vb_forward, vb_up, t] or [vb_forward, t]
+% Inputs: dvl - [vb_right, vb_front, vb_up, t] or [vb_front, t]
 %         sf - scale factor
 %          
 % See also  odplot, dvlplot, vn2vbl.

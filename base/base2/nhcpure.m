@@ -4,7 +4,7 @@ function [avp, jk] = nhcpure(imu, avp0, dyaw, accth, od)
 % Prototype: [avp, jk] = nhcpure(imu, avp0, dyaw, vth)
 % Inputs: imu - SIMU data array
 %         avp0 - initial avp0=[att0,vn0,pos0]
-%         dyaw - angle between IMU/car forward directions.
+%         dyaw - angle between IMU/car front directions.
 %         accth - acc threshold.
 %         
 % Outputs: avp - avp navigation result

@@ -31,7 +31,7 @@ function seg = trjsegment(seg, segtype, lasting, w, a, var1)
             seg.wat = [seg.wat; [lasting, seg.vel, 0, 0, 0, 0, a, 0]];
             seg.vel = seg.vel + lasting*a;
         case 'deaccelerate',
-            seg.wat = [seg.wat; [lasting, seg.vel, 0, 0, 0, 0,-a, 0]];
+            seg.wat = [seg.wat; [lasting, seg.vel, 0, 0, 0, 0,-a, 0]];  % a>0
             seg.vel = seg.vel - lasting*a;
         case 'headup',
             seg.wat = [seg.wat; [lasting, seg.vel, w*dps, 0, 0, 0, 0, cf]];
@@ -46,6 +46,11 @@ function seg = trjsegment(seg, segtype, lasting, w, a, var1)
         case 'rollright',
             seg.wat = [seg.wat; [lasting, seg.vel, 0, w*dps, 0, 0, 0, 0]];
         % compound ------
+        case 'static',
+            a = var1;  dacclasting = seg.vel/a;
+            seg = trjsegment(seg, 'deaccelerate',  dacclasting, 0, a);
+            seg.vel = 0;
+            seg = trjsegment(seg, 'uniform',  max(lasting,dacclasting)-dacclasting);
         case 'coturnleft', % coordinate turn left
             rolllasting = var1; rollw = atan(cf/9.8)/dps/rolllasting;
             seg = trjsegment(seg, 'rollleft',  rolllasting, rollw);

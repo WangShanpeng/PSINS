@@ -5,7 +5,7 @@ function vb = vf2vb(vf, dyaw, dpitch)
 % Inputs: vf - forward velocity(scale)
 %         dyaw - yaw misalignment angle
 %         dpitch - pitch misalignment angle
-% Output: vb - body frame velocity(right-forward-up vector)
+% Output: vb - body frame velocity(right-front-up vector)
 %
 % See also  drPrj.
 

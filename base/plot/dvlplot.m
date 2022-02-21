@@ -2,7 +2,7 @@ function dvlplot(dvl, sf)
 % DVL or OD plot.
 %
 % Prototype: dvlplot(dvl)
-% Inputs: dvl - [vb_right, vb_forward, vb_up, t] or [vb_forward, t]
+% Inputs: dvl - [vb_right, vb_front, vb_up, t] or [vb_front, t]
 %         sf - scale factor
 %          
 % See also  odplot, vnplot, imuplot, magplot, baroplot, insplot, inserrplot, kfplot, gpsplot.

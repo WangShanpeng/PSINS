@@ -95,4 +95,4 @@ function print_header(fid, infostr)
 	fprintf(fid, '%% SIMU data columns include:\n');
 	fprintf(fid, '%%   [g_x, g_y, g_z, a_x, a_y, a_z, dt]\n');
 	fprintf(fid, '%%   where dt, if exists, is sampling time dither in millisecond.\n');    
-	fprintf(fid, '%%   Conventionally, SIMU is mounted on vehicle with "x-Right,y-Forward,z-Up" orientations.\n\n');
+	fprintf(fid, '%%   Conventionally, SIMU is mounted on vehicle with "x-Right,y-Front,z-Up" orientations.\n\n');

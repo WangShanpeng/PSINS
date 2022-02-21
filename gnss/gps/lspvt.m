@@ -7,7 +7,7 @@ function [pvt, vpENU, res] = lspvt(recPos0, satpv, obs)
 %         obs - obs=[PR] or obs=[PR,PRDot], where PR is pseudo-range observations,
 %               including satellite clock corrections, and PRDot is Doppler
 %               observation. Make sure satellite num >= 4.
-% Outputs: pvt - 15x1 vector=[posXYZ;dt; Perr; satNum; DOP; velXYZ;dtDot; Verr]
+% Outputs: pvt - 16x1 vector=[posXYZ;dt; Perr; satNum; DOP; velXYZ;dtDot; Verr]
 %          res - some other results, see the code.
 %
 % See also  satPosVel, lsVel, spp, DOP.

@@ -40,6 +40,7 @@ global glv
     glv.mas = glv.sec/1000;         % milli arcsec
     glv.hur = 3600;                 % time hour (1hur=3600second)
     glv.dps = pi/180/1;             % arcdeg / second
+    glv.rps = 360*glv.dps;          % revolutions per second
     glv.dph = glv.deg/glv.hur;      % arcdeg / hour
     glv.dpss = glv.deg/sqrt(1);     % arcdeg / sqrt(second)
     glv.dpsh = glv.deg/sqrt(glv.hur);  % arcdeg / sqrt(hour)

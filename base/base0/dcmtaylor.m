@@ -4,7 +4,7 @@ function [Ct0, iter] = dcmtaylor(Wt, T, tol)
 % Prototype: [Ct0, iter] = dcmtaylor(Wt, T, tol)
 % Inputs: Wt - 3xn angluar rate coefficients of the polynomial in 
 %                 descending powers
-%         T - one step forward for time 0 to T
+%         T - one step forward from time 0 to T
 %         tol - error tolerance
 % Outputs: Ct0 - output DCM at time T
 %          iter - iteration count

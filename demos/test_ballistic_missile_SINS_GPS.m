@@ -27,7 +27,7 @@ a = -0;
 y = [y; y(end)+v*t+1/2*a*t.^2];  z = [z; z(end)+t*0];
 pitch = [pitch; t*0];
 tt = [tt; tt(end)+t];
-myfig, plot(y, z, '-'); xygo('forward/m','up/m');
+myfig, plot(y, z, '-'); xygo('front/m','up/m');
 %% imu,avp,gps
 dxyz = [y*0,y,z,tt];
 dxyz(:,1:3) = ar1filt(dxyz(:,1:3), 100);

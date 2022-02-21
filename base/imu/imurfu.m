@@ -1,5 +1,5 @@
 function [wvm, Dir] = imurfu(wvm0, dirstr)
-% In PSINS toolbox, Right-Forward-Up orientations are selected as body
+% In PSINS toolbox, Right-Front-Up orientations are selected as body
 % frame axes X-Y-Z respectively. Call this function when the user's 
 % SIMU outputs does not follow the above convention.
 %
@@ -8,7 +8,7 @@ function [wvm, Dir] = imurfu(wvm0, dirstr)
 %         dirstr - raw SIMU X-Y-Z orientations including three characters, 
 %               the orientation abbreviations are:
 %               'U': Upper; 'D': Down; 'R': Right; 'L': Left; 
-%               'F': Forword; 'B': Back; 'E': East; 'W': West; 'N': North;
+%               'F': Front; 'B': Back; 'E': East; 'W': West; 'N': North;
 %               'S': South.
 % Outputs: wvm - SIMU data with X-Y-Z pointing to R-F-U respectively,
 %               i.e. wvm(:,1:6) = wvm0(:,1:6)*blkdiag(Dir',Dir').
