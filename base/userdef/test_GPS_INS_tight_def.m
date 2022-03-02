@@ -23,7 +23,7 @@ switch tag
         [ins, LOS] = setvals(varargin);
         m = size(LOS,1);
         LT = LOS*Dblh2Dxyz(ins.pos);
-        LC = LOS*p2cne(ins.pos)';
+        LC = LOS*pos2cen(ins.pos);
 %       kf.Hk = [zeros(6,3), eye(6), zeros(6,6), [ins.CW,-ins.an;ins.MpvCnb,-ins.Mpvvn], zeros(6,2)];   
         Hk = [ zeros(m,6),  LT, zeros(m,6),  LT*ins.MpvCnb, -LT*ins.Mpvvn, ones(m,1),  zeros(m,1); 
          	   zeros(m,3), -LC, zeros(m,9), -LC*ins.CW,      LC*ins.an,    zeros(m,1), ones(m,1) ];

@@ -133,7 +133,7 @@ global glv
                 subplot(323), hold on, plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+avp(:,6).^2)], strk, 'LineWidth',2); xygo('V');
                 subplot(325), hold on, plot(t, [[avp(:,7)-avp0(1,7),(avp(:,8)-avp0(1,8))*cos(avp0(1,7))]*glv.Re,avp(:,9)-avp0(1,9)], strk, 'LineWidth',2); xygo('DP');
                 err = avpcmp(avp, avp0, phi_mu); t = err(:,end);
-                subplot(322), hold on, plot(t, err(:,1:3)/glv.min, strk, 'LineWidth',2); xygo(phi_mu); mylegend([phi_mu,'x'],[phi_mu,'y'],[phi_mu,'z']);
+                subplot(322), hold on, plot(t, err(:,1:3)/glv.min, strk, 'LineWidth',2); xygo(phi_mu); mylegend([phi_mu,'E'],[phi_mu,'N'],[phi_mu,'U']);
                 subplot(324), hold on, plot(t, err(:,4:6), strk, 'LineWidth',2); xygo('dV'); mylegend('dVE','dVN','dVU');
                 subplot(326), hold on, plot(t, [[err(:,7),err(:,8)*cos(avp(1,7))]*glv.Re,err(:,9)], strk, 'LineWidth',2); xygo('dP'); mylegend('dlat','dlon','dH');
             end

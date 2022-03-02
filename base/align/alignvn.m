@@ -45,7 +45,6 @@ global glv
         Cnb = q2mat(qnb);
         dvn = Cnn*Cnb*dvbm;
         vn = vn + dvn + eth.gn*nts;
-        %qnb = qupdt(qnb, phim-Cnb'*eth.wnin*nts);
         qnb = qupdt2(qnb, phim, eth.wnin*nts);
         Cnbts = Cnb*nts;
         kf.Phikk_1(4:6,1:3) = askew(dvn);
@@ -82,11 +81,11 @@ function avnplot(attk, xkpk)
 global glv
     t = attk(:,end);
     myfigure;
-	subplot(421); plot(t, attk(:,1:2)/glv.deg); xygo('pr')
+	subplot(421); plot(t, attk(:,1:2)/glv.deg); xygo('pr'); title('Xi');
 	subplot(423); plot(t, attk(:,3)/glv.deg); xygo('y');
 	subplot(425); plot(t, xkpk(:,7:9)/glv.dph); xygo('eb'); 
 	subplot(427); plot(t, xkpk(:,10:12)/glv.ug); xygo('db'); 
-	subplot(422); plot(t, sqrt(xkpk(:,13:15))/glv.min); xygo('phi');
+	subplot(422); plot(t, sqrt(xkpk(:,13:15))/glv.min); xygo('phi'); title('\surdPii')
 	subplot(424); plot(t, sqrt(xkpk(:,16:18))); xygo('dV');
 	subplot(426); plot(t, sqrt(xkpk(:,19:21))/glv.dph); xygo('eb');
  	subplot(428); plot(t, sqrt(xkpk(:,22:24))/glv.ug); xygo('db');   

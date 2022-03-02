@@ -1,4 +1,4 @@
-function [rho, LOS, AzEl, BLH, Cne] = rhoSatRec(satPos, recPos, rho0)
+function [rho, LOS, AzEl, BLH, Cen] = rhoSatRec(satPos, recPos, rho0)
 % Calculate distances between satellites and receiver, taking into
 % account the Earth rotation.
 %
@@ -24,8 +24,8 @@ global ggps
     rho = sqrt(dpos(:,1).^2+dpos(:,2).^2+dpos(:,3).^2);
     LOS = dpos./[rho,rho,rho];
     % topocent
-    [BLH, Cne] = xyz2blh(recPos(1,1:3));
-    Ln = LOS*Cne';  % Ln: LOS in receiver n-frame
+    [BLH, Cen] = xyz2blh(recPos(1,1:3));
+    Ln = LOS*Cen;  % Ln: LOS in receiver n-frame
     AzEl = [atan2(Ln(:,1), Ln(:,2)), atan(Ln(:,3)./sqrt(Ln(:,1).^2+Ln(:,2).^2))];
     idx = find(AzEl(:,1)<0);
     AzEl(idx,1) = AzEl(idx,1) + 2*pi;

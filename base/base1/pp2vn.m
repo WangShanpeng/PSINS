@@ -7,7 +7,7 @@ function vn = pp2vn(pos0, pos1, ts)
 %         ts - time interval between t0 and t1, i.e. ts = t1-t0
 % Output: vn - average velocity
 %
-% See also  vn2dpos, p2cne, gps2avp.
+% See also  vn2dpos, pos2cen, gps2avp.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

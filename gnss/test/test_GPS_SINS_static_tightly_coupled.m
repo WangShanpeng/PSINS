@@ -37,7 +37,7 @@ for k=1:nn:len-nn*2
         else
             C1 = obsi(:,ot.C1);
             [satPos, clkCorr] = satPosBatch(tpi-C1/ggps.c, ephi);
-            [posxyz, Cne] = blh2xyz(ins.pos);  % not posL !
+            [posxyz, Cen] = blh2xyz(ins.pos);  % not posL !
             [rho, LOS, AzEl] = rhoSatRec(satPos, posxyz, C1);
             el = AzEl(:,2); el(el<15*pi/180) = 1*pi/180;  P = diag(sin(el.^2));  % P = eye(size(P));
             delta_rho = C1 + clkCorr(:,1)*ggps.c - rho;

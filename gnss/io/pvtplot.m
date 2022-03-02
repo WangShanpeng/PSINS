@@ -16,7 +16,7 @@ global glv
     if nargin<3, xyz0 = pos(1,1:3)'; end
     ptype = lower(ptype);
     t = pos(:,end);
-    [blh0, Cne] = xyz2blh(xyz0);
+    [blh0, Cen] = xyz2blh(xyz0);
     xtext = 't / s';
     if ~isempty(strfind(ptype, 't0')), t = t-t(1)+mod(t(1)+blh0(2)/(2*pi)*86400,86400); xtext = 'local time t / s'; end
     if ~isempty(strfind(ptype, 'h')), t = t/3600; xtext = 'local time / h'; end
@@ -33,7 +33,7 @@ global glv
     if sum(abs(pos(:,16)))>1e-3
         myfigure;
         subplot(221), plot(t, pos(:,12:14)); xygo(xtext, 'Vxyz / m/s');
-        subplot(223), plot(t, pos(:,12:14)*Cne'); xygo(xtext, 'Venu / m/s');
+        subplot(223), plot(t, pos(:,12:14)*Cen); xygo(xtext, 'Venu / m/s');
         subplot(222), plot(t, pos(:,15)/3e8); xygo(xtext, '\deltatDot / s/s');
         subplot(224), plot(t, pos(:,16)); xygo(xtext, 'residual error / m/s');
     end

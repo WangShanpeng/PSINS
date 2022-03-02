@@ -5,7 +5,7 @@ switch tag
 	case psinsdef.kfinittag,
         [nts, imuerr] = setvals(varargin);
         kf.fx = @afamodel;
-        kf.Qk = diag([imuerr.web; imuerr.wdb])^2*nts;
+        kf.Qk = diag([imuerr.web; imuerr.wdb])^2*nts;  kf.Gammak = 1;
         kf.Rk = diag([0.1;0.1;0.1])^2;
         kf.Pxk = diag([[10;10;180]*glv.deg; [1;1;1]])^2;
         kf.Hk = [zeros(3), eye(3)];

@@ -32,28 +32,65 @@ function msource_Callback(hObject, eventdata, handles)
 global gmsource
 gmsource = hObject;
 return;
+% 1st column
 function psinsinit_Callback(hObject, eventdata, handles)
 opru('psinsinit.m');
+function rotordemo_Callback(hObject, eventdata, handles)
+opru('demo_gyro_rotor_precession.m');
+function hrgdemo_Callback(hObject, eventdata, handles)
+opru('demo_HRG_effect.m');
+function platformmotion_Callback(hObject, eventdata, handles)
+opru('demo_PINS_platform_motion.m');
 function conedemo_Callback(hObject, eventdata, handles)
 opru('demo_cone_motion.m');
 function noncommutativity_Callback(hObject, eventdata, handles)
 opru('demo_noncommutativity.m');
 function sculldemo_Callback(hObject, eventdata, handles)
 opru('demo_scull_motion.m');
-function rotordemo_Callback(hObject, eventdata, handles)
-opru('demo_gyro_rotor_precession.m');
-function hrgdemo_Callback(hObject, eventdata, handles)
-opru('demo_HRG_effect.m');
 function sagnacdemo_Callback(hObject, eventdata, handles)
 opru('demo_sagnac_effect.m');
 function randonmwalk_Callback(hObject, eventdata, handles)
 opru('demo_drift_random_walk.m');
+function coneclassic_Callback(hObject, eventdata, handles)
+opru('demo_cone_error.m');
+function attcompare_Callback(hObject, eventdata, handles)
+opru('test_attitude_update_methods_compare.m');
+function sinsstatic_Callback(hObject, eventdata, handles)
+opru('test_SINS_static.m');
+function seawavesimu_Callback(hObject, eventdata, handles)
+opru('seawavedlg.m');
+function srevaldlg_Callback(hObject, eventdata, handles)
+opru('srevaldlg.m');
+function imuanalysis_Callback(hObject, eventdata, handles)
+opru('imudlg.m');
+% 2nd column
+function alignsimulate_Callback(hObject, eventdata, handles)
+opru('test_align_methods_compare.m');
+function alignrealdata_Callback(hObject, eventdata, handles)
+opru('test_align_methods_compare_lgimu.m');
+function twoposition_Callback(hObject, eventdata, handles)
+opru('test_align_two_position.m');
+function alignrotation_Callback(hObject, eventdata, handles)
+opru('test_align_rotation.m');
+function alignekf_Callback(hObject, eventdata, handles)
+opru('test_align_ekf.m');
+function alignukf_Callback(hObject, eventdata, handles)
+opru('test_align_ukf.m');
+function kfekfstekfcmp_Callback(hObject, eventdata, handles)
+opru('test_align_kf_ekf_stekf_compare.m');
 function transfertrj_Callback(hObject, eventdata, handles)
 opru('test_align_transfer_trj.m');
 function transferimu_Callback(hObject, eventdata, handles)
 opru('test_align_transfer_imu_simu.m');
 function transferalign_Callback(hObject, eventdata, handles)
 opru('test_align_transfer.m');
+function transferalign_fkf_Callback(hObject, eventdata, handles)
+opru('test_align_transfer_fkf.m');
+function ahrsmahony_Callback(hObject, eventdata, handles)
+opru('test_AHRS_Mahony.m');
+function ahrsqekf_Callback(hObject, eventdata, handles)
+opru('test_AHRS_QEKF.m');
+% 3-column
 function cartrj_Callback(hObject, eventdata, handles)
 opru('test_SINS_trj.m');
 function sins_Callback(hObject, eventdata, handles)
@@ -61,7 +98,11 @@ opru('test_SINS.m');
 function dr_Callback(hObject, eventdata, handles)
 opru('test_DR.m');
 function sinsdr_Callback(hObject, eventdata, handles)
-opru('test_SINS_DR.m');;
+opru('test_SINS_DR.m');
+function sinszupttrj_Callback(hObject, eventdata, handles)
+opru('test_SINS_ZUPT_trj.m');
+function sinszupt_Callback(hObject, eventdata, handles)
+opru('test_SINS_ZUPT.m');
 function sinsgps153_Callback(hObject, eventdata, handles)
 set(handles.sinsgps153,'value',1); set(handles.sinsgps186,'value',0); set(handles.sinsgps193,'value',0);
 function sinsgps186_Callback(hObject, eventdata, handles)
@@ -76,38 +117,16 @@ elseif get(handles.sinsgps186,'value')
 else
     opru('test_SINS_GPS_193.m');
 end
+function sinsgnssukf_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_UKF_153.m');
+function sinsgnssckf_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_CKF_153.m');
 function sinscns_Callback(hObject, eventdata, handles)
 opru('test_SINS_CNS_184.m');
-function alignsimulate_Callback(hObject, eventdata, handles)
-opru('test_align_methods_compare.m');
-function alignrealdata_Callback(hObject, eventdata, handles)
-opru('test_align_methods_compare_lgimu.m');
-function twoposition_Callback(hObject, eventdata, handles)
-opru('test_align_two_position.m');
-function alignrotation_Callback(hObject, eventdata, handles)
-opru('test_align_rotation.m');
-function alignekf_Callback(hObject, eventdata, handles)
-opru('test_align_ekf.m');
-function alignukf_Callback(hObject, eventdata, handles)
-opru('test_align_ukf.m');
-function sysclbt_Callback(hObject, eventdata, handles)
-opru('test_system_calibration_19pos.m');
-function attcompare_Callback(hObject, eventdata, handles)
-opru('test_attitude_update_methods_compare.m');
-function sinsstatic_Callback(hObject, eventdata, handles)
-opru('test_SINS_static.m');
-function srevaldlg_Callback(hObject, eventdata, handles)
-opru('srevaldlg.m');
-function imuanalysis_Callback(hObject, eventdata, handles)
-opru('imudlg.m');
-function coneclassic_Callback(hObject, eventdata, handles)
-opru('demo_cone_error.m');
-function ahrsmahony_Callback(hObject, eventdata, handles)
-opru('test_AHRS_Mahony.m');
-function ahrsqekf_Callback(hObject, eventdata, handles)
-opru('test_AHRS_QEKF.m');
 function postrj_Callback(hObject, eventdata, handles)
 opru('test_POS_trj.m');
 function posfusion_Callback(hObject, eventdata, handles)
 opru('test_POS_fusion.m');
+function sysclbt_Callback(hObject, eventdata, handles)
+opru('test_system_calibration_19pos.m');
 

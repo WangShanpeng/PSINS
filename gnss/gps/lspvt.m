@@ -18,7 +18,7 @@ function [pvt, vpENU, res] = lspvt(recPos0, satpv, obs)
     satPos=satpv(:,1:3); PR=obs(:,1);
     rho = PR - recPos0(4);  % ?
     for iter = 1:20
-        [rho, LOS, AzEl, pos, Cne] = rhoSatRec(satPos, recPos0, rho);
+        [rho, LOS, AzEl, pos, Cen] = rhoSatRec(satPos, recPos0, rho);
         el = AzEl(:,2); el(el<15*pi/180) = 0.01*pi/180;
         W = diag(sin(el).^2); % eye(length(el)); % weight matrix
         dPR = PR - rho - recPos0(4);
@@ -37,10 +37,10 @@ function [pvt, vpENU, res] = lspvt(recPos0, satpv, obs)
     end
     pvt = [recPos;errPos;length(rho);DOP(A); recVel;errVel];
     if nargout>1
-        vpENU = [Cne*recVel(1:3);pos];
+        vpENU = [Cen'*recVel(1:3);pos];
     end
     if nargout>2
         res.rho = rho;  res.LOS = LOS;  res.AzEl = AzEl;
-        res.Cne = Cne;
+        res.Cen = Cen;
         res.W = W;
     end

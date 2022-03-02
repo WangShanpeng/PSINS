@@ -6,7 +6,7 @@ function vo = rotv(rv, vi)
 %         vi - input vector to be rotated
 % Output: vo - output vector result, such that vo=rv2m(rv)*vi
 % 
-% See also  rv2m, rv2q, qmulv, m2rv, q2rv, a2mat.
+% See also  rv2m, rv2q, qmulv, m2rv, q2rv, a2mat, rxyz.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

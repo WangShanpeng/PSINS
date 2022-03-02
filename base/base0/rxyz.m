@@ -2,7 +2,7 @@ function C01 = rxyz(ang, xyz)
 % Rotation by x,y or z axis with angle 'ang'.
 %
 % Prototype: C01 = rxyz(ang, xyz)
-% Inputs: ang - angle
+% Inputs: ang - angle in rad
 %         xyz - rotation axis 1/x/X, 2/y/Y or 3/z/Z
 % Output: C01 - corresponding DCM = C^0_1
 % 

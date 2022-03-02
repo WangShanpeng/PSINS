@@ -9,7 +9,7 @@ function [Cnb, Cnbr] = a2mat(att)
 % Test:
 %   att0=randn(3,1)/10; [Cnb,Cnbr]=a2mat(att0); att=m2att(Cnb); [~,attr]=m2att(Cnbr); [att0, att, attr]
 %
-% See also  a2qua, m2att, m2qua, q2att, q2mat, attsyn, rv2m, a2matBatch.
+% See also  a2qua, m2att, m2qua, q2att, q2mat, attsyn, rv2m, rxyz, a2matBatch.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

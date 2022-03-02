@@ -3,8 +3,8 @@ function [imu, avp0, avp] = imusway(avp0, swayA, swayTau, ts, T, imuerr)
 %
 % Prototype: [imu, avp0] = imusway(avp0, swayA, swayTau, ts, T, imuerr)
 % Inputs: avp0 - initial avp0=[att0,vn0,pos0]
-%         swayA - angular sway & linear motion amplitude
-%         swayTau - angular sway & linear motion period
+%         swayA - angular sway (in rad) & linear motion amplitude (in meter)
+%         swayTau - angular sway & linear motion period (in second)
 %         ts - SIMU sampling interval
 %         T - total sampling simulation time
 %         imuerr - SIMU error setting structure array from imuerrset
@@ -25,7 +25,7 @@ function [imu, avp0, avp] = imusway(avp0, swayA, swayTau, ts, T, imuerr)
 global glv;
     if length(avp0)<6, avp0 = [avp0(1:3); glv.pos0]; end
     if length(avp0)<9, avp0 = [avp0(1:3); zeros(3,1); avp0(4:6)]; end
-    swayA = pextend(swayA);  swayTau = pextend(swayTau);
+    swayA = pextend(swayA,0);  swayTau = pextend(swayTau,inf);
     t = (ts:ts:T)';  yaw = avp0(3);
     x = swayA(4)/glv.Re*cos(2*pi/swayTau(4)*t);  y = swayA(5)/glv.Re*cos(2*pi/swayTau(5)*t);
     ap = [ avp0(1)+swayA(1)*cos(2*pi/swayTau(1)*t), ...        % pch
@@ -36,11 +36,11 @@ global glv;
            avp0(9)+swayA(6)*cos(2*pi/swayTau(6)*t) ];          % hgt
     [imu, avp0, avp] = ap2imu([ap,t]);
     if exist('imuerr', 'var')
-        imu = imuadderr(imu, imuerr, ts);
+        imu = imuadderr(imu, imuerr);
     end
     
-function p = pextend(p)
-    if length(p)==1, p=[p; inf]; end
+function p = pextend(p,val)
+    if length(p)==1, p=[p; val]; end
     if length(p)==2, p=[p(1);p(1);p(1); p(2);p(2);p(2)]; end
-    if length(p)==3, p=[p; inf(3,1)]; end
+    if length(p)==3, p=[p; val;val;val]; end
         
