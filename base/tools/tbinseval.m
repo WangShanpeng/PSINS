@@ -25,7 +25,7 @@ global glv
     clear trj; trj.imu = imu; trj.avp = avp; trj.avp0 = avp0;
     if isempty(avperr), avperr = avperrset([0.1;0.1;1], 0.01, 0.1);  end
     if isempty(imuerr), imuerr = imuerrset(0.01,30,0.001,3,  0,1,0,1,  3,3, 3,3, 3);  end
-    aierr = [avperr; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.KA2; imuerr.web; imuerr.wdb];  % basic error
+    aierr = [avperr; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.KA2; imuerr.web; imuerr.wdb];  % basic error 39x1
     ts = diff(imu(1:2,end));
     ins = insinit(avp0, ts);  ins.nts=ts;
     kf = kfinit(ins, avperr, imuerr, 0);

@@ -4,7 +4,7 @@
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 10/06/2011, 10/02/2014
 glvs
-ts = 0.01;       % sampling interval
+ts = 0.1;       % sampling interval
 avp0 = [[0;0;0]; [0;0;0]; glv.pos0]; % init avp
 % trajectory segment setting
 xxx = [];

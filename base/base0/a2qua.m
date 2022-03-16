@@ -5,7 +5,7 @@ function qnb = a2qua(att)
 % Input: att - att=[pitch; roll; yaw] in radians
 % Output: qnb - attitude quaternion
 %
-% See also  a2qua1, a2mat, m2att, m2qua, q2att, q2mat, attsyn, rv2q.
+% See also  a2qua1, a2mat, m2att, m2qua, q2att, q2mat, attsyn, rv2q, attrf.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

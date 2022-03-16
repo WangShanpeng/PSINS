@@ -11,7 +11,6 @@ function [xk, pk, zk, rk, sk] = kffile(kfres, q, r, t0)
 %     psinstypedef(196);
 %     [xk,pk,zk,rk,sk] = kffile('kf.bin', 28,6,0);
 %     kfplot(xk,pk,1:19);
-%     xpplot(xk,pk,20,glv.ppm,'ppm');
 %     xpplot(xk,pk,[],1,'dKG');
 %     xpplot(xk,pk,[],1,'dKA');
 %     rvpplot(zk,rk);

@@ -17,7 +17,7 @@ function [x, b1] = delbias(x, b, clm)
         if length(b)==0; b = mean(x(:,clm)); end    %  delbias(x, [], clm)
         if length(b)==1; b = repmat(b,clm,1); end    %  delbias(x, b, clm)
         for k=1:length(clm)
-            x(:,clm(k)) = x(:,clm(k)) - b(clm(k));
+            x(:,clm(k)) = x(:,clm(k)) - b(k);
         end
         return;
     end

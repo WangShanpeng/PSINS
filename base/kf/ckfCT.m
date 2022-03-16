@@ -18,19 +18,30 @@ function [y, Pyy, Pxy, X, Y] = ckfCT(x, Pxx, hfx, tpara)
     sPxx = sqrt(n)*chol(Pxx)';    % Choleskey decomposition
     xn = repmat(x,1,n); 
     X = [xn+sPxx, xn-sPxx];
-    Y(:,1) = feval(hfx, X(:,1), tpara); m=length(Y); y = Y(:,1);
-    Y = repmat(Y,1,2*n);
-    Pyy = zeros(m); Pxy = zeros(n,m);
-    for k=2:1:2*n     % Sigma points nolinear propagation
+    y = feval(hfx, X(:,1), tpara);
+    Y = repmat(y,1,2*n);
+    Pyy = Y(:,1)*Y(:,1)'; Pxy = X(:,1)*Y(:,1)';
+    for k=2:1:2*n
         Y(:,k) = feval(hfx, X(:,k), tpara);
         y = y + Y(:,k);
+        Pyy = Pyy + Y(:,k)*Y(:,k)';
+        Pxy = Pxy + X(:,k)*Y(:,k)';
     end
-    y = 1/(2*n)*y;
-    for k=1:1:2*n
-        yerr = Y(:,k)-y;
-        Pyy = Pyy + (yerr*yerr');  % variance
-        xerr = X(:,k)-x;
-        Pxy = Pxy + xerr*yerr';  % covariance
-    end
-    Pyy = 1/(2*n)*Pyy; Pxy = 1/(2*n)*Pxy;
-    
+    y = 1/(2*n)*y;  % y mean
+    Pyy = 1/(2*n)*Pyy - y*y';  Pxy = 1/(2*n)*Pxy - x*y';
+ 
+%     Y(:,1) = feval(hfx, X(:,1), tpara); m=length(Y); y = Y(:,1);
+%     Y = repmat(Y,1,2*n);
+%     Pyy = zeros(m); Pxy = zeros(n,m);
+%     for k=2:1:2*n     % Sigma points nolinear propagation
+%         Y(:,k) = feval(hfx, X(:,k), tpara);
+%         y = y + Y(:,k);
+%     end
+%     y = 1/(2*n)*y;
+%     for k=1:1:2*n
+%         yerr = Y(:,k)-y;
+%         Pyy = Pyy + (yerr*yerr');  % variance
+%         xerr = X(:,k)-x;
+%         Pxy = Pxy + xerr*yerr';  % covariance
+%     end
+%     Pyy = 1/(2*n)*Pyy; Pxy = 1/(2*n)*Pxy;

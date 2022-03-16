@@ -23,7 +23,7 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 27
 /************** compiling control !!! ***************/
 #define PSINS_MATRIX_MAX_DIM	34
 #define PSINS_IO_FILE
-#define PSINS_RMEMORY
+//#define PSINS_RMEMORY
 //#define PSINS_AHRS_MEMS
 //#define PSINS_psinsassert
 //#define MAT_COUNT_STATISTIC
@@ -149,9 +149,15 @@ typedef unsigned char BYTE;
 #define fdKG3(dkii,dkij)	(dkij)*SEC,(dkij)*SEC,(dkii)*PPM		// dkxz,dkyz,dkzz
 #define fdKG9(dkii,dkij)	(dkii)*PPM,(dkij)*SEC,(dkij)*SEC,(dkij)*SEC,(dkii)*PPM,(dkij)*SEC,(dkij)*SEC,(dkij)*SEC,(dkii)*PPM
 #define fdKA6(dkii,dkij)	(dkii)*PPM,(dkij)*SEC,(dkij)*SEC,(dkii)*PPM,(dkij)*SEC,(dkii)*PPM
+#define fdKGA15(dkgii,dkgij,dkaii,dkaij)	fdKG9(dkgii,dkgij),fdKA6(dkaii,dkaij)
+//#define fdKGA(dkii,x1,x2,x3)				fdKG1(dkii)
+//#define fdKGA(dkii,dkij,x2,x3)			fdKG3(dkii,dkij)
+//#define fdKGA(dkii,dkij,x2,x3)			fdKG9(dkii,dkij)
+#define fdKGA(dkgii,dkgij,dkaii,dkaij)	fdKGA15(dkgii,dkgij,dkaii,dkaij)
 
-#define dbsize(datatype)	((int)(sizeof(datatype)/sizeof(double)))
-#define Delete(p)			{ if(p) { delete p; p=NULL; } }
+
+#define dbsize(datatype)	( (int)(sizeof(datatype)/sizeof(double)) )
+#define Deletep(p)			{ if(p) { delete p; p=NULL; } }
 
 #ifdef PSINS_psinsassert
 	BOOL	psinsassert(BOOL b);
@@ -191,7 +197,7 @@ class CAlignsv;		class CAligntrkang;	class CCAM;			class CCALLH;		class CVGHook;
 class CRAvar;		class CVAR;			class CVARn;		class CIIR;			class CIIRV3;
 class CMaxMin;		class CMaxMinn;		class CRMemory;		class CSmooth;		class CFileRdWt;
 class CDR;			class CVAutoPOS;	class CPOS618;		class CAutoDrive;	class CSINSGNSSOD;
-class CSGOClbt;		class CWzhold;		class CUartPP;
+class CSGOClbt;		class CWzhold;		class CUartPP;		class CInterp;
 class CVCFileFind;	class PSINSBoard;	class ConUart;		class CContLarge;
 		
 // function define
@@ -225,7 +231,7 @@ void	IMURFU(CVect3 *pwm, CVect3 *pvm, int nSamples, const char *str);
 #define MMD2	(MMD*MMD)
 
 // global variables
-extern const CVect3	O31, One31, Ipos, posNWPU;
+extern const CVect3	O31, One31, IZ, Ipos, posNWPU;
 extern const CQuat	qI;
 extern const CMat3	I33, O33, One33;
 extern const CVect  On1, O1n, Onen1;
@@ -330,7 +336,7 @@ public:
 	friend CMat3 pos2Cen(const CVect3 &pos);				// to geographical position matrix
 	friend CVect3 pp2vn(const CVect3 &pos1, const CVect3 &pos0, double ts=1.0, CEarth *pEth=(CEarth*)NULL);  // position difference to velocity
 	friend CVect3 MKQt(const CVect3 &sR, const CVect3 &tau);// first order Markov white-noise variance calculation
-	friend CVect3 sv2att(const CVect3 &fb, double yaw0=0.0, const CVect3 &fn=CVect3(0,0,1));
+	friend CVect3 sv2att(const CVect3 &fb, double yaw0=0.0, const CVect3 &fn=IZ);
 	friend CVect3 dv2att(const CVect3 &va1, const CVect3 &va2, const CVect3 &vb1, const CVect3 &vb2);  // attitude determination using double-vector
 	friend CVect3 vn2att(const CVect3 &vn);  // trans ENU velocity to attitude (pitch & yaw)
 	friend CVect3 Alignsb(const CVect3 wmm, const CVect3 vmm, double latitude);  // align in static-base
@@ -778,15 +784,17 @@ public:
 	int nq, nr;
 	unsigned int kfcount, measflag, measflaglog, measmask;
 	CMat Ft, Pk, Hk, Fading;
-	CVect Xk, Zk, Qt, Rt, rts, RtTau, measstop, measlost, Xmax, Pmax, Pmin, Pset, Zfd, Zfd0, Zmax,
+	CVect Xk, Zk, Qt, Rt, rts, RtTau, measstop, measlost, Xmax, Pmax, Pmin, Pset, Zfd, Zfd0, Zmax, Zdiffmax, Zdiffpre,
 		Rmax, Rmin, Rbeta, Rb, Rstop,			// measurement noise R adaptive
+		innoOutlier,				// innovation outlier
 		FBTau, FBMax, FBOne, FBOne1, FBXk, FBTotal;	// feedback control
-	int Rmaxcount[MMD], Rmaxcount0[MMD];
+	int Rmaxcount[MMD], Rmaxcount0[MMD], innoOutcount[MMD], innoOutcount0;
 
 	CKalman(void);
 	CKalman(int nq0, int nr0);
 	void Init(int nq0, int nr0);				// initialize Qk,Rk,P0...
 	void SetRmaxcount(int cnt=5);
+	void SetInnoOutcount(int cnt=5);
 	virtual void SetFt(int nnq) = 0;			// process matrix setting
 	virtual void SetHk(int nnq) = 0;			// measurement matrix setting
 	virtual void SetMeas(void) = 0;				// set measurement

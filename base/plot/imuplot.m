@@ -23,13 +23,16 @@ global glv
     end
     if length(type)>=7  % imuplot(imu1, imu2);
         imuplot(imu);
-        imu = type;   t = imu(:,end);  ts = diff(imu(1:2,end));
-        subplot(321), plot(t, imu(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');
-        subplot(323), plot(t, imu(:,2)/ts/dps, 'r');
-        subplot(325), plot(t, imu(:,3)/ts/dps, 'r');
-        subplot(322), plot(t, imu(:,4)/ts/g0, 'r');
-        subplot(324), plot(t, imu(:,5)/ts/g0, 'r');
-        subplot(326), plot(t, imu(:,6)/ts/g0, 'r');
+        imu2 = type;   t = imu2(:,end);  ts = diff(imu2(1:2,end));
+        subplot(321), plot(t, imu2(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');
+        subplot(323), plot(t, imu2(:,2)/ts/dps, 'r');
+        subplot(325), plot(t, imu2(:,3)/ts/dps, 'r');
+        subplot(322), plot(t, imu2(:,4)/ts/g0, 'r');
+        subplot(324), plot(t, imu2(:,5)/ts/g0, 'r');
+        subplot(326), plot(t, imu2(:,6)/ts/g0, 'r');
+        imu = interp1n(imu, imu2(:,end));
+        [t,i1,i2] = intersect(imu(:,end), imu2(:,end));
+        lost = [[imu(i1,1:6)-imu2(i2,1:6)], t];  % imuerr = imu1-imu2;
         return;
     end
     if size(imu,2)==3, imu(:,4) = (1:length(imu))'; end

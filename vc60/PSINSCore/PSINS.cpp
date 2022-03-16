@@ -8,7 +8,7 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 27
 
 #include "PSINS.h"
 
-const CVect3 O31(0.0), One31(1.0), Ipos(1.0/RE,1.0/RE,1.0), posNWPU=LLH(34.246048,108.909664,380); //NWPU-Lab-pos
+const CVect3 O31(0.0), One31(1.0), IZ(0,0,1.0), Ipos(1.0/RE,1.0/RE,1.0), posNWPU=LLH(34.246048,108.909664,380); //NWPU-Lab-pos
 const CQuat  qI(1.0,0.0,0.0,0.0);
 const CMat3  I33(1,0,0, 0,1,0, 0,0,1), O33(0,0,0, 0,0,0, 0,0,0), One33(1.0);
 const CVect  On1(MMD,0.0), O1n=~On1, Onen1(MMD,1.0);
@@ -1990,7 +1990,7 @@ CVARn::CVARn(int row0, int clm0)
 
 CVARn::~CVARn(void)
 {
-	Delete(pData);
+	Deletep(pData);
 }
 
 void CVARn::Reset(void)
@@ -2222,8 +2222,11 @@ void CKalman::Init(int nq0, int nr0)
 	Hk = CMat(nr,nq,0.0);  Fading = CMat(nr,nq,1.0); zfdafa = 0.1;
 	Qt = Pmin = Xk = CVect(nq,0.0);  Xmax = Pmax = CVect(nq,INF);  Pset = CVect(nq,-INF);
 	Zk = CVect(nr,0.0);  Rt = CVect(nr,INF); rts = CVect(nr,1.0);  Zfd = CVect(nr,0.0); Zfd0 = Zmax = CVect(nr,INF);
+	Zdiffpre = CVect(nr,0.0); Zdiffmax = CVect(nr,INF);
 	RtTau = Rmax = CVect(nr,INF); measstop = measlost = Rmin = Rb = Rstop = CVect(nr,0.0); Rbeta = CVect(nr,1.0);
 	SetRmaxcount(5);
+	innoOutlier = CVect(nr,INF);
+	SetInnoOutcount(5);
 	FBTau = FBMax = FBOne = FBOne1 = CVect(nq,INF); FBXk = FBTotal = CVect(nq,0.0);
 	kfcount = measflag = measflaglog = 0;  SetMeasMask(3,nr0);
 }
@@ -2231,6 +2234,11 @@ void CKalman::Init(int nq0, int nr0)
 void CKalman::SetRmaxcount(int cnt)
 {
 	for(int i=0; i<nr; i++) { Rmaxcount[i]=0, Rmaxcount0[i]=cnt; }
+}
+
+void CKalman::SetInnoOutcount(int cnt)
+{
+	for(int i=0; i<nr; i++) { innoOutcount[i]=0, innoOutcount0=cnt; }
 }
 
 void CKalman::TimeUpdate(double kfts, int fback)
@@ -2551,16 +2559,32 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 					Pxz = Pk*(~Hi);
 					Pz0 = (Hi*Pxz)(0,0);
 					innovation = Zk(row)-(Hi*Xk)(0,0);
-					adptOKi = 1;
-					if(Rb.dd[row]>EPS && Rstop.dd[row]<EPS)
-						adptOKi=RAdaptive(row, innovation, Pz0);
-					double Pzz = Pz0 + Rt(row)/rts(row);
-					Kk = Pxz*(1.0/Pzz);
+					double Zdiff = innovation - Zdiffpre.dd[row];  Zdiffpre.dd[row] = innovation;
+					int *pinnoOutcount=&innoOutcount[row];
+					if(*pinnoOutcount>0) (*pinnoOutcount)--;
+					if(innovation<-innoOutlier.dd[row] || innovation>innoOutlier.dd[row])
+					{
+						if(*pinnoOutcount<2*innoOutcount0) *pinnoOutcount += 2;
+					}
+					if( (*pinnoOutcount==0||*pinnoOutcount>innoOutcount0) 
+						&& (innovation>-Zmax.dd[row]&&innovation<Zmax.dd[row])
+						&& (Zdiff>-Zdiffmax.dd[row]&&Zdiff<Zdiffmax.dd[row]) )
+					{
+						adptOKi = 1;
+						if(Rb.dd[row]>EPS && Rstop.dd[row]<EPS)
+							adptOKi=RAdaptive(row, innovation, Pz0);
+						double Pzz = Pz0 + Rt(row)/rts(row);
+						Kk = Pxz*(1.0/Pzz);
+					}
+					else
+					{
+						adptOKi = 0;
+					}
 				}
 				else
 				{
 					measflag ^= flag;
-					if(adptOKi && measstop.dd[row]<EPS && (innovation>-Zmax.dd[row]&&innovation<Zmax.dd[row]))
+					if(adptOKi && measstop.dd[row]<EPS)
 					{
 						measRes |= flag;
 						Xk += Kk*innovation;
@@ -2691,32 +2715,35 @@ void CSINSGNSS::Init(const CSINS &sins0, int grade)
 	avpi.Init(sins, kfts, 1);
 	if(grade==0) {  // inertial grade
 		Pmax.Set2(fDEG3(1.0),  fXXX(100.0),  fdPOS(1.0e6), fDPH3(0.5),  fMG3(1.0),
-			fXXX(100.0), 0.5, fdKG9(1000.0,900.0), fdKA6(100.0,100.0));
+			fXXX(100.0), 0.5, fdKGA15(1000.0,900.0,100.0,100.0));
 		Pmin.Set2(fPHI(0.1,1.0),  fXXX(0.001),  fdPOS(.01),  fDPH3(0.001),  fUG3(10.0),
-			fXXX(0.001), 0.0001, fdKG9(1.0,1.0), fdKA6(1.0,1.0));
+			fXXX(0.001), 0.0001, fdKGA15(1.0,1.0,1.0,1.0));
 		Pk.SetDiag2(fPHI(60,600),  fXXX(1.0),  fdPOS(100.0),  fDPH3(0.1),  fMG3(1.0),
-			fXXX(1.0),  0.01,  fdKG9(100.0,90.0), fdKA6(10.0,10.0));
+			fXXX(1.0),  0.01,  fdKGA15(100.0,90.0,10.0,10.0));
 		Qt.Set2(fDPSH3(0.001),  fUGPSHZ3(1.0),  fOOO,  fOO6,
 			fOOO, 0.0,  fOO9,  fOO6);
 		//MarkovGyro(I31*1000.0, I31*0.01*DPH);  MarkovAcc(I31*1000.0, I31*1.0*UG);
 		Xmax.Set(fINF9,  fDPH3(0.5),  fMG3(1.0),
-			fXXX(10.0), 0.5,  fdKG9(1000.0,900.0),  fdKA6(1000.0,900.0));
+			fXXX(10.0), 0.5,  fdKGA15(1000.0,900.0,1000.0,900.0));
 		Rt.Set2(fXXZ(0.5,1.0),   fdLLH(10.0,30.0));
 		Rmax = Rt*100;  Rmin = Rt*0.01;  Rb = 0.6;
+		innoOutlier.Set(fXXX(1.0), fdPOS(30.0));  SetInnoOutcount(5);
+		Zmax.Set(fXXX(10.0), fdPOS(1.0e6));
+		Zdiffmax.Set(fXXZ(3.0,2.0), fdLLH(100.0,10.0));
 		FBOne1.Set(fPHI(1,1), fXXX(0.1), fdLLH(1,3), fDPH3(0.01), fUG3(10), fXXX(0.1), 0.01, fINF9,  fINF6);
 		FBTau.Set(fXX9(0.1),  fXX6(1.0),  fINF3, INF,  fINF9,  fINF6);
 	}
 	else if(grade==1) {  // MEMS grade
 		Pmax.Set2(fDEG3(50.0),  fXXX(100.0),  fdPOS(1.0e6), fDPH3(5000.0),  fMG3(30.0),
-			fXXX(100.0), 0.5, fdKG9(1000.0,900.0), fdKA6(100.0,100.0));
+			fXXX(100.0), 0.5, fdKGA15(1000.0,900.0,100.0,100.0));
 		Pmin.Set2(fPHI(1,1),  fXXX(0.0001),  fdPOS(.001),  fDPH3(0.001),  fUG3(1.0),
-			fXXX(0.001), 0.0001, fdKG9(1.0,1.0), fdKA6(1.0,1.0));
+			fXXX(0.001), 0.0001, fdKGA15(1.0,1.0,1.0,1.0));
 		Pk.SetDiag2(fPHI(600,600),  fXXX(1.0),  fdPOS(100.0),  fDPH3(1000.0),  fMG3(10.0),
-			fXXX(1.0),  0.01,  fdKG9(1000.0,90.0), fdKA6(10.0,10.0));
+			fXXX(1.0),  0.01,  fdKGA15(1000.0,90.0,10.0,10.0));
 		Qt.Set2(fDPSH3(1.1),  fUGPSHZ3(10.0),  fOOO,  fOO6,
 			fOOO, 0.0,  fOO9,  fOO6);
 		Xmax.Set(fINF9,  fDPH3(3600.0),  fMG3(50.0),
-			fXXX(10.0), 0.5,  fdKG9(1000.0,900.0),  fdKA6(1000.0,900.0));
+			fXXX(10.0), 0.5,  fdKGA15(1000.0,900.0,1000.0,900.0));
 		Rt.Set2(fXXZ(0.5,1.0),   fdLLH(10.0,30.0));
 		Rmax = Rt*100;  Rmin = Rt*0.01;  Rb = 0.6;
 		FBTau.Set(fXX9(0.1),  fXX6(1.0),  fINF3, INF,  fINF9,  fINF6);
@@ -2738,7 +2765,7 @@ void CSINSGNSS::SetFt(int nnq)
 	}
 	else if(nnq==22) {
 		CMat3 Cwz=-sins.wib.k*sins.Cnb;
-		Ft.SetMat3(0,19, Cwz);				// 19-21 dKGz
+		Ft.SetMat3(0,19, Cwz);				// 19-21 dKG*z
 	}
 	else if(nnq>=28) {
 		CMat3 Cwx=-sins.wib.i*sins.Cnb, Cwy=-sins.wib.j*sins.Cnb, Cwz=-sins.wib.k*sins.Cnb; 
@@ -2784,7 +2811,7 @@ void CSINSGNSS::Feedback(int nnq, double fbts)
 	}
 	else if(nnq==22) {
 		CMat3 IdKGz(1.0,0.0,-FBXk.dd[19], 0.0,1.0,-FBXk.dd[20], 0.0,0.0,1.0-FBXk.dd[21]);
-		sins.Kg = IdKGz*sins.Kg;		// 19-21 dKGz
+		sins.Kg = IdKGz*sins.Kg;		// 19-21 dKG*z
 	}
 	else if(nnq>=28) {
 		CMat3 IdKG = I33-(~(*(CMat3*)&FBXk.dd[19]));
@@ -2854,9 +2881,9 @@ CPOS618::CPOS618(double ts, double smthSec, BOOL isdebug):CSINSGNSS(19, 6, ts)
 
 CPOS618::~CPOS618()
 {
-	Delete(pmemImuGnss); Delete(pmemFusion); Delete(pmemFusion1);
-	Delete(psmth);
-	Delete(fins); Delete(fkf);
+	Deletep(pmemImuGnss); Deletep(pmemFusion); Deletep(pmemFusion1);
+	Deletep(psmth);
+	Deletep(fins); Deletep(fkf);
 }
 
 BOOL CPOS618::Load(char *fname, double t0, double t1)
@@ -3203,7 +3230,7 @@ void CSINSGNSSOD::operator<<(CFileRdWt &f)
 	f<<sins.att<<sins.vn<<sins.pos<<sins.eb<<sins.db  // 1-15
 		<<sins.vnL<<sins.posL<<lvGNSS   // 16-24
 		<<vnOD<<posOD<<lvOD<<ODKappa()  // 25-36
-		<<dtGNSSdelay<<dyawGNSS <<kftk; // 47-39
+		<<dtGNSSdelay<<dyawGNSS<<(sins.Kg.e22-1.0) <<kftk; // 37-40
 }
 #endif
 
@@ -3303,9 +3330,9 @@ int CAutoDrive::Update(const CVect3 *pwm, const CVect3 *pvm, double dS, int nn, 
 }
 
 //***************************  class CSGOClbt  *********************************/
-CSGOClbt::CSGOClbt(double ts):CSINSGNSSOD(26, 10, ts, 9)
+CSGOClbt::CSGOClbt(double ts):CSINSGNSSOD(27, 10, ts, 9)
 {
-	// 0-14: phi,dvn,dpos,eb,db; 15-17: lvGNSS; 18-20: Kappa; 21-23: lvOD; 24: dtGNSS; 25: dyawGNSS
+	// 0-14: phi,dvn,dpos,eb,db; 15-17: lvGNSS; 18-20: Kappa; 21-23: lvOD; 24: dtGNSS; 25: dyawGNSS; 26: dKGzz
 	// Hk(0:5,:) ...								// 0-5: SINS/GNSS-dvn,dpos
 	Hk.SetMat3(6, 3, I33);							// 6-8: SINS/OD-dvn
 	Hk(yawHkRow,2) = 1.0; Hk(yawHkRow,25) = -1.0; 	// 9: SINS/GNSS-dyaw
@@ -3317,12 +3344,12 @@ void CSGOClbt::Init(const CSINS &sins0, int grade)
 	CSINSGNSSOD::Init(sins0, grade);
 	if(grade<0) return;
 	Pmax.Set2(fDEG3(10.0), fXXX(50.0), fdPOS(1.0e4),
-		fDPH3(3600), fMG3(10.0), fXXX(1.1), fKPP(1,0.01,1), fXXX(10.0), 0.1, 1*DEG);
+		fDPH3(3600), fMG3(10.0), fXXX(1.1), fKPP(1,0.01,1), fXXX(10.0), 0.1, 1*DEG, 1000*PPM);
 	Pmin.Set2(fPHI(0.1,0.6), fXXX(0.001), fdPOS(0.01),
-		fDPH3(0.1), fUG3(100), fXXZ(0.01,0.01), fKPP(0.01,0.001,0.01), fXXX(0.001), 0.0001, 0.01*DEG);
+		fDPH3(0.1), fUG3(100), fXXZ(0.01,0.01), fKPP(0.01,0.001,0.01), fXXX(0.001), 0.0001, 0.01*DEG, 0.0);
 	Pk.SetDiag2(fDEG3(1.0), fXXX(1.0), fdPOS(100.0),
-		fDPH3(10), fMG3(1.0), fXXZ(1.1,1.1), fKPP(0.1,0.01,1.1), fXXX(1.0), 0.01, 1.1*DEG);
-	Qt.Set2(fDPSH3(0.51), fUGPSHZ3(1000), fOO9, fOOO, fOOO, fOOO, 0.0, 0.0);
+		fDPH3(10), fMG3(1.0), fXXZ(1.1,1.1), fKPP(0.1,0.01,1.1), fXXX(1.0), 0.01, 1.1*DEG, 1000*PPM);
+	Qt.Set2(fDPSH3(0.51), fUGPSHZ3(1000), fOO9, fOOO, fOOO, fOOO, 0.0, 0.0, 0.0);
 	Rt.Set2(fXXZ(0.2,0.6), fdLLH(10.0,30.0), fXXZ(0.1,0.1), 1.0*DEG);
 	Rmax = Rt*100;  Rmin = Rt*0.0001;  Rb.SetBit(077, 0.5);
 	FBTau = .10;
@@ -3331,6 +3358,7 @@ void CSGOClbt::Init(const CSINS &sins0, int grade)
 void CSGOClbt::SetFt(int nnq)
 {
 	CSINSGNSS::SetFt(18);
+	Ft(2,26) = -sins.wib.k*sins.Cnb.e22;  // 26 dKGzz
 }
 
 void CSGOClbt::SetHk(int nnq)
@@ -3345,10 +3373,11 @@ void CSGOClbt::Feedback(int nnq, double fbts)
 {
 	CSINSGNSS::Feedback(18, fbts);
 	Cbo = Cbo*a2mat(CVect3(FBXk.dd[18],0.0,FBXk.dd[20]));
-	Kod *= 1 - FBXk.dd[19];
-	lvOD += *(CVect3*)&FBXk.dd[21];
+	Kod *= 1.0-FBXk.dd[19];
+	lvOD += *(CVect3*)&FBXk.dd[21]; 
 	dtGNSSdelay += FBXk.dd[24];
 	dyawGNSS += FBXk.dd[25];
+	sins.Kg.e22 *= 1.0-FBXk.dd[26];
 }
 
 int CSGOClbt::Update(const CVect3 *pwm, const CVect3 *pvm, double dS, int nn, double ts, int nSteps)
@@ -4647,7 +4676,7 @@ CSmooth::CSmooth(int clm, int row)
 
 CSmooth::~CSmooth()
 {
-	Delete(pmem);
+	Deletep(pmem);
 }
 
 CVect CSmooth::Update(const double *p, double *pmean)
@@ -4690,7 +4719,7 @@ CInterp::CInterp(const char *fname, int clm)
 
 CInterp::~CInterp()
 {
-	if(pmem->pMemStart0) Delete(pmem);
+	if(pmem->pMemStart0) Deletep(pmem);
 }
 
 double CInterp::Interp(double t, double *data)
@@ -4976,13 +5005,13 @@ void CAlignsv::Init(const CVect3 &pos, double ts, double T2, double T1)
 	t = tk = 0.0; this->ts = ts; this->T2 = T2; this->T1 = T1;
 	alnkfinit = 0;
 	alni0.Init(pos);
-	Delete(pMem);
+	Deletep(pMem);
 	pMem = new CRMemory((int)(T1/ts+10), 6*sizeof(double));
 }
 
 CAlignsv::~CAlignsv()
 {
-	Delete(pMem);
+	Deletep(pMem);
 }
 
 int CAlignsv::Update(const CVect3 *pwm, const CVect3 *pvm, int nSteps)

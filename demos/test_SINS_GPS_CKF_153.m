@@ -1,12 +1,12 @@
 % SINS/GPS intergrated navigation simulation using CKF.
 % Please run 'test_SINS_trj.m' to generate 'trj10ms.mat' beforehand!!!
-% See also  test_SINS_GPS_UKF_153, test_SINS_GPS_153.
+% See also  test_SINS_GPS_UKF_153, test_SINS_GPS_EKF_153, test_SINS_GPS_153.
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 27/02/2022
 glvs
 psinstypedef('test_SINS_GPS_UKF_153_def');
-trj = trjfile('trj10ms.mat');
+trj = trjfile('trj10ms.mat');  % insplot(trj.avp);
 % initial settings
 [nn, ts, nts] = nnts(2, trj.ts);
 imuerr = imuerrset(0.03, 100, 0.001, 5);
@@ -17,21 +17,20 @@ ins = insinit(avpadderr(trj.avp0,davp0), ts);
 rk = poserrset([1;1;3]);
 kf = kfinit(ins, davp0, imuerr, rk);
 len = length(imu); [avp, xkpk] = prealloc(fix(len/nn), 10, 2*kf.n+1);
-timebar(nn, len, '15-state SINS/GPS UKF Simulation.'); 
+timebar(nn, len, '15-state SINS/GPS CKF Simulation.'); 
 ki = 1;
 for k=1:nn:len-nn+1
     k1 = k+nn-1;  
     wvm = imu(k:k1,1:6);  t = imu(k1,end);
     ins = insupdate(ins, wvm);
     kf.px = ins;
+	kf = ckf(kf);
     if mod(t,1)==0
         posGPS = trj.avp(k1,7:9)' + davp0(7:9).*randn(3,1);  % GPS pos simulation with some white noise
-        kf = ckf(kf, ins.pos-posGPS);  % CKF filter
+        kf = ckf(kf, ins.pos-posGPS, 'M');  % CKF filter
         [kf, ins] = kffeedback(kf, ins, 1, 'avp');
         avp(ki,:) = [ins.avp', t];
         xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t]';  ki = ki+1;
-    else
-        kf = ckf(kf);
     end
     timebar;
 end

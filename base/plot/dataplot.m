@@ -25,5 +25,6 @@ global glv
         case 'od',   odplot(res);
         case 'odv',    myfig; plot(res(:,end),res(:,1:3)); xygo('dV');
         case 'kappa',  odpplot(res);
+        case 'dKGzz',  myfig; plot(res(:,end),res(:,1)/glv.ppm); xygo('dKGzz / ppm');
         case 'temp',  templot(res);
     end

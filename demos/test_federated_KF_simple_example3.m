@@ -18,7 +18,7 @@ ckf.Hk = [1 1 0; 1 0 1];  [m,n] = size(ckf.Hk);  ckf.Rk = diag(1*ones(m,1))^2;
 ckf.Pxk = P0;
 ckf = kfinit0(ckf, 1);
 %% federated KF init
-fkf = fkfinit(ckf, {[1,2]; [1,3]},  {[1]; [2]}, [5/10; 5/10], 0, 3);
+fkf = fkfinit(ckf, {[1,2]; [1,3]},  {[1]; [2]}, [5/10; 5/10], 1, 1);
 %% 
 [xtrue, cxk,cpk, xk1,pk1, xk2,pk2, fxk,fpk] = prealloc(len,  ckf.n+1, ckf.n,ckf.n, fkf{1}.n,fkf{1}.n, fkf{2}.n,fkf{2}.n, fkf{3}.n,fkf{3}.n);
 ki = timebar(1, len, '3-state centralized v.s. federated KF simulation.');

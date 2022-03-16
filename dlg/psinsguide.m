@@ -39,6 +39,8 @@ function rotordemo_Callback(hObject, eventdata, handles)
 opru('demo_gyro_rotor_precession.m');
 function hrgdemo_Callback(hObject, eventdata, handles)
 opru('demo_HRG_effect.m');
+function sagnacdemo_Callback(hObject, eventdata, handles)
+opru('demo_sagnac_effect.m');
 function platformmotion_Callback(hObject, eventdata, handles)
 opru('demo_PINS_platform_motion.m');
 function conedemo_Callback(hObject, eventdata, handles)
@@ -47,8 +49,6 @@ function noncommutativity_Callback(hObject, eventdata, handles)
 opru('demo_noncommutativity.m');
 function sculldemo_Callback(hObject, eventdata, handles)
 opru('demo_scull_motion.m');
-function sagnacdemo_Callback(hObject, eventdata, handles)
-opru('demo_sagnac_effect.m');
 function randonmwalk_Callback(hObject, eventdata, handles)
 opru('demo_drift_random_walk.m');
 function coneclassic_Callback(hObject, eventdata, handles)
@@ -110,13 +110,11 @@ set(handles.sinsgps153,'value',0); set(handles.sinsgps186,'value',1); set(handle
 function sinsgps193_Callback(hObject, eventdata, handles)
 set(handles.sinsgps153,'value',0); set(handles.sinsgps186,'value',0); set(handles.sinsgps193,'value',1);
 function sinsgps_Callback(hObject, eventdata, handles)
-if get(handles.sinsgps153,'value')
-    opru('test_SINS_GPS_153.m');
-elseif get(handles.sinsgps186,'value')
-    opru('test_SINS_GPS_186.m');
-else
-    opru('test_SINS_GPS_193.m');
-end
+    if get(handles.sinsgps153,'value'),         opru('test_SINS_GPS_153.m');
+    elseif get(handles.sinsgps186,'value'),     opru('test_SINS_GPS_186.m');
+    else,                                       opru('test_SINS_GPS_193.m');  end
+function sinsgnssekf_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_EKF_153.m');
 function sinsgnssukf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_UKF_153.m');
 function sinsgnssckf_Callback(hObject, eventdata, handles)
@@ -129,4 +127,3 @@ function posfusion_Callback(hObject, eventdata, handles)
 opru('test_POS_fusion.m');
 function sysclbt_Callback(hObject, eventdata, handles)
 opru('test_system_calibration_19pos.m');
-

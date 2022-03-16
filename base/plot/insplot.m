@@ -79,6 +79,7 @@ global glv
             tscalepop();
         case 'ap',
             insplot([avp(:,1:3),zeros(length(avp),3),avp(:,4:end)],'avp');
+            subplot(323), delete(gca); %cla;  xygo('N/A'); legend('');
         case 'vp',
             insplot([zeros(length(avp),3),avp],'avp');
         case 'vuh',  % plot VU & hgt

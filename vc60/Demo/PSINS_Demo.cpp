@@ -1,25 +1,9 @@
 #include "PSINS_Demo.h"
 
 #ifdef  PSINSDemo
-double data[][2] =
-{
-	{-100, 1}, 
-	{1,2},
-	{2,3},
-	{100,5},
-};
 
 void Demo_User(void)
 {
-//	CInterp int1(data, 4, 2);
-	CInterp int1("D:\\ygm2021\\小论文\\惯性天文误差分析\\dut1.bin", 2);
-	FILE *f=fopen("D:\\ygm2021\\小论文\\惯性天文误差分析\\int.txt", "wt");
-	for(int k=1; k<100; k++) {
-		double t = 2000 + k/10.0 + randn(0,1)/10;
-		double d = int1.Interp(t);
-		fprintf(f, "%f, %f \n", t, d);
-	}
-	fclose(f);
 }
 
 void Demo_CIIRV3(void)
@@ -114,6 +98,7 @@ void Demo_CSINS_static(void)
 
 void Demo_CAlignsv(void)
 {
+#ifdef PSINS_RMEMORY
 	CFileRdWt::Dir("..\\Data\\", ".\\Data\\");
 	CFileIMU6 fimu("lasergyro.imu"); CFileRdWt faln("aln.bin");
 	CAlignsv aln(fimu.pos0, fimu.ts, 600, 200);
@@ -124,6 +109,7 @@ void Demo_CAlignsv(void)
 		faln<<q2att(aln.qnb)<<aln.tk;
 		disp(i, 100, 100);
 	}
+#endif
 }
 
 void Demo_CAligntf(void)
@@ -179,6 +165,7 @@ void Demo_CAlign_CSINS(void)
 
 void Demo_CSINSGNSS(void)
 {
+#ifdef PSINS_RMEMORY
 	CFileRdWt::Dir("D:\\psins210406\\vc60\\Data\\");
 	CFileIMUGNSS fimu("imugps.bin"); CFileRdWt fins("ins.bin"), fkf("kf.bin");
 	CAlignsv aln(fimu.pos0, fimu.ts, 50);
@@ -202,6 +189,7 @@ void Demo_CSINSGNSS(void)
 		if(i%20==0) fkf<<kf;
 		disp(i, 100, 100);
 	}
+#endif
 }
 
 void Demo_CSINSGNSSDR(void)
@@ -250,11 +238,13 @@ void Demo_SINSOD(void)
 
 void Demo_POS618(void)
 {
+#ifdef PSINS_RMEMORY
 	CFileRdWt::Dir("D:\\ygm2021\\立得空间\\0901\\");
 	CPOS618 pos(0.01, 5.0);
 	pos.Load("imugnss.bin", 0, 50000);
 	pos.Init(0, CVect3(0,0,126)*DEG);
 	pos.Process("posres.bin");
+#endif
 }
 
 void Demo_CNS_PrecNut(void)

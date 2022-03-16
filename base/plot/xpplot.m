@@ -7,7 +7,7 @@ function xpplot(x, p, clm, unt, untstr, clm1, unt1, untstr1)
 %         unt - unit
 %         untstr = unit string to show in ylabel
 %
-% See also  dataplot, kfplot, inserrplot, kffile, rvpplot.
+% See also  kfplot, xpclm, dataplot, inserrplot, kffile, rvpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -68,6 +68,22 @@ global glv
         t = p(:,end); x = x(:,clm); p = p(:,clm);
         subplot(211), plot(t, x(:,1)); xygo('dT');
         subplot(212), plot(t, sqrt(p(:,1))); xygo('dT');
+        return
+    end
+    if strcmp(untstr,'dKG1')
+        if length(clm)<1, clm=20; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1)/glv.ppm); xygo('dKzz'); title('Scale Gyro')
+        subplot(212), plot(t, sqrt(p(:,1))/glv.ppm); xygo('dKzz'); title('Std Scale Gyro')
+        return
+    end
+    if strcmp(untstr,'dKG3')
+        if length(clm)<3, clm=20:22; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(221), plot(t, x(:,1:2)/glv.sec); xygo('dKx/yz'); title('Install angles')
+        subplot(223), plot(t, sqrt(p(:,1:2))/glv.sec); xygo('dKx/yz'); title('Std Install angles')
+        subplot(222), plot(t, x(:,3)/glv.ppm); xygo('dKzz'); title('Scale Gyro')
+        subplot(224), plot(t, sqrt(p(:,3))/glv.ppm); xygo('dKzz'); title('Std Scale Gyro')
         return
     end
     if strcmp(untstr,'dKG')
