@@ -2231,6 +2231,14 @@ void CKalman::Init(int nq0, int nr0)
 	kfcount = measflag = measflaglog = 0;  SetMeasMask(3,nr0);
 }
 
+void CKalman::SetRmmbt(double rmin, double rmax, double b, double tau)
+{
+	if(tau<INF/2)  RtTau = tau;
+	if(b<INF/2)  Rb = b;
+	if(rmax<INF/2)  Rmax = Rt * (rmax*rmax);
+	Rmin = Rt * (rmin*rmin);
+}
+
 void CKalman::SetRmaxcount(int cnt)
 {
 	for(int i=0; i<nr; i++) { Rmaxcount[i]=0, Rmaxcount0[i]=cnt; }

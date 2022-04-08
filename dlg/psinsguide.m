@@ -119,8 +119,12 @@ function sinsgnssukf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_UKF_153.m');
 function sinsgnssckf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_CKF_153.m');
+function sinsgnsspf_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_PF_153.m');
 function sinscns_Callback(hObject, eventdata, handles)
 opru('test_SINS_CNS_184.m');
+function sinsgpstc_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_tightly_coupled.m');
 function postrj_Callback(hObject, eventdata, handles)
 opru('test_POS_trj.m');
 function posfusion_Callback(hObject, eventdata, handles)

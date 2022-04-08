@@ -1,4 +1,4 @@
-function [kf, ins, xfb_tmp] = kffeedback(kf, ins, T_fb, fbstr)
+function [kf, ins, xfb] = kffeedback(kf, ins, T_fb, fbstr)
 % Kalman filter state estimation feedback to SINS.
 %
 % Prototype: [kf, ins] = kffeedback(kf, ins, T_fb)
@@ -7,6 +7,7 @@ function [kf, ins, xfb_tmp] = kffeedback(kf, ins, T_fb, fbstr)
 %         T_fb - feedback time interval
 %         fbstr - feedback string
 % Outputs: kf, ins - Kalman filter & SINS structure array after feedback
+%          xfb - feedback state value
 %
 % See also  kfinit, kffk, kfhk, kfplot, psinstypedef.
 
@@ -22,7 +23,7 @@ function [kf, ins, xfb_tmp] = kffeedback(kf, ins, T_fb, fbstr)
         xtau = kf.xtau;
     	xtau(kf.xtau<kf.T_fb) = kf.T_fb;  kf.coef_fb = kf.T_fb./xtau;  %2015-2-22
     end
-    xfb_tmp = kf.coef_fb.*kf.xk;
+    xfb_tmp = kf.coef_fb.*kf.xk;  xfb = xfb_tmp*0;
     for k=1:length(fbstr)
         switch fbstr(k)
             case 'a',
@@ -63,6 +64,7 @@ function [kf, ins, xfb_tmp] = kffeedback(kf, ins, T_fb, fbstr)
         end
         kf.xk(idx) = kf.xk(idx) - xfb_tmp(idx);    %
         kf.xfb(idx) = kf.xfb(idx) + xfb_tmp(idx);  % record total feedback
+        xfb(idx) = xfb_tmp(idx);
     end
     [ins.qnb, ins.att, ins.Cnb] = attsyn(ins.qnb);
     ins.avp = [ins.att; ins.vn; ins.pos];  % 2015-2-22

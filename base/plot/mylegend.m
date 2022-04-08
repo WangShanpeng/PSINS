@@ -6,10 +6,18 @@ function mylegend(str1, str2, str3, str4, str5)
 %
 % See also  lbdef.
 
-% Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
+% Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 20/05/2014
+% 20/05/2014, 23/03/2022
     location = 'NorthEast';
+    if iscell(str1)  % legend( {'a','b','c',...}, data_abc, ' .3f' )
+        if nargin<3, str3=' %.3f'; end
+        for k=1:length(str1)
+            str1{k} = sprintf([str1{k},str3], str2(k));
+        end
+        legend(str1);
+        return;
+    end
     switch nargin
         case 1,
             str1 = lbdef(str1);

@@ -15,6 +15,6 @@ void CKFApp::Init(const CSINS &sins0, int grade)
 	Pk.SetDiag2(fPHI(60,600),  fXXX(1.0),  fdPOS(10.0),  fDPH3(100),  fMG3(3.0), fXXX(1.0),  0.01);
 	Qt.Set2(fDPSH3(0.1),  fUGPSHZ3(1.0),  fOOO,  fOO6,	fOOO, 0.0);
 	Rt.Set2(fXXZ(0.5,1.0),   fdLLH(10.0,30.0));
-	Rmax = Rt*100;  Rmin = Rt*0.01;  Rb = 0.6;
+	SetRmmbt(0.1, 10, 0.6);
 	FBTau.Set(fXX9(0.1),  fXX6(1.0),  fINF3, INF);
 }

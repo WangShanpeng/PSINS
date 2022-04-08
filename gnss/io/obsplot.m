@@ -12,7 +12,8 @@ function obsplot(tpPRN, obs, ytext)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 29/07/2015
     clr = 'bgrcmyk';
-    tp = tpPRN(:,1); PRN = tpPRN(:,2); uniPRN = unique(PRN);
+    t0 = tpPRN(1,1);
+    tp = tpPRN(:,1)-t0; PRN = tpPRN(:,2); uniPRN = unique(PRN);
     myfigure
     len = length(uniPRN); clr = repmat(clr,1,fix(len/length(clr))+1);
     for k=1:len
@@ -21,4 +22,4 @@ function obsplot(tpPRN, obs, ytext)
         text(ktp(end), kobs(end,:), num2str(uniPRN(k))); hold on;
     end
     if nargin<3, ytext = 'obs'; end
-    xygo(ytext);
+    xygo(sprintf('\\itt\\rm / s (+%0.f)',t0), ytext);

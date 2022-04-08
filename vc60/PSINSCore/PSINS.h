@@ -793,6 +793,7 @@ public:
 	CKalman(void);
 	CKalman(int nq0, int nr0);
 	void Init(int nq0, int nr0);				// initialize Qk,Rk,P0...
+	void SetRmmbt(double rmin=0.1, double rmax=INF, double b=INF, double tau=INF);
 	void SetRmaxcount(int cnt=5);
 	void SetInnoOutcount(int cnt=5);
 	virtual void SetFt(int nnq) = 0;			// process matrix setting
