@@ -9,7 +9,7 @@ function [y, Pyy, Pxy, X, Y] = ckfCT(x, Pxx, hfx, tpara)
 %          Pxy - covariance matrix between x & y
 %          X, Y - Sigma-point vectors before & after UT
 %
-% See also  ckf, ukfUT.
+% See also  ckf, ukfUT, SSUT.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

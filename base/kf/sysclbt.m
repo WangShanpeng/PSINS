@@ -14,7 +14,7 @@ function [clbt, av] = sysclbt(imu, pos, g0, Cba)
 %                where wb=wm/ts, fb=vm/ts, and fL is accelerometer inner
 %                lever arm effect (refer to the following code). 
 %
-% See also  imuscale, lsclbt, clbtfile, clbtdiff, imuclbt, imuerrset, insupdate, kfupdate.
+% See also  imuscale, imudpdrift, lsclbt, clbtfile, clbtdiff, imuclbt, imuerrset, kfupdate.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -38,11 +38,13 @@ global glv
         imu1(:,1:6) = [imu(:,1:3)*clbt.Kg', imu(:,4:6)*clbt.Ka'];    % IMU calibration for alignment
         imu1(:,1:6) = [imu1(:,1)-clbt.eb(1)*ts,imu1(:,2)-clbt.eb(2)*ts,imu1(:,3)-clbt.eb(3)*ts, ...  % 20181102
                        imu1(:,4)-clbt.db(1)*ts,imu1(:,5)-clbt.db(2)*ts,imu1(:,6)-clbt.db(3)*ts];
-        [~, qnb] = alignsb(imu1(frq2:kstatic,:), pos); vn = zeros(3,1);  % align
+        qnb = a2qua(alignsb(imu1(frq2:kstatic,:), pos)); vn = zeros(3,1);  % qnb=setyaw(qnb,0); % align
 %         if iter==1, qnb0 = qnb;  else, qnb0 = qdelphi(qnb0, kf.xk(1:3)); end
 %         att = q2att(qnb); att0 = q2att(qnb0); qnb = a2qua([att(1:2);att0(3)]);
         dotwf = imudot(imu1, 5.0);
         if iter~=itertion,  kf = clbtkfinit(nts);  else, kf.Pxk = kf.Pxk*100; kf.Pxk(:,3)=0; kf.Pxk(3,:)=0; kf.xk = kf.xk*0; end
+%         if iter~=itertion,  kf = clbtkfinit(nts);  else, kf.Pxk = diag(diag(kf.Pxk))*100; kf.xk = kf.xk*0; end
+% kf = clbtkfinit(nts);
         t1s = 0; vn1s = zeros(fix(len*ts), 4);  kkv = 1;
         av = zeros(fix(len*ts),7); xkpk = zeros(fix(len*ts), kf.n*2+1);  kk = 1;
         timebar(nn, len-2*frq2, sprintf('System Calibration of SIUM( iter=%d ).',iter));
@@ -60,7 +62,7 @@ global glv
             t1s = t1s + nts;
             kf.Phikk_1 = eye(kf.n)+getFt(fb, wb, q2mat(qnb), wnie, SS)*nts;
             kf = kfupdate(kf);
-            if t1s>(1-ts/2)  % kf measurement update every 1 second
+            if t1s>(0.2-ts/2)  % kf measurement update every 1 second
                 t1s = 0;
                 ww = mean(imu(k-frq2:k+frq2,1:3),1); ww = norm(ww)/ts;
                 if ww<20*glv.dph   % if IMU is static
@@ -81,7 +83,7 @@ global glv
 function kf = clbtkfinit(ts)
 global glv
     kf.Qt = diag([ [1;1;1]*0.01*glv.dpsh; [1;1;1]*100*glv.ugpsHz; zeros(37,1) ])^2;
-    kf.Rk = diag([1;1;1]*0.01)^2;
+    kf.Rk = diag([1;1;1]*0.001)^2;
     kf.Pxk = diag([ [0.1;0.1;1]*glv.deg; [1;1;1]; [1;1;1]*0.1*glv.dph; [1;1;1]*glv.mg; ...
         [100*glv.ppm;100*glv.sec;100*glv.sec]; [100*glv.sec;100*glv.ppm;100*glv.sec]; [100*glv.sec;100*glv.sec;100*glv.ppm]; ...
         [100*glv.ppm;100*glv.sec;100*glv.sec]; [  0*glv.sec;100*glv.ppm;100*glv.sec]; [  0*glv.sec;  0*glv.sec;100*glv.ppm]; [1;1;1]*100*glv.ugpg2; ...

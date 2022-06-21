@@ -41,7 +41,7 @@ function kf = ckf(kf, yk, TimeMeasBoth)
             kf.xkk_1 = kf.xk; kf.Pxkk_1 = kf.Pxk;
         end
         if isfield(kf, 'hx')  % nonliear measurement propagation
-            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ckfCT(kf.xkk_1, kf.Pxkk_1, kf.hfx, kf.py);
+            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ckfCT(kf.xkk_1, kf.Pxkk_1, kf.hx, kf.py);
             kf.Pykk_1 = kf.Pykk_1 + kf.Rk;
         else
             kf.ykk_1 = kf.Hk*kf.xkk_1;

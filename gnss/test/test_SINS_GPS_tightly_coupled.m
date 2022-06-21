@@ -7,7 +7,7 @@ ggpsvars
 psinstypedef('test_SINS_GPS_tightly_def');
 load insgpseo_tc.mat;  % vars: imu ephs obss t0
 [nn, ts, nts] = nnts(1, diff(imu(1:2,end)));  % imuplot(imu);  
-vp = getgnssvp(ephs, obss, 185500);
+vp = getgnssvp(ephs, obss, 185500, 1);
 att=aligni0(datacut(imu,0,50), vp(4:6)); 
 avp0 = [att; vp]; % avp=inspure(imu, [att;vp]); 
 davp = avperrset([10;10;60], 1, 100);
@@ -23,9 +23,9 @@ for k=1:nn:len-nn*2
     ins = insupdate(ins, wvm);
     kf.Phikk_1 = kffk(ins);
     kf = kfupdate(kf);
-    if mod(tp,1)<0.005
+    if mod(tp,1)<ts
         obsi = findgpsobs(tp);
-        if length(obsi)<4, continue; end
+        if size(obsi,1)<4, continue; end
         ephi = ephs(obsi(:,2),:);  CA = obsi(:,3);
         [satpv, clkerr] = satPosVelBatch(tp-CA/ggps.c, ephi);      % SPP
         [pvti, vp, res] = lspvt(recPos, satpv, CA+clkerr(:,2)*ggps.c); recPos = pvti(1:4);

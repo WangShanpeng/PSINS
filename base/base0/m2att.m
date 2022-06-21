@@ -5,7 +5,7 @@ function [att, attr] = m2att(Cnb)
 % Input: Cnb - DCM from navigation-frame(n) to body-frame(b)
 % Outputs: att - att=[pitch; roll; yaw] in radians, in yaw->pitch->roll
 %                (3-1-2) rotation sequence
-%          attr - in yaw->roll->pitch (3-2-1) roation sequence
+%          attr - in yaw->roll->pitch (3-2-1) rotation sequence
 % Test:
 %   att0=randn(3,1)/10; [Cnb,Cnbr]=a2mat(att0); att=m2att(Cnb); [~,attr]=m2att(Cnbr); [att0, att, attr]
 %

@@ -30,9 +30,7 @@ paras = [
 att = attrottt(att0, paras, ts);
 % att1=att; att1(:,end)=att1(:,end)/2; att3ddemo(att1(1:10:end,:),1);
 % IMU simulation
-len = length(att);
-avp = [att(:,1:3),zeros(len,3),repmat(pos0',len,1),att(:,4)];
-imu = avp2imu(avp);
+imu = avp2imu(att,pos0);
 imuplot(imu,1);
 % systematic calibration
 imu1 = imuclbt(imu);

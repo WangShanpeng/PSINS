@@ -2,11 +2,11 @@ function [fkf, testHk] = fkfupdate(ckf, fkf, yk)
 % federated Kalman filter updating.
 %
 % Prototype: fkf = fkfupdate(ckf, fkf, zk)
-% Inputs: ckf - centralized KF structure;
+% Inputs: ckf - centralized KF structure, just for FKF Phikk_1/Hk setting;
 %         fkf - federated Kalman filter structure cell
 %         yk - measurement array same as input to ckf
 % Outputs: fkf - federated Kalman filter structure cell
-%          testHk - must be 0, showing CKF measurement consistency with FKF
+%          testHk - must be 0, indicating CKF measurement consistency with FKF
 %
 % See also  fkfinit, kfupdate, kfinit.
 

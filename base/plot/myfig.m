@@ -1,4 +1,4 @@
-function h = myfig(namestr)
+function h = myfig(namestr, ylb)
 % Short for myfigure.
 %
 % See also  myfigure.
@@ -9,8 +9,9 @@ function h = myfig(namestr)
     if ~exist('namestr','var')
         h0 = myfigure;
     else
-        if ~ischar(namestr)  % myfig(data);
-            myfig; plot(namestr); grid on
+        if ~ischar(namestr)  % myfig(data, ylabel);
+            if nargin<2, ylb='val'; end
+            myfig; plot(namestr); xygo(ylb);
             return;
         end
         h = myfigure(namestr);

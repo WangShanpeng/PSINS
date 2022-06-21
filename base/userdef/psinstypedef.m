@@ -30,6 +30,7 @@ global psinsdef
     psinsdef.kfinit186 = 186;
     psinsdef.kfinit193 = 193;
     psinsdef.kfinit196 = 196;
+    psinsdef.kfinit246 = 246;
     psinsdef.kfinit331 = 331;
     psinsdef.kfinit343 = 343;
     psinsdef.kfinit346 = 346;
@@ -40,6 +41,7 @@ global psinsdef
     psinsdef.kffk15 = 15;
     psinsdef.kffk18 = 18;
     psinsdef.kffk19 = 19;
+    psinsdef.kffk24 = 24;
     psinsdef.kffk33 = 33;
     psinsdef.kffk34 = 34;
     psinsdef.kffk37 = 37;
@@ -52,6 +54,7 @@ global psinsdef
     psinsdef.kfhk186 = 186;
     psinsdef.kfhk193 = 193;
     psinsdef.kfhk196 = 196;
+    psinsdef.kfhk246 = 246;
     psinsdef.kfhk331 = 331;
     psinsdef.kfhk343 = 343;
     psinsdef.kfhk346 = 346;

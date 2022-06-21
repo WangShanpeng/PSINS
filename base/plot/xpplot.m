@@ -7,7 +7,7 @@ function xpplot(x, p, clm, unt, untstr, clm1, unt1, untstr1)
 %         unt - unit
 %         untstr = unit string to show in ylabel
 %
-% See also  kfplot, xpclm, dataplot, inserrplot, kffile, rvpplot.
+% See also  kfplot, xpclm, dataplot, inserrplot, insserrplot, kffile, rvpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -118,6 +118,13 @@ global glv
         t = p(:,end); x = x(:,clm); p = p(:,clm);
         subplot(211), plot(t, x(:,1)/glv.deg); xygo('y');
         subplot(212), plot(t, sqrt(p(:,1))/glv.deg); xygo('y');
+        return
+    end
+    if strcmp(untstr,'mu')
+        if length(clm)<1, clm=1:3; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)/glv.min); xygo('mu');
+        subplot(212), plot(t, sqrt(p(:,1:3))/glv.min); xygo('mu');
         return
     end
     if strcmp(untstr,'kappa')

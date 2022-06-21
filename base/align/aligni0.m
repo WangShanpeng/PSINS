@@ -79,4 +79,4 @@ global glv
     subplot(211), plot(t, attk(:,1:2)/glv.deg), xygo('pr');
         hold on,  plot(t, attkv(:,1:2)/glv.deg, 'm:'),
     subplot(212), plot(t, attk(:,3)/glv.deg), xygo('y');
-        hold on,  plot(t, attkv(:,3)/glv.deg, 'm:'), legend('i0 pos', 'i0 vel'); title(sprintf('\\psi=%.4f', attk(end,3)/glv.deg));
+        hold on,  plot(t, attkv(:,3)/glv.deg, 'm:'), legend('i0 pos', 'i0 vel'); title(sprintf('\\psi=%.4f \\circ', attk(end,3)/glv.deg));

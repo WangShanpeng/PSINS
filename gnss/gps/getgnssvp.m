@@ -1,4 +1,4 @@
-function vp = getgnssvp(ephs, obss, tp)
+function vp = getgnssvp(ephs, obss, tp, isfig)
 % see also  findgpsobs.
 global ggps
     findgpsobs(obss);
@@ -11,6 +11,11 @@ global ggps
         [pvt, vp, res] = lspvt(recPos, satpv, [obsi(:,3)+clkerr(:,2)*ggps.c]);
         break;
     end
+    if nargin>=4
+        AzEl = satPos2AzEl(satpv, vp(4:6));
+        satplot(obsi(:,2), AzEl);
+    end
+
     
     
     

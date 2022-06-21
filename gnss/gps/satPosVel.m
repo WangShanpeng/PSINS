@@ -8,7 +8,7 @@ function [satPoss, satClkCorrs, satVels] = satPosVel(transmitTime, eph)
 %          satClkCorrs - satellite clock corrections
 %          satVels - satellite velocities in ECEF at transmit time
 %
-% See also  satPosVelBatch, findEph, lsPos.
+% See also  satPosVelBatch, findEph, lsPos, DOP, maxtetra.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

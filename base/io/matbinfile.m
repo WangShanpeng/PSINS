@@ -7,7 +7,7 @@ function data = matbinfile(fname, varname, clm)
 %         clm - column for '.bin' file.
 % Output: data - data array read from the '.mat' or '.bin' file
 
-% See also  binfile, txtbinfile, fig2jpg.
+% See also  binfile, txtbinfile, txtmatfile, txt2matfile, fig2jpg.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

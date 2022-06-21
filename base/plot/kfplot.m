@@ -10,6 +10,7 @@ function kfplot(xkpk, varargin)
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 05/10/2013, 14/01/2021
+global glv
 global psinsdef
     if nargin>1  % kfplot(xk, pk, clm)
         if psinsdef.kfplot==0
@@ -37,6 +38,14 @@ global psinsdef
                 end
             end
             inserrplot([sqrt(xkpk(:,psinsdef.kfplot+1:end-1)),xkpk(:,end)]);
+        case 24
+            inserrplot(xkpk(:,[1:15,end]));
+            inserrplot([sqrt(xkpk(:,25:39)),xkpk(:,end)]);
+            myfigure;
+            subplot(221), plot(xkpk(:,end), xkpk(:,15+[1,5,9])/glv.ppm); xygo('dKg');
+            subplot(222), plot(xkpk(:,end), xkpk(:,15+[2,3,6])/glv.sec); xygo('dAg');
+            subplot(223), plot(xkpk(:,end), sqrt(xkpk(:,39+[1,5,9]))/glv.ppm); xygo('dKg');
+            subplot(224), plot(xkpk(:,end), sqrt(xkpk(:,39+[2,3,6]))/glv.sec); xygo('dAg');
         case 30
             inserrplot(xkpk(:,[1:15,end]));
             inserrplot(xkpk(:,[16:30,end]),'kgka');

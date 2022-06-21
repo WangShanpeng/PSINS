@@ -5,11 +5,11 @@ function [Cnb, Cnbr] = a2mat(att)
 % Input: att - att=[pitch; roll; yaw] in radians
 % Outputs: Cnb - DCM from navigation-frame(n) to body-frame(b), in yaw->pitch->roll
 %                (3-1-2) rotation sequence
-%          Cnbr - DCM in yaw->roll->pitch (3-2-1) roation sequence
+%          Cnbr - DCM in yaw->roll->pitch (3-2-1) rotation sequence
 % Test:
 %   att0=randn(3,1)/10; [Cnb,Cnbr]=a2mat(att0); att=m2att(Cnb); [~,attr]=m2att(Cnbr); [att0, att, attr]
 %
-% See also  a2qua, m2att, m2qua, q2att, q2mat, attsyn, rv2m, rxyz, a2matBatch.
+% See also  a2qua, m2att, m2qua, q2att, q2mat, attsyn, rv2m, rxyz, a2matBatch, axxx2a.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -1,5 +1,7 @@
 function [eps, dpsi, deps] = Equinox(T)
 % Equinox parameter calculation.
+% Ref. 'Space-time coordinate transformation and its error analysis for
+%      INS/CNS integrated navigation, 2022'
 %
 % Prototype: [eps, dpsi, deps] = Equinox(T)
 % Input: T - using TDB to predict the precession

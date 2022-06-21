@@ -8,7 +8,7 @@ function phi = aa2phi(att1, att0)
 % Output: phi - platform misalignment angles from computed nav-frame to
 %               ideal nav-frame, phi=[phiE;phiN;phiU]
 %
-% See also  aa2mu, aa2phimu, aa2dkg, qq2phi, qq2afa, qaddphi, qdelphi, diffyaw.
+% See also  aa2mu, aa2phimu, phi2datt, aa2dkg, qq2phi, qq2afa, qaddphi, qdelphi, diffyaw.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

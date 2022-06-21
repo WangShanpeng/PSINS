@@ -11,4 +11,8 @@ function tscale = tscalepop()
 % 07/07/2021
     global glv
     tscale = glv.tscale(end);
-    glv.tscale = glv.tscale(1:end-1,:);
+    if length(tscale)>1
+        glv.tscale = glv.tscale(1:end-1,:);
+    else
+        glv.tscale = 1;
+    end

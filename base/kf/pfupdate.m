@@ -50,8 +50,9 @@ function [pf, Pxk] = pfupdate(pf, Zk, TimeMeasBoth)
 %         [vRv, idx] = sort(vRv);  pf.particles = pf.particles(:,idx);
         weight = exp(-vRv/2);%/sqrt((2*pi)^pf.m*det(pf.Rk)); % Normal distribution
         cumw = cumsum(weight+0.01/pf.Npts);  cumw = cumw/cumw(end);
-        idx = interp1(cumw, (1:pf.Npts)', linspace(cumw(1),cumw(end),pf.Npts+10), 'nearest');  % resampling index
-        pf.particles = pf.particles(:,idx(3:pf.Npts+2)); % myfig,hist(pf.particles(1,:));
+%         idx = interp1(cumw, (1:pf.Npts)', linspace(cumw(1),cumw(end),pf.Npts+10), 'nearest');  % resampling index
+        idx = interp1(cumw, (1:pf.Npts)', cumw(1)+(cumw(end)-cumw(1))*rand(pf.Npts+10,1), 'nearest');  % resampling index
+        pf.particles = pf.particles(:,idx(3:pf.Npts+2)); % myfig,hist(pf.particles(2,:));
     end
     pf.xk = mean(pf.particles,2);
     xk = pf.particles - repmat(pf.xk,1,pf.Npts);

@@ -16,7 +16,7 @@ global glv
     if nargin==3
         stripNo = 0;
     else
-        stripNo = floor(xy(2)/1e7);
+        stripNo = floor(xy(2)/1e6);
     end
     xy(2) = xy(2)-stripNo*1.0e6-5.0e5;
     

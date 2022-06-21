@@ -11,7 +11,7 @@ function kf = ukf(kf, yk, TimeMeasBoth)
 %                             measurement updating.
 % Output: kf - filter structure array after time/meas updating
 %
-% See also  ukfUT, ckf, ekf, kfupdate.
+% See also  ukfUT, ckf, ssukf, ekf, kfupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -41,7 +41,7 @@ function kf = ukf(kf, yk, TimeMeasBoth)
             kf.xkk_1 = kf.xk; kf.Pxkk_1 = kf.Pxk;
         end
         if isfield(kf, 'hx')  % nonliear measurement propagation
-            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ukfUT(kf.xkk_1, kf.Pxkk_1, kf.hfx, kf.py, 1e-3, 2, 0);
+            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ukfUT(kf.xkk_1, kf.Pxkk_1, kf.hx, kf.py, 1e-3, 2, 0);
             kf.Pykk_1 = kf.Pykk_1 + kf.Rk;
         else
             kf.ykk_1 = kf.Hk*kf.xkk_1;

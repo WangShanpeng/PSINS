@@ -7,7 +7,7 @@ function [qnb, Cnb] = a2qua1(att)
 % Input: att - att=[pitch; roll; yaw] in radians
 % Output: qnb - attitude quaternion
 %
-% See also  q2att1, a2qua, attrf.
+% See also  q2att1, a2qua, attrf, axxx2a.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -10,7 +10,7 @@ function [pvt, vpENU, res] = lspvt(recPos0, satpv, obs)
 % Outputs: pvt - 16x1 vector=[posXYZ;dt; Perr; satNum; DOP; velXYZ;dtDot; Verr]
 %          res - some other results, see the code.
 %
-% See also  satPosVel, lsVel, spp, DOP.
+% See also  satPosVel, lsVel, spp, DOP, maxtetra.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

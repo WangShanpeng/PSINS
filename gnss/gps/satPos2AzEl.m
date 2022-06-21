@@ -4,7 +4,7 @@ function [AzEl, BLH] = satPos2AzEl(satPos, xyz0)
 %
 % Prototype: [AzEl, BLH] = satPos2AzEl(satPos, xyz0)
 % Inputs: satPos - satellites positions in ECEF
-%         xyz0 - receiver position in ECEF
+%         xyz0 - receiver position in ECEF, or pos=[lat;lon;hgt];
 % Outputs: AzEl - satellite azimuth(s) and elevation(s)
 %          BLH - receiver position represented by [lat lon hgt]
 %

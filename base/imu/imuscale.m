@@ -4,10 +4,10 @@ function [imu, sf] = imuscale(imu, t, w, f)
 %
 % Prototype: imu = imuscale(imu, t, w, f)
 % Inputs: imu - SIMU data array
-%         t - specific time
-%         w/f - given angular rate(force)
+%         t - specific times =[tgx,tgy,tgz, tax,tay,taz]
+%         w/f - given angular rate(force), in rad/s (m/s^2)
 % Outputs: imu - SIMU data array after scaling
-%          sf - scale factor
+%          sf - scale factor array
 %
 % See also  sysclbt, imuinc, imudot, imurot.
 

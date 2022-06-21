@@ -2,7 +2,7 @@ function Cie = cnsCie(utc, s, dUT1, dTAI)
 % In CNS application, J2000 to ECEF rotation matrix 'Cie' calculation
 %
 % Prototype: Cie = cnsCie(utc, s, dUT1, dTAI)
-% Inputs: utc - UTC day in [year,month,day] array
+% Inputs: utc - UTC day in [year,month,day] array or JD
 %         s - UTC seconds within a day, [0~86400)
 %         dUT1 - = UT1-UTC
 %         dTAI - = TT-TAI
@@ -17,6 +17,7 @@ function Cie = cnsCie(utc, s, dUT1, dTAI)
     if nargin<3, dUT1=-0.5; end
     if nargin<2, s=0; end
     [dUT1, dTT] = dUT1TT(dUT1, dTAI);
-    [theta, ~, ~, TT, eps, dpsi, deps] = GAST(JD(utc), s+dUT1, dTT);
+    if length(utc)>1, jd=JD(utc); else, jd=utc; end
+    [theta, ~, ~, TT, eps, dpsi, deps] = GAST(jd, s+dUT1, dTT);
     NP = rxyz(eps+deps,'x') * rxyz(dpsi,'z') * rxyz(-eps,'x') * Precmat(TT);
     Cie = NP'*rxyz(theta,'z');

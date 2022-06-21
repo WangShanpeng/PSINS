@@ -7,7 +7,7 @@ function mu = datt2mu(datt, att0)
 %         att0 - reference Euler angles att0=[pitch0;roll0;yaw0]
 % Output: mu - installation error angles mu=[mux;muy;muz]
 %
-% See also  aa2mu, aa2phi.
+% See also  aa2mu, aa2phi, phi2datt.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

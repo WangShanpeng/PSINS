@@ -1,8 +1,9 @@
-function [imu, avp0] = avp2imu(avp)
+function [imu, avp0] = avp2imu(avp, pos0)
 % Simulate SIMU sensor outputs from attitude, velocity & position profile.
 %
-% Prototype: [imu, avp0] = avp2imu(avp)
-% Input: avp = [att,vn,pos,t]
+% Prototype: [imu, avp0] = avp2imu(avp, pos0)
+% Inputs: avp = [att,vn,pos,t]
+%         pos0 - for static base
 % Outputs: imu = [wm,vm,t]
 %          avp0 = init [att,vn,pos]
 %
@@ -12,6 +13,12 @@ function [imu, avp0] = avp2imu(avp)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 15/10/2013, 15/03/2014
 global glv
+    if nargin==2,  % [imu, avp0] = avp2imu(att, pos0)
+        len = length(avp);
+        avp = [avp(:,1:3),zeros(len,3),repmat(pos0',len,1),avp(:,end)];
+        [imu, avp0] = avp2imu(avp);
+        return;
+    end
     if size(avp,2)<9, avp = ap2avp(avp, diff(avp(1:2,end))); end
     len = size(avp,1);  ts = avp(2,10)-avp(1,10);  ts2 = ts/2;
     Cbn_1 = a2mat(avp(1,1:3)')';  vn_1 = avp(1,4:6)';  pos_1 = avp(1,7:9)';

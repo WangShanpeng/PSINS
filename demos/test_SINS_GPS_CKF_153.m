@@ -1,6 +1,6 @@
 % SINS/GPS intergrated navigation simulation using CKF.
 % Please run 'test_SINS_trj.m' to generate 'trj10ms.mat' beforehand!!!
-% See also  test_SINS_GPS_UKF_153, test_SINS_GPS_EKF_153, test_SINS_GPS_153.
+% See also  test_SINS_GPS_UKF_153, test_SINS_GPS_SSUKF_153, test_SINS_GPS_EKF_153, test_SINS_GPS_153.
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 27/02/2022

@@ -2,7 +2,7 @@ function dop = DOP(A)
 % Calculate GPS positioning DOP values.
 %
 % Input: A - = [-losEi, -losNi, -losUi, 1]
-% See also  lspvt.
+% See also  lspvt, maxtetra.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

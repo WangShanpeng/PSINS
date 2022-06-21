@@ -14,6 +14,7 @@ function clbtout = clbtfile(clbt, fname)
 global glv
     if nargout==0  % out
         if nargin==1 % display
+            if isfield(clbt,'sf'), disp('sf'); disp(clbt.sf'); end
             if isfield(clbt,'Kg'), disp('Kg'); disp(clbt.Kg); end
             if isfield(clbt,'eb'), disp('eb(dph)'); disp(clbt.eb'/glv.dph); end
             if isfield(clbt,'Ka'), disp('Ka'); disp(clbt.Ka); end
@@ -24,8 +25,13 @@ global glv
         else
             fid = fopen(fname, 'w');
             if strcmp(fname(end-3:end),'.bin')==1 % write to bin file
-                fwrite(fid, [reshape(clbt.Kg',9,1);clbt.eb;reshape(clbt.Ka',9,1);clbt.db;clbt.Ka2;clbt.rx;clbt.ry;clbt.rz;clbt.tGA], 'double');
+                data = [reshape(clbt.Kg',9,1);clbt.eb;reshape(clbt.Ka',9,1);clbt.db;clbt.Ka2;clbt.rx;clbt.ry;clbt.rz;clbt.tGA];
+%                 if isfield(clbt,'sf'),  data=[clbt.sf; data]; end
+                fwrite(fid, data, 'double');
             else % write to text file
+                if isfield(clbt,'sf'),
+                    fprintf(fid, 'sf = [\r\n\t');   fprintf(fid, '%.8e \t%.8e \t%.8e \t%.8e \t%.8e \t%.8e\r\n\t', clbt.sf'); fprintf(fid, '];\r\n');
+                end
                 fprintf(fid, 'Kg = [\r\n\t');   fprintf(fid, '%.8e \t%.8e \t%.8e\r\n\t', clbt.Kg'); fprintf(fid, '];\r\n');
                 fprintf(fid, 'eb = [\r\n\t');   fprintf(fid, '%.8e \t%.8e \t%.8e\r\n\t', clbt.eb/glv.dph); fprintf(fid, ']; \t%% deg/h\r\n');
                 fprintf(fid, 'Ka = [\r\n\t');   fprintf(fid, '%.8e \t%.8e \t%.8e\r\n\t', clbt.Ka'); fprintf(fid, '];\r\n');
@@ -46,8 +52,12 @@ global glv
             clbt.Ka = reshape(cbt(13:21),3,3)';  clbt.db = cbt(22:24);  clbt.Ka2 = cbt(25:27);
             clbt.rx = cbt(28:30); clbt.ry = cbt(31:33); clbt.rz = cbt(34:36);
             clbt.tGA = cbt(37);
-        else
-            NA = 1;
+        elseif strcmp(fname(end-1:end),'.m')==1
+            run(fname);
+            clbt.Kg = Kg;  clbt.eb = eb';
+            clbt.Ka = Ka;  clbt.db = db';  clbt.Ka2 = Ka2';
+            clbt.rx = rx'; clbt.ry = ry'; clbt.rz = rz';
+            clbt.tGA = tGA;
         end
         clbtout = clbt;
     end

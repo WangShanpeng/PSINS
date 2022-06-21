@@ -3,7 +3,7 @@ function m = mupdt(m1, rv)
 % 
 % Prototype: m = mupdt(m1, rv)
 % Inputs: m1 - input DCM
-%         rv - roation vector
+%         rv - rotation vector
 % Output: m - output DCM, such that m = m1*rv2m(rv)
 %
 % See also  rv2m, qupdt.

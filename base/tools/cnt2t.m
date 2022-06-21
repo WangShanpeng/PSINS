@@ -14,7 +14,7 @@ function t = cnt2t(cnt, ts, t0)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 29/03/2018
     if ~exist('ts', 'var'), ts = 1; end
-    if ~exist('t0', 'var'), t0 = 1; end
+    if ~exist('t0', 'var'), t0 = ts; end
     dcnt = diff(cnt);
     m = max(cnt);
     if m==15
@@ -28,6 +28,4 @@ function t = cnt2t(cnt, ts, t0)
         dcnt(idx) = dcnt(idx)+m;
     end
     t = cumsum([cnt(1);dcnt])*ts;
-    if t0==0
-        t = t - t(1) + ts;
-    end
+	t = t - t(1) + t0;

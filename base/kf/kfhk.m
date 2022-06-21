@@ -25,6 +25,8 @@ global psinsdef
             Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb, -ins.Mpvvn];
         case 196
             Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.an;-ins.MpvCnb,-ins.Mpvvn]];
+        case 246
+            Hk = [zeros(6,3), eye(6), zeros(6,15)];
         case 331
             Hk = zeros(1,33);
         case 343 % glv.psinsdef.kfhkxx3

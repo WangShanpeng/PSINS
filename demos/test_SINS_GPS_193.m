@@ -1,4 +1,4 @@
-% SINS/GPS intergrated navigation simulation using kalman filter, with
+% SINS/GPS intergrated navigation simulation using Kalman filter, with
 % 19-state included:
 %       phi(3), dvn(3), dpos(3), eb(3), db(3), lever(3), dT(1)
 % Please run 'test_SINS_trj.m' to generate 'trj10ms.mat' beforehand!!!

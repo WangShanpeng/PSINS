@@ -5,7 +5,7 @@ function data = txtbinfile(fname)
 % Inputs: fname - file name, with extension '.txt' or '.dat'
 % Output: data - data array read from the '.txt' file
 
-% See also  matbinfile.
+% See also  matbinfile, txtmatfile, txt2matfile.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

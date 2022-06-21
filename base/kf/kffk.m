@@ -23,6 +23,11 @@ global psinsdef
         case {18,19} % psinsdef.kffkxx, xx=18,19
             Ft = etm(ins);
             Ft(psinsdef.kffk, psinsdef.kffk) = 0;
+        case {24}
+            Ft = etm(ins);
+            Ft(psinsdef.kffk,psinsdef.kffk) = 0;
+            % 15+dKg(9)
+            Ft(1:3,16:24) = [-ins.wib(1)*ins.Cnb, -ins.wib(2)*ins.Cnb, -ins.wib(3)*ins.Cnb];
         case {33}
             Ft = etm(ins);
             Ft(psinsdef.kffk,psinsdef.kffk) = 0;
@@ -32,6 +37,7 @@ global psinsdef
         case {34, 37}
             Ft = etm(ins);
             Ft(psinsdef.kffk,psinsdef.kffk) = 0;
+            % 19+dKg(9)+dKa(6)
             Ft(1:3,20:28) = [-ins.wib(1)*ins.Cnb, -ins.wib(2)*ins.Cnb, -ins.wib(3)*ins.Cnb];
             Ft(4:6,29:34) = [ins.fb(1)*ins.Cnb, ins.fb(2)*ins.Cnb(:,2:3), ins.fb(3)*ins.Cnb(:,3)];
         otherwise,

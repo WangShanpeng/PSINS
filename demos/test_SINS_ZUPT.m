@@ -1,4 +1,4 @@
-% SINS ZUPT using 15-state kalman filter.
+% SINS ZUPT using 15-state Kalman filter.
 % Please run 'test_SINS_ZUPT.m' to generate 'trj10ms.mat' beforehand!!!
 % See also  test_SINS, test_SINS_GPS_153.
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.

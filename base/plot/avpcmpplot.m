@@ -7,7 +7,7 @@ function err = avpcmpplot(avp0, varargin)
 %         varargin - the last input parameter may be comparison type or by
 %                    default value
 %          
-% See also  avpcmp, posflucmpplot, inserrplot, kfplot, gpsplot, imuplot, avperrstd, errstplot.
+% See also  avpcmp, posflucmpplot, inserrplot, kfplot, gpsplot, imuplot, avperrstd, errstplot, pos2dplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

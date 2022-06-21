@@ -18,4 +18,4 @@ function [yaw, incl] = magplot(mag)
     myfigure;
     subplot(211), plot(t, [mag(:,1:3),normv(mag(:,1:3))]), xygo('\itt / \rms', 'Mag^b / mGauss');
     subplot(212), plot(t, [yaw,incl]/(pi/180)),
-    xygo('\itt / \rms', 'MagYaw&Incl / \circ');
+    xygo('\itt / \rms', 'MagYaw & Incl / (\circ)');

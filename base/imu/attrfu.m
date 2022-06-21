@@ -7,12 +7,12 @@ function att1 = attrfu(att0, dirstr)
 %               the orientation abbreviations are:
 %               'U': Upper; 'D': Down; 'R': Right; 'L': Left; 
 %               'F': Forword; 'B': Back.
-% Outputs: att1 - Euler angle outputs for R-F-U vehicle.
+% Output: att1 - Euler angle outputs for R-F-U vehicle.
 %
 % Example:
 %   att1 = attrfu([0,0,0], 'flu')
 %
-% See also  imurfu, Cbbstr, wierfu.
+% See also  imurfu, Cbbstr, wierfu, axxx2a.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

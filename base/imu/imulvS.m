@@ -3,7 +3,8 @@ function SS = imulvS(wb, dotwb, Cba)
 %
 % Prototype: SS = imulvS(wb, dotwb, Cba)
 % Inputs: wb - gyro algular rate
-%         dotwb - gyro angular acceleration 
+%         dotwb - gyro angular acceleration
+%         Cba - IMU body to acc sensor frame
 % Output: SS - output lever related matrix
 %
 % See also  sysclbt, imuclbt.

@@ -21,6 +21,7 @@ function  avp = ap2avp(ap, ts)
     for k=1:3  % attitude spline interpolation
         avp(:,k) = spline(ap(:,7), ap(:,k), t);
     end
+    avp(:,1:3) = iatt2c(avp(:,1:3));
     for k=1:3
         pp = spline(ap(:,7), ap(:,3+k));
         avp(:,6+k) = ppval(pp, t); % position interpolation

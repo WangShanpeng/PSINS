@@ -2,12 +2,12 @@
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 27/11/2015
 glvs
-T = 300;  % total simulation time length
+T = 24*3600;  % total simulation time length
 [nn, ts, nts] = nnts(2, 1);
 avp0 = avpset([0;0;0], [0;0;0], [34;110;380]);  eth = earth(avp0(7:9));
-imuerr = imuerrset([0;0;0.01], [0;0;0], 0.0, 0.0);
+imuerr = imuerrset([0;0;0.0001], [0;0;0], 0.0, 0.0);
 imu = imustatic(avp0, ts, T, imuerr);   % SIMU simulation
-davp0 = avperrset([0;0;30], [0.0;0.0;0.0], [0;0;0]);
+davp0 = avperrset([0;0;1], [0.0;0.0;0.0], [0;0;0]);
 avp00 = avpadderr(avp0, davp0);
 ins = insinit(avp00, ts);
 len = length(imu);    avp = zeros(fix(len/nn), 10);
@@ -21,7 +21,7 @@ for k=1:nn:len-nn+1
 end
 avperr = avpcmp(avp, avp0);
 inserrplot(avperr);
-%% 前面是惯导解算误差，后面是理论误差
+%% 前面是惯导解算的误差，后面是理论误差方程的传播误差
 R = sqrt(eth.RNh*eth.RMh); L = avp0(7); tL = tan(L); eL = sec(L);
 wN = eth.wnie(2); wU = eth.wnie(3); g = -eth.gn(3);
 qnb = a2qua(avp0(1:3)); en = qmulv(qnb,imuerr.eb); dn = qmulv(qnb,imuerr.db);

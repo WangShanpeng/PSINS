@@ -3,7 +3,7 @@ function vb = vn2vb(av, isavpflag)
 %
 % Prototype: vb = vn2vb(av, isavpflag)
 % Input: av - =[att,vn,t] or avp array
-%        isavpflag - avp flag for output 
+%        isavpflag - avp flag for output, vb = [att, vb, pos, t] 
 % Output: vb - =[vx,vy,vz,t] or avp array
 %
 % See also  vn2vbl, vn2att, a2mat.

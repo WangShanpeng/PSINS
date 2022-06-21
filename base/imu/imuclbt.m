@@ -6,7 +6,7 @@ function imu = imuclbt(imu, clbt, eb, Ka, db)
 %         clbt - calibration struct
 % Output: imu - IMU simulation output
 %
-% See also  clbtfile, imuadderr, imulvS, sysclbt.
+% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China
@@ -42,16 +42,18 @@ global glv
     if ~isfield(clbt, 'ry'), clbt.ry = zeros(3,1); end
     if ~isfield(clbt, 'rz'), clbt.rz = zeros(3,1); end
     if ~isfield(clbt, 'tGA'), clbt.tGA = 0; end
-    timebar(1, length(imu), 'IMU calibration,');
-    for k=2:length(imu)
-        wb = imu(k,1:3)'/ts; fb = imu(k,4:6)'/ts;
-        dwb = (imu(k,1:3)-imu(k-1,1:3))'/ts/ts;
-        SS = imulvS(wb, dwb);  fL = SS*[clbt.rx;clbt.ry;clbt.rz];
-        fb = fb - fL + clbt.tGA*cross(wb,fb);
-        imu(k,4:6) = fb'*ts;
-        timebar(1);
+    if norm(clbt.rx)>0 || norm(clbt.ry)>0
+        timebar(1, length(imu), 'IMU calibration,');
+        for k=2:length(imu)
+            wb = imu(k,1:3)'/ts; fb = imu(k,4:6)'/ts;
+            dwb = (imu(k,1:3)-imu(k-1,1:3))'/ts/ts;
+            SS = imulvS(wb, dwb);  fL = SS*[clbt.rx;clbt.ry;clbt.rz];
+            fb = fb - fL + clbt.tGA*cross(wb,fb);
+            imu(k,4:6) = fb'*ts;
+            timebar(1);
+        end
     end
-    imuerr.dKg = -(clbt.Kg-eye(3)); imuerr.eb = -clbt.eb; imuerr.web = zeros(3,1); imuerr.sqg = zeros(3,1);
-    imuerr.dKa = -(clbt.Ka-eye(3)); imuerr.db = -clbt.db; imuerr.KA2 = -clbt.Ka2; imuerr.wdb = zeros(3,1);  imuerr.sqa = zeros(3,1);
-    imu = imuadderr(imu, imuerr, ts);
+    imuerr.dKg = (clbt.Kg-eye(3)); imuerr.eb = -clbt.eb; imuerr.web = zeros(3,1); imuerr.sqg = zeros(3,1);
+    imuerr.dKa = (clbt.Ka-eye(3)); imuerr.db = -clbt.db; imuerr.KA2 = -clbt.Ka2; imuerr.wdb = zeros(3,1);  imuerr.sqa = zeros(3,1);
+    imu = imuadderr(imu, imuerr);
     

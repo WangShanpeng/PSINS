@@ -16,7 +16,6 @@ function ins = insupdate(ins, imu)
     nn = size(imu,1);
     nts = nn*ins.ts;  nts2 = nts/2;  ins.nts = nts;
     [phim, dvbm] = cnscl(imu,0);    % coning & sculling compensation
-%     [phim, dvbm] = cnscl0(imu);    % coning & sculling compensation
     phim = ins.Kg*phim-ins.eb*nts; dvbm = ins.Ka*dvbm-ins.db*nts;  % calibration
     %% earth & angular rate updating 
     vn01 = ins.vn+ins.an*nts2; pos01 = ins.pos+ins.Mpv*vn01*nts2;  % extrapolation at t1/2
@@ -41,7 +40,7 @@ function ins = insupdate(ins, imu)
     ins.an0 = ins.an;
     %% (3)attitude updating
     ins.Cnb0 = ins.Cnb;
-%     ins.qnb = qupdt(ins.qnb, ins.wnb*nts);  % lower accuracy than next line
+%     ins.qnb = qupdt(ins.qnb, ins.wnb*nts);  % lower accuracy than the next line
     ins.qnb = qupdt2(ins.qnb, phim, ins.eth.wnin*nts);
     [ins.qnb, ins.att, ins.Cnb] = attsyn(ins.qnb);
     ins.avp = [ins.att; ins.vn; ins.pos];

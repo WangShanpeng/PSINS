@@ -7,6 +7,11 @@ function xy = gkprj(gk, BL, lgiCenter)
 %         lgiCenter - central meridian in rad
 % Output: xy - xy coordinate
 %
+% Example:
+%    gk = gkpinit();
+%    xy = gkprj(gk, [34; 106]*glv.deg)
+%    BL = gkpinv(gk, xy)/glv.deg
+%
 % See also  gkpinit, gkpinv, gkprjBatch, gkpinvBatch.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.

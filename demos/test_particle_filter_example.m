@@ -1,10 +1,10 @@
 function test_particle_filter_example
 % 建模描述参见'捷联惯导算法与组合导航原理'书练习题47.
     Ts = 0.1;    % parameter setting
-    rho = 0.01;
+    rho = 0.01; g = -9.8;
     h0 = 1000; v0 = 0;  Xk = [h0; v0];
     Qt = 0.01;  Rk = 10^2;  Qk = [0,0;0,Qt*Ts];
-    tpara.rho = rho; tpara.Ts = Ts;
+    tpara.rho = rho; tpara.g = g; tpara.Ts = Ts;
     len = 500;
     X = zeros(len,2); Z = zeros(len,1);
     for k=1:len  % model simulation
@@ -12,7 +12,7 @@ function test_particle_filter_example
         Zk = pfhx(Xk, tpara) + sqrt(Rk)*randn(1);   Z(k,:) = Zk;
     end
     %% particle filter
-    pf = pfinit([h0+30;v0+3], [50;10], Qk, Rk, 500);
+    pf = pfinit([h0+30;v0+3], [50;10], Qk, Rk, 100);
     pf.fx = @pffx; pf.hx = @pfhx;  pf.tpara = tpara;
     Xpf = X; sPpf = X;
     for k=1:len 
@@ -21,9 +21,13 @@ function test_particle_filter_example
         if mod(k,5)==0
             pf = pfupdate(pf, Z(k), 'M');
         end
+        if k>200
+            aa=1;
+        end
         % myfig,subplot(211),hist(pf.particles(1,:));subplot(212),hist(pf.particles(2,:));
         Xpf(k,:) = pf.xk';  sPpf(k,:) = sqrt(diag(pf.Pxk)');
     end
+%     myfig,subplot(211),hist(pf.particles(1,:));subplot(212),hist(pf.particles(2,:));
     myfig;
     subplot(321), plot([X(:,1),Xpf(:,1)]); xygo('k','h / m'); legend('h real', 'h est');
     subplot(323), plot([X(:,2),Xpf(:,2)]); xygo('k','vel / m/s'); legend('vel real', 'vel est');
@@ -32,9 +36,9 @@ function test_particle_filter_example
     subplot(324), plot([Xpf(:,2)-X(:,2),sPpf(:,2)]); xygo('k','vel err / m/s'); legend('est err', 'est std');
 
 function X = pffx(X, tpara)  % state model
-    rho = tpara.rho;  Ts = tpara.Ts;
+    rho = tpara.rho;  g = tpara.g;  Ts = tpara.Ts;
     h = X(1);  v = X(2);
-    v1 = v + (-9.8+rho*v^2)*Ts;
+    v1 = v + (g+rho*v^2)*Ts;
     h = h + (v+v1)/2*Ts; v = v1;
     X = [h; v];
 

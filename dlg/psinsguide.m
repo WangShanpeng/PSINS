@@ -117,6 +117,8 @@ function sinsgnssekf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_EKF_153.m');
 function sinsgnssukf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_UKF_153.m');
+function sinsgnssssukf_Callback(hObject, eventdata, handles)
+opru('test_SINS_GPS_SSUKF_153.m');
 function sinsgnssckf_Callback(hObject, eventdata, handles)
 opru('test_SINS_GPS_CKF_153.m');
 function sinsgnsspf_Callback(hObject, eventdata, handles)
@@ -131,3 +133,4 @@ function posfusion_Callback(hObject, eventdata, handles)
 opru('test_POS_fusion.m');
 function sysclbt_Callback(hObject, eventdata, handles)
 opru('test_system_calibration_19pos.m');
+

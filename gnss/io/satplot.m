@@ -9,7 +9,7 @@ function satplot(PRN, AzEl, mycontour)
     if nargin<3, mycontour=[15;30;45;60;75]; end
     mycontour = [0;mycontour]*pi/180;
     afa=(0:0.1:360)*pi/180;
-    myfigure,
+    myfigure, subplot(1,5,2:4);
     for k=1:length(mycontour)
         x = cos(mycontour(k))*sin(afa); y = cos(mycontour(k))*cos(afa);
         plot(x,y,':b'); hold on;

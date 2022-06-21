@@ -3,7 +3,7 @@ function q = qupdt(q1, rv)
 % 
 % Prototype: q = qupdt(q1, rv)
 % Inputs: q1 - input quaternion
-%         rv - roation vector
+%         rv - rotation vector
 % Output: q - output quaternion, such that q = qmul(q1, rv2q(rv))
 %
 % See also  qupdt2, mupdt, qmul, rv2q, lq2m.

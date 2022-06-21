@@ -42,7 +42,7 @@ global glv
         dvn = Cnn*Cnb*dvbm;
         vn = vn + dvn + eth.gn*nts;
         qnb = qupdt2(qnb, phim, eth.wnin*nts);
-        Fev = [0 -1.0/eth.RMh 0;  1.0/eth.RNh 0 0;  tan(eth.pos(1))/eth.RNh 0 0];  %vvv
+        Fev = [0 -1.0/eth.RMh 0;  1.0/eth.RNh 0 0;  tan(eth.pos(1))/eth.RNh 0 0];  % Mav
         kf.Ft(1:3,1:9) = [-askew(eth.wnin)+Fev*askew(vn), Fev, -Cnb];  
         kf.Ft(4:6,1:12) = [-askew(eth.gn)-askew(vn)*askew(eth.wnie), -askew(2*eth.wnie+eth.wnen), askew(vn)*Cnb, Cnb]; 
         kf.Phikk_1 = kf.I + kf.Ft * nts;

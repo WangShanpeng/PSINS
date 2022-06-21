@@ -3,8 +3,8 @@ function qnb1 = qupdt2(qnb0, rv_ib, rv_in)
 % 
 % Prototype: qnb1 = qupdt2(qnb0, rv_ib, rv_in)
 % Inputs: qnb0 - input quaternion
-%         rv_ib - roation vector of b-frame with respect to i-frame
-%         rv_in - roation vector of n-frame with respect to i-frame
+%         rv_ib - rotation vector of b-frame with respect to i-frame
+%         rv_in - rotation vector of n-frame with respect to i-frame
 % Output: qnb1 - output quaternion, 
 %                such that qnb1 = rv2q(-rv_in)*qnb0*rv2q(rv_ib)
 %

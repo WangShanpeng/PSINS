@@ -6,7 +6,7 @@ function att = attrf(att, dir)
 %         dir - flag 0 from rocket-board to fligh-board, 1 from fligh-board to rocket-board
 % Output: att - output Euler angle
 %
-% See also  a2mat, a2qua1.
+% See also  a2mat, a2qua1, axxx2a.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
