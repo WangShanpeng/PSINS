@@ -23,6 +23,6 @@ global glv
     t = imut(:,end)/tscaleget();
 	subplot(3,1,[1,2]), ax=plotyy(t, imu(:,1:3)/nts/glv.dph, t, imu(:,4:6)/nts/glv.ug);
     xyygo(ax, 'wdph', 'fug'); legend('Gx', 'Gy', 'Gz', 'Ax', 'Ay', 'Az');
-    title(sprintf('%f; ', b));
+    title(['mean=', sprintf('%f; ', b), '(\circ/h,g)']);
 	subplot(313), plot(t, imut(:,7:end-1));  xygo('Temp');
     tscalepop();

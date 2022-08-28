@@ -19,7 +19,7 @@ seg = trjsegment(seg, 'uniform',      50);
 seg = trjsegment(seg, 'climb',        10, 2, xxx, 50);
 seg = trjsegment(seg, 'uniform',      50);
 seg = trjsegment(seg, 'descent',      10, 2, xxx, 50);
-seg = trjsegment(seg, 'uniform',      50);
+seg = trjsegment(seg, 'uniform',      40);
 seg = trjsegment(seg, 'deaccelerate', 5,  xxx, 2);
 seg = trjsegment(seg, 'uniform',      600-sum(seg.wat(:,1)));
 % generate, save & plot

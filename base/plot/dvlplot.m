@@ -17,4 +17,4 @@ function dvlplot(dvl, sf)
     else
         plot(dvl(:,4), [dvl(:,1:3),sqrt(dvl(:,1).^2+dvl(:,2).^2+dvl(:,3).^2)]*sf);
     end
-	xygo('V');
+	xygo('V');  title('DVL velocity');

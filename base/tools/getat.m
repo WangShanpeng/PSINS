@@ -1,4 +1,4 @@
-function val = getat(array, tk, method)
+function val = getat(array, tk, clm, method)
 % Get value at tk from array.
 %
 % Prototype: val = getat(array, tk, method)
@@ -11,6 +11,7 @@ function val = getat(array, tk, method)
     if tk<array(1,end) || tk>array(end,end),
         error(' tk out of range. ');
     else
-        if nargin<3, method = 'nearest'; end
-        val = interp1(array(:,end), array(:,1:end-1), tk)';
+        if nargin<3, clm=1:size(array,2)-1; end
+        if nargin<4, method = 'nearest'; end
+        val = interp1(array(:,end), array(:,clm), tk, method)';
     end

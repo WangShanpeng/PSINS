@@ -4,5 +4,5 @@ function [strnames, n] = dirstr(str)
     f = dir(str);
     n = length(f);
     for k=1:n
-        strnames{k} = f(k).name;
+        strnames{k,1} = f(k).name;
     end

@@ -27,7 +27,7 @@ global glv
     wnie = eth.wnie; wN = wnie(2); wU = wnie(3); Cnn = rv2m(-wnie*nts/2);
     vn = [0;0]; dpos = [0;0];  wnc = [0;0;0]; % control parameters
     gc0 = gcctrl(ctl0(1));   gc1 = gcctrl(ctl1(1), ctl1(2));
-    attk = prealloc(len/nn, 3); 
+    attk = prealloc(len/nn, 4); 
     ki = timebar(nn, len, 'Initial align using gyro-compass method.');
     for k=1:nn:len-nn+1
         wvm = imu(k:k+nn-1,1:6);
@@ -56,7 +56,7 @@ global glv
             wnc(1) = -dVN*(1+gc1.kz2)/glv.Re;
             wnc(3) = (dVN*gc1.kz3*nts/wN+wnc(3))/(1+gc1.kz4*nts);
         end
-        attk(ki,:) = q2att(qnb)';
+        attk(ki,:) = [q2att(qnb);imu(k:k+nn-1,end)]';
         ki = timebar;
     end
     att0 = attk(end,:)';

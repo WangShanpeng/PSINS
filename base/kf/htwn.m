@@ -6,7 +6,7 @@ function [wn, s] = htwn(wp, s, len)
 %         s - std enlarge with probability 'wp' 
 %         len - element number 
 % Outputs: wn - noise output
-%          s - enlarge number
+%          s - enlarge number for each wn
 %
 % Example1:
 %    figure, plot(htwn(0.01, 100, 1000)); grid on
@@ -14,7 +14,7 @@ function [wn, s] = htwn(wp, s, len)
 % Example2:
 %    x=-30:0.1:30; n=1000; figure, plot(x,histc([randn(10000,1),htwn(0.3,10,10000)],x)/n); grid on
 %
-% See also  N/A.
+% See also  rstd.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

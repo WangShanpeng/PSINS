@@ -32,7 +32,7 @@ global pf_yaw pf_pch pf_rll
     p=[[-1;-1;0], [1;-1;0], [1;1;0], [-1;1;0]]*1.9; p1=[[1.9;-0.5;0], [2.5;0;0;], [1.9;0.5;0]]; p2=[[-2.5;0;0], [-1.9;0;0;]]; % vehicle
     p=Cyaw*Cpch*Crll*p; p1=Cyaw*Cpch*Crll*p1; p2=Cyaw*Cpch*Crll*p2;
     plot3(p(1,[1:4,1]),p(2,[1:4,1]),p(3,[1:4,1]),'-ok','linewidth',10);  plot3(p1(1,:),p1(2,:),p1(3,:),'-ok','linewidth',10);  plot3(p2(1,:),p2(2,:),p2(3,:),'-ok','linewidth',10); 
-    xlim([-2;2]);ylim([-2;2]);zlim([-2;2]);
+    a=2.2; xlim([-a;a]);ylim([-a;a]);zlim([-a;a]);
     note = '\leftarrow:Yaw++; \rightarrow:Yaw--; \uparrow:Pitch++; \downarrow:Pitch--; /:Roll++; \\:Roll--';
     pry = sprintf('(Yaw =%4.0f\\circ;  Pitch =%4.0f\\circ;  Roll =%4.0f\\circ)', pf_yaw, pf_pch, pf_rll);
     title({note,pry});

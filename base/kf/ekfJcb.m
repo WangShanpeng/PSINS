@@ -8,7 +8,7 @@ function [Jcb, y] = ekfJcb(hfx, x, tpara)
 % Outputs: Jcb - Jacobian matrix of hfx
 %          y - y = fhx(x)
 %
-% See also  ekf, ckf, ukf.
+% See also  ekf, ckf, ukf, Jacob5, alignvn_ekf.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

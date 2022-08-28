@@ -22,8 +22,8 @@ switch tag
         [reskf, resekf] = setvals(varargin);
         t = reskf(:,end);
         myfigure;
-        subplot(321); plot(t, [reskf(:,1),resekf(:,1)]/glv.min); xygo('phiE');
-        subplot(323); plot(t, [reskf(:,2),resekf(:,2)]/glv.min); xygo('phiN');
+        subplot(321); plot(t, [reskf(:,1),resekf(:,1)]/glv.sec); xygo('phiE');
+        subplot(323); plot(t, [reskf(:,2),resekf(:,2)]/glv.sec); xygo('phiN');
         subplot(325); plot(t, [reskf(:,3),resekf(:,3)]/glv.min); xygo('phiU'); legend('Linear Kalman', 'EKF');
         subplot(322); plot(t, [reskf(:,4),resekf(:,4)]), xygo('dVE');
         subplot(324); plot(t, [reskf(:,5),resekf(:,5)]), xygo('dVN');

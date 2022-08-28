@@ -8,7 +8,7 @@ function coef = wm2wtcoef(ts, n, N)
 %             nmuber
 % Output: coef - angular rate coefficient matrix, such that wt = wm'*coef
 %
-% See also  qpicard, dcmtaylor.
+% See also  qpicard, dcmtaylor, avptaylor.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

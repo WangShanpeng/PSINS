@@ -1,14 +1,14 @@
 function [res, idx] = norep(scr, clm, delrep)
-% To get non-repeat data for specified columns.
+% To get non-repeat data for specific columns.
 %
 % Prototype: [res, idx] = norep(scr, clm, delrep)
 % Inputs: scr - data source input
 %         clm - column for non-repeat
-%         delrep - =1 for delete repeated row; = 0 for set repeated row as 0.
+%         delrep - =1 for delete repeated row; =0 for set repeated row as 0.
 % Outputs: res - result
 %          idx - non-repeat index
 %
-% See also  no0, setrep0, normv, scaleclm.
+% See also  no0, norep0, setrep0, normv, scaleclm.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

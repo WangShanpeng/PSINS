@@ -7,7 +7,7 @@ function ins = insupdate(ins, imu)
 %         imu - gyro & acc incremental sample(s)
 % Output: ins - SINS structure array after updating
 %
-% See also  insinit, cnscl, earth, trjsimu, imuadderr, avpadderr, q2att,
+% See also  insinit, cnscl, earth, inspure, trjsimu, imuadderr, avpadderr, q2att,
 %           inslever, alignvn, aligni0, etm, kffk, kfupdate, insplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.

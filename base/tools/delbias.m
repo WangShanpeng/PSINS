@@ -1,21 +1,24 @@
 function [x, b1] = delbias(x, b, clm)
 % Delete bias.
 %
-% Prototype:  out = delbias(in, b, clm)
-% Inputs: in - input date with bias
+% Prototype:  [x, b1] = delbias(x, b, clm)
+% Inputs: x_in - input date with bias
 %         b - bias
 %         clm - data column to delete bias
-% Outputs: out - output date with no bias
+% Outputs: x_out - output date with no bias
 %          b1 - bias output
 %
-% See also  deltrend, imudeldrift, adddt, sumn, meann.
+% See also  deltrend, imudeldrift, mulsf, adddt, sumn, meann.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 23/07/2016, 03/07/2018, 24/03/2022 
+    if nargin==1
+        clm=1:size(x,2); b = mean(x(:,clm));   %  delbias(x)  % clm=1:size(x,2)
+    end
     if nargin==3
-        if isempty(b)==0; b = mean(x(:,clm)); end     %  delbias(x, [], clm)
-        if length(b)==1; b = repmat(b,clm,1); end    %  delbias(x, b, clm)
+        if isempty(b); b = mean(x(:,clm)); end     %  delbias(x, [], clm)
+        if length(b)==1; b = repmat(b,clm,1); end    %  delbias(x, [bbb...], clm)
         for k=1:length(clm)
             x(:,clm(k)) = x(:,clm(k)) - b(k);
         end

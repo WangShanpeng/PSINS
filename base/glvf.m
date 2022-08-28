@@ -75,6 +75,7 @@ global glv
     glv.t0 = 0;
     glv.tscale = 1;  % =1 for second, =60 for minute, =3600 for hour, =24*3600 for day
     glv.isfig = 1;
+    glv.dgn = [];
     %%
     [glv.rootpath, glv.datapath, glv.mytestflag] = psinsenvi;
     glv1 = glv;

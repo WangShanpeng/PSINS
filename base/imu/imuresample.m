@@ -29,4 +29,7 @@ function imu = imuresample(imu0, ts, t1, method)
     t = (t1:ts:t0(end))';
     imu = interp1(t0, imu0, t, method);   % 'linear' or 'spline' interpolation
     imu = [diff(imu), t(2:end)];  % restore increment (de-cumulate)
+    if size(imu,2)>7
+        imu(:,7:end-1) = imu(:,7:end-1)/(ts/ts0);  % for temperature mean
+    end
  

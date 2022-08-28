@@ -26,6 +26,7 @@ function kf = kfinit0(kf, nts)
     if ~isfield(kf, 'pconstrain'),  kf.pconstrain = 0;  end
     kf.Pmax = (diag(kf.Pxk)+1)*1.0e10;
     kf.Pmin = kf.Pmax*0;
+    kf.Pykk_1 = kf.Hk*kf.Pxk*kf.Hk'+kf.Rk;
     kf.xfb = zeros(kf.n, 1);
 %     kf.coef_fb = (1.0-exp(-kf.T_fb./kf.xtau));
 %     kf.coef_fb = ar1coefs(kf.T_fb, kf.xtau);

@@ -211,6 +211,8 @@ BOOL	logtrigger(int n, double f0=1.0);
 inline  BOOL IsZero(double f, double eps=EPS);
 int		sign(double val, double eps=EPS);
 double	range(double val, double minVal, double maxVal);
+double  attract(double f, double th=1.0, double center=0.0);
+double  polyval(const double *p, int order, double x);
 double	atan2Ex(double y, double x);
 double  diffYaw(double yaw, double yaw0);
 double	MKQt(double sR, double tau);
@@ -354,6 +356,7 @@ public:
 	friend CVect3 v3double(double f);
 	friend void v5double(double f, CVect3 &v1, CVect3 &v2);
 	friend CVect3 sort(const CVect3 &v);
+	friend CVect3 attract(const CVect3 &v, const CVect3 &th=One31, const CVect3 &center=O31);
 };
 
 class CQuat
@@ -655,17 +658,20 @@ public:
 
 class CIMU
 {
-	CMat3 *pKga, Kg, Ka, *pgSens, gSens, *pgSens2, gSens2, *pgSensX, gSensX;  // gyro g-sensitivity
-	CVect3 eb, db, *pKa2, Ka2;  // acc quadratic nonlinearity
-	CVect3 *plv, lvx, lvy, lvz, wb_1;  // inner lever-arm
+	CMat3 Kg; CVect3 eb; CMat3 Ka; CVect3 db, Ka2, lvx, lvy, lvz; double tGA;  // Do not modify this line!
+	CMat3 *pKga, *pgSens, gSens, *pgSens2, gSens2, *pgSensX, gSensX;  // gyro g-sensitivity
+	CVect3 Sfg, Sfa, *pSf, *pKa2;  // acc quadratic nonlinearity
+	CVect3 *plv, wb_1;  // inner lever-arm
 	char *prfu, rfu[3];
 public:
-	int nSamples;
-	double tk, nts, _nts, tGA;
+	int nSamples, iTemp;
+	double tk, nts, _nts, Temp, *pTempArray;
 	bool preFirst, onePlusPre, preWb;
 	CVect3 phim, dvbm, wmm, vmm, wm_1, vm_1;
 
 	CIMU(void);
+	void SetSf(const CVect3 &Sfg0, const CVect3 &Sfa0);
+	void SetTemp(double *tempArray0, int type=1);
 	void SetKga(const CMat3 &Kg0, const CVect3 eb0, const CMat3 &Ka0, const CVect3 &db0);
 	void SetgSens(const CMat3 &gSens0, const CMat3 &gSens20=O33, const CMat3 &gSensX0=O33);
 	void SetKa2(const CVect3 &Ka20);

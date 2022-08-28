@@ -13,7 +13,7 @@ function [att0, attk, xkpk] = alignvn_ekf(imu, qnb, pos, phi0, imuerr, wvn, isfi
 % Outputs: att0 - attitude align result
 %         attk, xkpk - for debug
 %
-% See also  alignvn, alignvn_stekf.
+% See also  alignvn, alignvn_stekf, Jacob5.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -28,6 +28,7 @@ global glv
     vn = zeros(3,1);
     eth = earth(pos);  Cnn=rv2m(-eth.wnie*nts/2);
     kf = ekfinit(nts, phi0, imuerr, wvn);  % ekf init
+    kf.fx = @Jacob5; kf.px.wnie = eth.wnie; kf.px.fn = -eth.gn; kf.px.ts = nts;
     len = length(imu); [attk, xkpk] = prealloc(fix(len/nn), 4, 2*kf.n+1);
     ki = timebar(nn, len, 'Initial align using vn as meas (EKF).' );
     for k=1:nn:len-nn+1
@@ -37,8 +38,7 @@ global glv
         Cnb = q2mat(qnb);
         dvn = Cnn*Cnb*dvbm;  vn = vn + dvn + eth.gn*nts;   % velocity updating
         qnb = qupdt(qnb, phim-Cnb'*eth.wnie*nts); % attitude updating
-        [kf.xkk_1, kf.Phikk_1] = Jacob5(kf.xk, eth.wnie, dvn/nts, nts);
-        kf.ykk_1 = kf.Hk*kf.xkk_1;
+        kf.fn = dvn/nts;
         kf = ekf(kf, vn(1:2));
         qnb = qdelafa(qnb, 0.91*kf.xk(1:3)); kf.xk(1:3) = 0.09*kf.xk(1:3);
         vn(1:2) = vn(1:2)-0.91*kf.xk(4:5);  kf.xk(4:5) = 0.09*kf.xk(4:5);
@@ -55,12 +55,13 @@ function kf = ekfinit(nts, phi0, imuerr, wvn)
     kf.Rk = diag(wvn(1:2))^2/nts;
     kf.Pxk = diag([phi0; [1;1]])^2;
     kf.Hk = [zeros(2,3), eye(2)];
-    [kf.m, kf.n] = size(kf.Hk);
-    kf.I = eye(kf.n);
-    kf.xk = zeros(kf.n, 1);
-    kf.adaptive = 0;
-    kf.xconstrain = 0; kf.pconstrain = 0;
-    kf.fading = 1;
+    kf = kfinit0(kf, nts);
+%     [kf.m, kf.n] = size(kf.Hk);
+%     kf.I = eye(kf.n);
+%     kf.xk = zeros(kf.n, 1);
+%     kf.adaptive = 0;
+%     kf.xconstrain = 0; kf.pconstrain = 0;
+%     kf.fading = 1;
     
 function ekfplot(attk, xkpk)
 global glv

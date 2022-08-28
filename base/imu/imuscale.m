@@ -9,7 +9,7 @@ function [imu, sf] = imuscale(imu, t, w, f)
 % Outputs: imu - SIMU data array after scaling
 %          sf - scale factor array
 %
-% See also  sysclbt, imuinc, imudot, imurot.
+% See also  sysclbt, imuinc, imudot, imurot, imustaticcale.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

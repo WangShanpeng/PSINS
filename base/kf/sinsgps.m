@@ -3,7 +3,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % The 19-state includes:
 %       [phi(3); dvn(3); dpos(3); eb(3); db(3); lever(3); dT(1)]
 % The 3- or 6- measurements are:
-%       [dvn(3)] or [dvn(3); dpos(3)]
+%       [dpos(3)] or [dvn(3); dpos(3)]
 %
 % Prototype: [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, lever, dT, rk, Pmin, Rmin, fbstr, isfig)
 % Inputs: imu - IMU array [wm, vm, t]
@@ -28,7 +28,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % imuerr = imuerrset(0.03, 100, 0.001, 1);
 % Pmin = [avperrset([0.1,1],0.001,0.01); gabias(0.1, [10,30]); [0.01;0.01;0.01]; 0.0001].^2;
 % Rmin = vperrset(0.001, 0.01).^2;
-% [avp1, xkpk, zkrk, sk, ins1, kf1] = sinsgps(imu, gps, ins, avperr, imuerr, rep3(1), 0.01, vperrset(0.1,10), Pmin, Rmin, 'avp');
+% [avp1, xkpk, zkrk, sk, ins1, kf1] = sinsgps(imu, gps, ins, avperr, imuerr, [rep3(1);1], [0.01;1], vperrset(0.1,10), Pmin, Rmin, 'avp');
 %
 % Example 3:
 % t0 = 1;  t1 = 916;
@@ -45,6 +45,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 09/10/2013, 06/02/2021, 02/11/2021
+global glv
     [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     if size(gps,2)<=5, gpspos_only=1; pos0=gps(1,1:3)'; else, gpspos_only=0; pos0=gps(1,4:6)'; end 
     if ~exist('rk', 'var'),
@@ -62,6 +63,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
     end
     ins.lever = lever(1:3);  ins.tDelay = dT(1);
     ins = inslever(ins, -ins.lever);  ins.vn = ins.vnL; ins.pos = ins.posL;
+    if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
     psinstypedef(196-gpspos_only*3);
     kf = [];
     kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(3,1); imuerr.sqg; imuerr.sqa; zeros(3,1); 0])^2;
@@ -90,7 +92,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
     for k=1:nn:len-nn+1
         k1 = k+nn-1; 
         wvm = imu(k:k1,1:6); t = imu(k1,end);
-        ins = insupdate(ins, wvm);
+        ins = insupdate(ins, wvm);  ins.eth.dgnt=t;
         kf.Phikk_1 = kffk(ins);
         kf = kfupdate(kf);
         [kgps, dt] = imugpssyn(k, k1, 'F');

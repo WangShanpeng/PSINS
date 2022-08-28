@@ -1,5 +1,5 @@
 function mylegend(str1, str2, str3, str4, str5)
-% Legend of specified characteristic.
+% Legend of specific characteristic.
 %
 % Prototype: myfigure(str1, str2, ...)
 % Inputs: str1,str2 - strings for legend

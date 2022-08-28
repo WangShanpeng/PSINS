@@ -57,13 +57,14 @@ global glv
             elseif n<17, ptype='avped'; end
             insplot(avp, ptype);
             if n<8, subplot(222); xygo('v_{x,y}^b / (m/s)'); subplot(224); xygo('v_z^b / (m/s)');
-            else, subplot(323); xygo('V^b / (m/s)'); end
+            else, subplot(323); xygo('V ^b / (m/s)'); end
         case 'avp',
             if size(avp,2)==9, t=1:length(t); end
             myfig;
             subplot(321), plot(t, avp(:,1:2)/glv.deg); xygo('pr'); legend('Pitch','Roll');
             subplot(322), plot(t, avp(:,3)/glv.deg); xygo('y'); legend('Yaw');
-            subplot(323), plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+avp(:,6).^2)]); xygo('V'); legend('V_E','V_N', 'V_U', '|V|');
+%             subplot(323), plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+avp(:,6).^2)]); xygo('V'); legend('V_E','V_N', 'V_U', '|V|');
+            subplot(323), plot(t, avp(:,4:6)); xygo('V'); legend('V_E','V_N', 'V_U');
             dxyz = pos2dxyz(avp(:,7:9));
             subplot(325), plot(t, dxyz(:,[2,1,3])); xygo('DP'); legend('\DeltaLat','\DeltaLon','\DeltaHgt');
 %             subplot(325), plot(t, [[avp(:,7)-avp(1,7),(avp(:,8)-avp(1,8))*cos(avp(1,7))]*glv.Re,avp(:,9)-avp(1,9)]); xygo('DP');

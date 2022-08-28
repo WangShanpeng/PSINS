@@ -1,5 +1,5 @@
 function imu = imuadderr(imu, imuerr)
-% SIMU outputs adding errors simulation, denoted as:
+% SIMU adding errors simulation, denoted as:
 %    imu = K*imu + drift error.
 %
 % Prototype: imu = imuadderr(imu, imuerr, ts)
@@ -7,7 +7,7 @@ function imu = imuadderr(imu, imuerr)
 %         imuerr - SIMU error struture array
 % Output: imu - output SIMU data added errors
 %
-% See also  imuerrset, imuclbt, imudeldrift, imuasyn, imugsensi, avperrset, trjsimu, insupdate.
+% See also  imuerrset, imuclbt, imudeldrift, imuaddka2, imuasyn, imugsensi, avperrset, trjsimu, insupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

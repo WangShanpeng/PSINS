@@ -25,7 +25,7 @@ global glv
     if nargin<5,  imuerrset(0.01, 100, 0.001, 1);  end
     if nargin<6,  wvn = [0.01; 0.01; 0.01];  end
     if nargin<7,  ts = imu(2,7)-imu(1,7);  end
-    if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
+    if length(qnb)==3, qnb=a2qua(qnb); end  % if input qnb is Eular angles.
     nn = 2; nts = nn*ts;
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos); vn = zeros(3,1); Cnn = rv2m(-eth.wnie*nts/2);
@@ -47,10 +47,13 @@ global glv
         kf.Gammak = [-Cnb,zeros(3); zeros(3),Cnb; zeros(6)];
         if norm(phim)<100*glv.dps*nts
             kf = kfupdate(kf, vn);
+%             kfs = kfstat(kfs, kf, 'B');
+            kfs = kfstat(kfs, kf, 'T');   kfs = kfstat(kfs, kf, 'M');
         else
             kf = kfupdate(kf);
+            kfs = kfstat(kfs, kf, 'T');
         end
-        kfs = kfstat(kfs, kf, 'B');
+%         kfs = kfstat(kfs, kf, 'B');
         qnb = qdelphi(qnb, 0.1*kf.xk(1:3)); kf.xk(1:3) = 0.9*kf.xk(1:3);
         vn = vn-0.1*kf.xk(4:6);  kf.xk(4:6) = 0.9*kf.xk(4:6);
         attk(ki,:) = [q2att(qnb)', t];

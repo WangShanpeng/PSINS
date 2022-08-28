@@ -28,6 +28,7 @@ global glv
     [nn, ts, nts] = nnts(2, imu(2,end)-imu(1,end));
     if length(avp0)<9, avp0=[avp0(1:3);zeros(3,1);avp0(4:end)]; end  % avp0=[att;pos]
     ins = insinit(avp0, ts);  vn0 = avp0(4:6); pos0 = avp0(7:9);
+    if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
     if nargin<3,  href = avp0(9);  end
     vp_fix = 'n';
     if length(href)==1
@@ -57,7 +58,7 @@ global glv
     for k=1:nn:len-nn+1
         k1 = k+nn-1;
         wvm = imu(k:k1, 1:6);  t = imu(k1,end);
-        ins = insupdate(ins, wvm);  % ins.vn(3) = 0;
+        ins = insupdate(ins, wvm);  ins.eth.dgnt=t; % ins.vn(3) = 0;
         if vp_fix=='v',      ins.vn = vn0;
         elseif vp_fix=='V',  ins.vn(3) = vn0(3);
         elseif vp_fix=='p',  ins.pos = pos0; ins.vn(3) = vn0(3);

@@ -26,7 +26,7 @@ function apt = seawave6(apTau, T, ts, t0, t1, isfig)
     if ~exist('t1', 'var'), t1 = 20; end
     if ~exist('t0', 'var'), t0 = 10; end
     if ~exist('ts', 'var'), ts = 0.01; end
-    ts0 = ts; ts = min(apTau(:,2))/4; 
+    ts0 = ts; ts = min(apTau(:,2))/10; 
     t = (0:ts:T+t0+t1)';
     apt1 = zeros(length(t),7); apt1(:,end) = t;
     apt1(fix(t0/ts):fix((t0+T)/ts),1:6) = randn(fix((t0+T)/ts)-fix(t0/ts)+1,6);
@@ -34,13 +34,13 @@ function apt = seawave6(apTau, T, ts, t0, t1, isfig)
         if size(apTau,2)<3
             [b, a] = butter(6, [1/apTau(k,2)]/(0.5/ts), 'low');
         else
-            [b, a] = butter(6, [1/apTau(k,3),1/apTau(k,2)]/(0.5/ts), 'bandpass');
+            [b, a] = butter(6, [1/apTau(k,3),1/apTau(k,2)]/(0.5/ts), 'bandpass');  % figure, freqz(b,a,1000,1/ts)
         end
 %         apt1(:,k) = filtfilt(b,a,apt1(:,k))*apTau(k,3);
         thres = 1.0;
         idx = apt1(:,k)>thres;  apt1(idx,k) = thres;
         idx = apt1(:,k)<-thres;  apt1(idx,k) = -thres;
-        apt1(:,k) = filter(b,a,apt1(:,k));
+        apt1(:,k) = filter(b,a,apt1(:,k));  % figure, pwelch(apt1(:,k),[],[],[],1/ts);
     end
     afa = 1;
     for k=fix((T+t0)/ts):length(apt1)
@@ -52,7 +52,7 @@ function apt = seawave6(apTau, T, ts, t0, t1, isfig)
     t = (t(1):ts0:t(end))'; apt = zeros(length(t),7); apt(:,end) = t;
     for k=1:6
 %         apt(:,k) = interp1(apt1(:,end), apt1(:,k), t);
-        apt(:,k) = interp1(apt1(:,end), apt1(:,k), t, 'spline');
+        apt(:,k) = interp1(apt1(:,end), apt1(:,k), t, 'spline');  % figure, pwelch(apt(:,k),[],[],[],1/ts0);
         apt(:,k) = apt(:,k)/std(apt(:,k))*apTau(k,1)*2/3;
     end
     if ~exist('isfig','var'), isfig=0; end

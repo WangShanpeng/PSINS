@@ -9,7 +9,7 @@ function [Ct0, iter] = dcmtaylor(Wt, T, tol)
 % Outputs: Ct0 - output DCM at time T
 %          iter - iteration count
 % 
-% See also  qtaylor, qpicard, wm2wtcoef.
+% See also  qtaylor, qpicard, avptaylor, wm2wtcoef.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

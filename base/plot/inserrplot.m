@@ -124,4 +124,7 @@ global glv
             subplot(325), plot(t, err(:,3)); ylabel('\it\delta h\rm / m'); xlgo
             subplot(3,2,[4,6]), plot(err(:,5)/glv.deg, err(:,4)/glv.deg);
             hold on, plot(err(:,8)/glv.deg, err(:,7)/glv.deg, 'r'); xlabel('\it\lambda\rm / \circ'); ylabel('\itL\rm / \circ'); grid on;  
+        case 'p',
+            myfigure;
+            plot(t, [err(:,1:2)*glv.Re,err(:,3)]); xygo('dP'); mylegend('dlat','dlon','dH');
     end

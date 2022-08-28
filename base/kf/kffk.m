@@ -7,7 +7,7 @@ function [Fk, Ft] = kffk(ins, varargin)
 % Outputs: Fk - discrete-time transition matrix, = Phikk_1
 %          Ft - continuous-time transition matirx
 %
-% See also  kfhk, kfinit, kfupdate, kfc2d, insupdate, etm, psinstypedef, ekffk.
+% See also  kfhk, kfinit, kfupdate, kfc2d, insupdate, etm, psinstypedef.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

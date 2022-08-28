@@ -1,7 +1,7 @@
 function yaw = yawcvt(yaw, cvstr)
 % Euler yaw angles convertion to designated convension.
 %
-% Prototype: yaw = yawcvt(yaw, dirstr)
+% Prototype: yaw = yawcvt(yaw, cvstr)
 % Inputs: yaw - input yaw angles, in rad
 %         dirstr - convention descript string
 % Output: yaw - output yaw angles in new convention
@@ -10,7 +10,8 @@ function yaw = yawcvt(yaw, cvstr)
 %         glvs
 %         y=mod((0:400)',360)*glv.deg;       figure, plot([y, yawcvt(y,'c360cc180')]/glv.deg); grid on
 %         y=(mod((0:400)',360)-180)*glv.deg;  figure, plot([y, yawcvt(y,'cc180c360')]/glv.deg); grid on
-% See also  avpcvt, att2c.
+%
+% See also  yawadd, avpcvt, att2c.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -37,3 +37,8 @@ function eth = ethupdate(eth, pos, vn)
     eth.gcc(1) = eth.wnien(3)*vn(2)-eth.wnien(2)*vn(3);
     eth.gcc(2) = eth.wnien(1)*vn(3)-eth.wnien(3)*vn(1);
     eth.gcc(3) = eth.wnien(2)*vn(1)-eth.wnien(1)*vn(2)+eth.gn(3);
+    if isfield(eth, 'dgn')
+        while eth.dgnt>eth.dgn(eth.dgnk,end) && eth.dgnk<eth.dgnlen, eth.dgnk=eth.dgnk+1; end
+        eth.gcc = eth.gcc + eth.dgn(eth.dgnk,1:3)';
+        eth.gn = eth.gn + eth.dgn(eth.dgnk,1:3)';
+    end

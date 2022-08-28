@@ -1,12 +1,12 @@
 function imu = imuclbt(imu, clbt, eb, Ka, db)
-% IMU simuation by adding calibration errors.
+% IMU calibration.
 %
 % Prototype: imu = imuclbt(imu, clbt)
-% Inputs: imu - ideal IMU simulation data
+% Inputs: imu - IMU before calibration 
 %         clbt - calibration struct
-% Output: imu - IMU simulation output
+% Output: imu - IMU output after calibration 
 %
-% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt.
+% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt, imutclbt.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China
@@ -14,6 +14,7 @@ function imu = imuclbt(imu, clbt, eb, Ka, db)
 global glv
     ts = diff(imu(1:2,end));
     if nargin<2  % imuclbt(imu)  default as an example
+        clbt.sf = [1; 1; 1; 1; 1; 1];
         clbt.Kg = eye(3) - diag([10;20;30]*glv.ppm) + ...
             [0, 10, 20; 30, 0, 40; 50, 60, 0]*glv.sec;
         clbt.eb = [0.1; 0.2; 0.3]*glv.dph;
@@ -33,6 +34,7 @@ global glv
         imu(:,1:6) = [imu(:,1:3)*Kg',imu(:,4:6)*Ka'] - repmat([eb;db]'*ts,length(imu),1);
         return;
     end
+    if ~isfield(clbt, 'sf'), clbt.Sfg = [1;1;1;1;1;1]; end
     if ~isfield(clbt, 'Kg'), clbt.Kg = eye(3); end
     if ~isfield(clbt, 'Ka'), clbt.Ka = eye(3); end
     if ~isfield(clbt, 'eb'), clbt.eb = zeros(3,1); end
@@ -42,6 +44,7 @@ global glv
     if ~isfield(clbt, 'ry'), clbt.ry = zeros(3,1); end
     if ~isfield(clbt, 'rz'), clbt.rz = zeros(3,1); end
     if ~isfield(clbt, 'tGA'), clbt.tGA = 0; end
+    for k=1:6, imu(:,k)=imu(:,k)*clbt.sf(k); end
     if norm(clbt.rx)>0 || norm(clbt.ry)>0
         timebar(1, length(imu), 'IMU calibration,');
         for k=2:length(imu)

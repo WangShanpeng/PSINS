@@ -1,5 +1,5 @@
 function data = negclm(data, clm)
-% Negative the specified data column, i.e. data(:,clm) = -data(:,clm).
+% Negative the specific data column, i.e. data(:,clm) = -data(:,clm).
 %
 % Prototype: data = negclm(data, clm)
 % Inputs: data - input data

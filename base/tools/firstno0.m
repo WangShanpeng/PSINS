@@ -1,5 +1,5 @@
 function [res, idx] = firstno0(scr, clm)
-% To get the first non-zero data for specified columns.
+% To get the first non-zero data for specific columns.
 %
 % Prototype: [res, k1] = firstno0(scr, clm)
 % Inputs: scr - data source input

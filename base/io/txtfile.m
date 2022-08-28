@@ -7,7 +7,10 @@ function data = txtfile(fname, formatstr, data, varargin)
 %         data - data to be saved
 %         varargin - infomation strings attatched to the txt file
 % Output: data - data read from txt file
-
+%
+% Example
+%   txtfile('posdata.txt', '%.8f %.8f %.2f', [gps(:,5)/glv.deg,gps(:,4)/glv.deg,gps(:,6)]);
+%
 % See also  loadtxt, binfile, imufile, avpfile.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.

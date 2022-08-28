@@ -1,8 +1,9 @@
-function imutemplot(imu)
+function imutemplot(imu, n)
 % SIMU data plot where temperature in x-axis.
 %
 % Prototype: imutemplot(imu)
 % Inputs: imu - SIMU data, =[wm, vm, temp, t]
+%         n - mean count
 %          
 % See also  imutplot, imuplot, imumeanplot.
 
@@ -10,6 +11,11 @@ function imutemplot(imu)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 04/08/2021
     global glv
+    if nargin>1
+        imu = imuresample(imu, n*diff(imu(1:2,end)));
+        imutemplot(imu);
+        return;
+    end
     myfig;
     ts = diff(imu(1:2,end));
     subplot(321), plot(imu(:,7), imu(:,1)/ts/glv.dph); xygo('Temp', 'wxdph');

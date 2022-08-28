@@ -1,5 +1,5 @@
 % KF,EKF & STEKF align methods are compared.
-% See also  test_align_methods_compare.
+% See also  alignvn_ekf, alignvn_stekf, test_align_methods_compare.
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 26/10/2021
@@ -9,7 +9,7 @@ attr = [0;0;20]*glv.deg;  pos0 = glv.pos0;
 imuerr = imuerrset(0.03, 100, 0.001, 1);
 imu = imustatic([attr;pos0], ts, 600, imuerr);  % imuplot(imu);
 %%
-phi = 1*[2; 3; 18]*glv.deg;      % Please modify here, '0.1*, 1.0*, 5.0* or 10.0*'
+phi = 5*[2; 3; 18]*glv.deg;      % Please modify here, '0.1*, 1.0*, 5.0* or 10.0*'
 att = qaddafa(a2qua(attr),phi);
 phi0 = [5; 5; 30]*glv.deg; wvm = 0.01; isfig = 0;
 [att0, attk, xkpk] = alignvn(imu, att, pos0, phi0, imuerr, wvm, isfig);

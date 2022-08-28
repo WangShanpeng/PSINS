@@ -1,5 +1,5 @@
 function [m, s] = titlems(mnk, p)
-% Add data mean&std title to the specified axis.
+% Add data mean&std title to the specific axis.
 %
 % Prototype: [m, s] = titlems(mnk, p)
 % Inputs: mnk - subplot figure

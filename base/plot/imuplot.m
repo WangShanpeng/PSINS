@@ -7,7 +7,7 @@ function lost = imuplot(imu, type, t0)
 %         t0 - plot time t0 as 0
 % Output: lost - lost index      
 %          
-% See also  imumeanplot, insplot, inserrplot, kfplot, gpsplot, odplot, magplot, igsplot, ttest.
+% See also  imumeanplot, imutplot, insplot, inserrplot, kfplot, gpsplot, odplot, magplot, igsplot, ttest.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -52,10 +52,10 @@ global glv
 %     end
     myfig;
     if type==1
-%         subplot(121), plot(t, [imu(:,1:3)]/dps); xygo('w');
-%         subplot(122), plot(t, [imu(:,4:6)]/g0);  xygo('f');
-        subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');
-        subplot(122), plot(t, [imu(:,4:6),normv(imu(:,4:6))]/g0);  xygo('f'); legend('Ax','Ay','Az','|A|');
+        subplot(121), plot(t, [imu(:,1:3)]/dps); xygo('w');
+        subplot(122), plot(t, [imu(:,4:6)]/g0);  xygo('f');
+%         subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');
+%         subplot(122), plot(t, [imu(:,4:6),normv(imu(:,4:6))]/g0);  xygo('f'); legend('Ax','Ay','Az','|A|');
     elseif type==2
         ax = plotyy(t, imu(:,1:3)/dps, t, imu(:,4:6)/g0); xyygo(ax, 'w', 'f');
     elseif type==3
@@ -78,6 +78,20 @@ global glv
         subplot(322), myplotyy([imu(:,4)/g0,wfdot(:,4)/g0/ts,t], 'fx', 'f_xdot/(g/s)');
         subplot(324), myplotyy([imu(:,5)/g0,wfdot(:,5)/g0/ts,t], 'fy', 'f_ydot/(g/s)');
         subplot(326), myplotyy([imu(:,6)/g0,wfdot(:,6)/g0/ts,t], 'fz', 'f_zdot/(g/s)');
+    elseif type==5  % test if some data repeat
+        wfdot = diff([imu(1,:)+111;imu]);
+        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');
+        repidx = find(wfdot(:,1)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,1)/dps,'ro');  end
+        subplot(323), plot(t, imu(:,2)/dps); xygo('wy');
+        repidx = find(wfdot(:,2)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,2)/dps,'ro');  end
+        subplot(325), plot(t, imu(:,3)/dps); xygo('wz');
+        repidx = find(wfdot(:,3)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,3)/dps,'ro');  end
+        subplot(322), plot(t, imu(:,4)/g0);  xygo('fx');
+        repidx = find(wfdot(:,4)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,4)/g0,'ro');  end
+        subplot(324), plot(t, imu(:,5)/g0);  xygo('fy');
+        repidx = find(wfdot(:,5)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,5)/g0,'ro');  end
+        subplot(326), plot(t, imu(:,6)/g0);  xygo('fz');
+        repidx = find(wfdot(:,6)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,6)/g0,'ro');  end
     elseif type==glv.dph
         dt = diff(t);
         lost = abs(dt)>mean(dt)*1.5; tlost = t(lost)+dt(1);

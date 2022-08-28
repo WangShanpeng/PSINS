@@ -9,7 +9,7 @@ function [qt0, iter] = qtaylor(Wt, T, tol)
 % Outputs: qt0 - output quaternion at time ts
 %          iter - iteration count
 % 
-% See also  dcmtaylor, qrk4, qpicard, wm2wtcoef.
+% See also  dcmtaylor, avptaylor, qrk4, qpicard, wm2wtcoef.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

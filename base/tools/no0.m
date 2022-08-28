@@ -1,5 +1,5 @@
 function [res, idx] = no0(scr, clm)
-% To get non-zero data for specified columns.
+% To get non-zero data for specific columns.
 %
 % Prototype: res = no0(scr, clm)
 % Inputs: scr - data source input
@@ -7,7 +7,7 @@ function [res, idx] = no0(scr, clm)
 % Outputs: res - result
 %          idx - row index for non-zero data
 %
-% See also  firstno0, nonan, norep, normv.
+% See also  firstno0, nonan, norep, norep0, normv.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

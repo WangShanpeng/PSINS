@@ -2,7 +2,7 @@ function y1 = rgkt4(hfun, x01, y0, h)
 % Solve differential equation 'dy/dx=fun(x,y)' using Runge-Kutta method.
 %
 % Prototype: y1 = rgkt4(ff, x01, y0, h)
-% Inputs: hfun - differential equation handle
+% Inputs: hfun - differential equation handle to dy/dx=fun(x,y)
 %         x01 - x01 = [x0, xhalf, x1], independant variable vectors at 
 %               times t0, t1/2 and t1
 %         y0 - dependant variable vector at time t0

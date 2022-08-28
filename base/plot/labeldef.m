@@ -59,8 +59,8 @@ function stext = labeldef(stext)
         'lat',   '\itL\rm / ( \circ )';
         'lon',   '\it\lambda\rm / ( \circ )';
         'hgt',   '\ith\rm / ( m )';
-        'est',   '\itEast\rm / m';
-        'nth',   '\itNorth\rm / m';
+        'est',   'East\rm / m';
+        'nth',   'North\rm / m';
         'H',     '\itH\rm / m';
         'DP',    '\Delta\it P\rm / m';
         'ebyz',  '\it\epsilon _{y,z}\rm / ( (\circ)/h )';

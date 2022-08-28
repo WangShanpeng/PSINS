@@ -1,5 +1,5 @@
 function h = myfigure(namestr)
-% Figure of specified characteristic.
+% Figure of specific characteristic.
 %
 % Prototype: h = myfigure(namestr)
 % Input: namestr - figure name string

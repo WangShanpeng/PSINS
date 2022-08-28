@@ -18,7 +18,7 @@ function varargout = interp1n(x1t1, varargin)
     tmin = zeros(length(varargin),1); tmax = tmin;
     for k=1:length(varargin)
         [~,idx] = sort(varargin{k}(:,end));
-        varargin{k} = varargin{k}(idx,:);
+        varargin{k} = norep(varargin{k}(idx,:),size(varargin{k},2));
         tmin(k) = varargin{k}(1,end); tmax(k) = varargin{k}(end,end);
     end
     tmin = max(tmin); tmax = min(tmax);

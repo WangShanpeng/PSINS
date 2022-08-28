@@ -27,10 +27,10 @@ for k=1:nn:len-nn+1
     kf.Phikk_1 = kffk(ins);
     kf = kfupdate(kf);
     if mod(t,1)==0
-        if t<400, s=1; elseif t<600, s=10; else s=1; end
-        posGPS = trj.avp(k1,7:9)' + davp0(7:9).*randn(3,1)*s;  % GPS pos simulation with some white noise
+        if t<400, s=1; elseif t<800, s=100; else s=1; end
+        posGPS = trj.avp(k1,7:9)' + davp0(7:9).*htwn(0.1,s,3);  % GPS pos simulation with some heavy-tailed noise
         zk = ins.pos-posGPS;    rk = zk-kf.Hk*kf.xk;
-        w = igg3(rk./sqrt(diag(kf.Rk)),5,100);
+        w = igg1(rk./sqrt(diag(kf.Pykk_1)),3,inf);
         kf = kfupdate(kf, w.*zk, 'M');
         [kf, ins] = kffeedback(kf, ins, 1, 'avp');
         avp(ki,:) = [ins.avp', t];

@@ -22,7 +22,7 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
 %    (3) If kf.fading>1, then use fading memory filtering method.
 %    (4) Using Pmax&Pmin to constrain Pxk, such that Pmin<=diag(Pxk)<=Pmax.
 %
-% See also  kfinit, kfupdatesq, kffk, kfhk, kfc2d, kffeedback, kfplot, RLS, ekf, ukf.
+% See also  kfinit, kfinit0, kfupdatesq, kffk, kfhk, kfc2d, kffeedback, kfplot, RLS, ekf, ukf.
 
 % Copyright(c) 2009-2015, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -1,5 +1,5 @@
 function [res, idx] = nonan(scr, clm)
-% To get non-NAN data for specified columns.
+% To get non-NAN data for specific columns.
 %
 % Prototype: res = nonan(scr, clm)
 % Inputs: scr - data source input

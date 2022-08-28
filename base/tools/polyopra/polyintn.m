@@ -1,5 +1,6 @@
 function pi = polyintn(p,k)
-% See also  polyvaln, polycross, polydot, polydotmul, polyadd.
+% Integrate polynomials analytically.
+% See also  polyint, polyvaln, polycross, polydot, polydotmul, polyadd.
 
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

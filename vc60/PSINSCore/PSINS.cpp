@@ -545,6 +545,13 @@ CVect3 sort(const CVect3 &v)
 	return vtmp;
 }
 
+CVect3 attract(const CVect3 &v, const CVect3 &th, const CVect3 &center)
+{
+	CVect3 dv=v-center;
+	if(dv.i>th.i || dv.i<-th.i || dv.j>th.j || dv.j<-th.j || dv.k>th.k || dv.k<-th.k) return v;
+	return CVect3(attract(v.i,th.i,center.i), attract(v.j,th.j,center.j), attract(v.k,th.k,center.k));
+}
+
 //***************************  class CQuat  *********************************/
 CQuat::CQuat(void)
 {
@@ -3757,7 +3764,7 @@ CIMU::CIMU(void)
 	nSamples = 1;
 	preFirst = onePlusPre = preWb = true; 
 	phim = dvbm = wm_1 = vm_1 = O31;
-	pKga = pgSens = pgSens2 = pgSensX = NULL; pKa2 = NULL; prfu = NULL;
+	pSf = NULL; pTempArray = NULL; pKga = pgSens = pgSens2 = pgSensX = NULL; pKa2 = NULL; prfu = NULL;
 	plv = NULL;  tk = tGA = 0.0;
 }
 
@@ -3765,6 +3772,20 @@ void CIMU::SetRFU(const char *rfu0)
 {
 	for(int i=0; i<3; i++) rfu[i]=rfu0[i];
 	prfu = rfu;
+}
+
+void CIMU::SetSf(const CVect3 &Sfg0, const CVect3 &Sfa0)
+{
+	Sfg = Sfg0;  Sfa = Sfa0;
+	pSf = &Sfg;
+}
+
+void CIMU::SetTemp(double *tempArray0, int type)
+{
+	pTempArray = tempArray0;  iTemp = 0;
+	double *p=&Kg.e00, *p1=tempArray0;
+	for(int k=0; k<37; k++,p++,p1+=5) *p = *p1;
+	pKga = &Kg;  if(type>1) pKa2 = &Ka2;  if(type>2) plv = &lvx;
 }
 
 void CIMU::SetKga(const CMat3 &Kg0, const CVect3 eb0, const CMat3 &Ka0, const CVect3 &db0)
@@ -3823,6 +3844,16 @@ void CIMU::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts)
 	vmm += pvm[i];
 	phim = wmm + cm*pwm[i];
 	dvbm = vmm + 1.0/2*wmm*vmm + (cm*pvm[i]+sm*pwm[i]);
+	if(pSf)
+	{
+		phim = dotmul(phim, Sfg);  dvbm = dotmul(dvbm, Sfa);
+	}
+	if(pTempArray)
+	{
+		double *p=&pTempArray[iTemp*5];
+		*(&Kg.e00+iTemp) = p[0] + polyval(&p[1], 3, Temp);
+		if(++iTemp==37) iTemp=0;  // (&tGA-&Kg.e00)==37
+	}
 	if(pKga)
 	{
 		phim = Kg*phim - eb*nts;   // Kg ~= Ka ~= I33
@@ -5140,8 +5171,8 @@ void CAlignkf::Init(const CSINS &sins0)
 {
 	CSINSTDKF::Init(sins0);  sins.mvnT = 0.1;
 	Pmax.Set2(fDEG3(30.0), fXXX(50.0), fdPOS(1.0e4), fDPH3(10.0), fMG3(10.0));
-	Pmin.Set2(fXXZU(1.0,10.0, SEC), fXXX(0.001), fXXX(0.01), fDPH3(0.001), fUG3(1.0));
-	Pk.SetDiag2(fXXZU(1.10,10.0, DEG), fXXX(1.0), fXXX(100.0), fDPH3(0.05), fUG3(100.0));
+	Pmin.Set2(fXXZU(1.0,10.0, SEC), fXXX(0.001), fdPOS(0.01), fDPH3(0.001), fUG3(1.0));
+	Pk.SetDiag2(fXXZU(1.10,10.0, DEG), fXXX(1.0), fdPOS(100.0), fDPH3(0.05), fUG3(100.0));
 	Qt.Set2(fDPSH3(0.001), fUGPSHZ3(1.0), fXXX(0.0), fXXX(0.0), fXXX(0.0));
 	Xmax.Set(fINF9, fDPH3(0.1), fMG3(1.0));
 	Rt.Set2(fXXX(0.1), fdPOS(100.0));
@@ -5707,6 +5738,23 @@ double range(double val, double minVal, double maxVal)
 		res = val;
 	}
 	return res;
+}
+
+double attract(double f, double th, double center)
+{
+	f -= center;
+	if(f>-th && f<th) {
+		th = f/th;  th *= th;
+		f *= th;
+	}
+	return (f+center);
+}
+
+double polyval(const double *p, int order, double x)
+{
+	double y=p[0];
+	for(int k=1; k<=order; k++)  y = y*x + p[k];
+	return y;
 }
 
 double atan2Ex(double y, double x)
