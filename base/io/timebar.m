@@ -1,4 +1,4 @@
-function tk = timebar(tStep, tTotal, msgstr)
+function [tk, r] = timebar(tStep, tTotal, msgstr)
 % In PSINS Toolbox, a waitbar is always used to show the program running
 % progress when needs a long time to processing. If the waitbar closed by user, 
 % the processing abort; if the processing done, the waitbar will disappear
@@ -33,6 +33,10 @@ global tb_arg
                 close(tb_arg.handle);
             end
         end
+        if tStep==0 && tTotal==0, tb_arg.on=0; return; end      % timebar(0,0) stop all timebar     20/11/2022
+        if tStep==1 && tTotal==1; tb_arg.on=1; return; end      % timebar(1,1) restart timebar
+        if ~isfield(tb_arg,'on'), tb_arg.on=1; end  % default 'on'
+        if tb_arg.on==0, return; end
         if nargin<3,  msgstr = [];    end
         tb_arg.handle = waitbar(0,[msgstr, ' Please wait...'], ...
             'Name','PSINS Toolbox', 'WindowStyle', 'modal', ...
@@ -41,6 +45,7 @@ global tb_arg
     end
     tb_arg.tk = tb_arg.tk + 1; tk = tb_arg.tk;
     tb_arg.tCur = tb_arg.tCur + tb_arg.tStep;
+    if tb_arg.on==0, r=tb_arg.tCur/tb_arg.tTotal; return; end
     if tb_arg.tCur-tb_arg.tOld > tb_arg.tTotal001
         r = tb_arg.tCur/tb_arg.tTotal;
         if ishandle(tb_arg.handle)

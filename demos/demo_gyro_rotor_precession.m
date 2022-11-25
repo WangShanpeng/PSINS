@@ -1,5 +1,5 @@
 % Gyro rotor procession simulation.
-% See also  demo_HRG_effect, demo_cone_motion.
+% See also  demo_gyro_rotor_precession_nutation, demo_HRG_effect, demo_cone_motion.
 % Copyright(c) 2009-2015, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 28/09/2015

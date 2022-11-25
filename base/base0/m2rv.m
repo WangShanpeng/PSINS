@@ -12,6 +12,12 @@ function rv = m2rv(m)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 05/02/2009, 18/03/2014
+        rv = [m(3,2)-m(2,3); m(1,3)-m(3,1); m(2,1)-m(1,2)];  % 11/10/2022
+        phi = acos((m(1,1)+m(2,2)+m(3,3)-1)/2);
+        if phi<1e-10, afa=1/2; else afa=phi/(2*sin(phi)); end
+%         afa = phi/sqrt(rv'*rv);
+        rv = afa*rv;
+        return;
     rv = q2rv(m2qua(m));
     m1 = m - eye(3);
 %     rv = iaskew(m-glv.I33);  % coarse init is ok when rv is small, otherwise may fail

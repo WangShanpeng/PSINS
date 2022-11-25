@@ -15,7 +15,7 @@ function  [imu, avp0, avp] = ap2imu(ap, ts)
 %   [imu, avp0] = ap2imu(ap, 0.001);
 %   imuplot(imu);
 %
-% See also  ap2avp, avp2imu.
+% See also  ap2avp, avp2imu, att2c, pos2c.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

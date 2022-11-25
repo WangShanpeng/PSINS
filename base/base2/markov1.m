@@ -19,7 +19,7 @@ function [data, beta, q] = markov1(sigma, tau, ts, len, ifplot)
 %          [data2, beta, q] = markov1(sigma, tau, ts2, fix(100*tau/ts2));
 %          figure, plot((1:length(data1))'*ts1, data1, (1:length(data2))'*ts2, data2); xygo;
 %
-% See also  mkvq, markov2, ar1coefs, imuadderr.
+% See also  mkvq, markov2, ar1coefs, iir1, imuadderr.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

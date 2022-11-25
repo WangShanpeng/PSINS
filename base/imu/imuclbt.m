@@ -6,7 +6,7 @@ function imu = imuclbt(imu, clbt, eb, Ka, db)
 %         clbt - calibration struct
 % Output: imu - IMU output after calibration 
 %
-% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt, imutclbt.
+% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt, imutclbt, imuasyn.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China
@@ -34,7 +34,7 @@ global glv
         imu(:,1:6) = [imu(:,1:3)*Kg',imu(:,4:6)*Ka'] - repmat([eb;db]'*ts,length(imu),1);
         return;
     end
-    if ~isfield(clbt, 'sf'), clbt.Sfg = [1;1;1;1;1;1]; end
+    if ~isfield(clbt, 'sf'), clbt.sf = [1;1;1;1;1;1]; end
     if ~isfield(clbt, 'Kg'), clbt.Kg = eye(3); end
     if ~isfield(clbt, 'Ka'), clbt.Ka = eye(3); end
     if ~isfield(clbt, 'eb'), clbt.eb = zeros(3,1); end

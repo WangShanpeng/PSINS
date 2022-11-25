@@ -18,7 +18,7 @@ function imu = imuresample(imu0, ts, t1, method)
     t0 = imu0(:,n);  ts0 = t0(2)-t0(1);
     t0 = [t0(1)-ts0; t0];
     imu0 = cumsum([zeros(1,n-1); imu0(:,1:n-1)]);  % cumulated increment
-    if nargin<4, method='linear'; end
+    if nargin<4, method='spline'; end
     if nargin==3, 
         if ischar(t1), method=t1; t1=fix(t0(1)); end 
     end

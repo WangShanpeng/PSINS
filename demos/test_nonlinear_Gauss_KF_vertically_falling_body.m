@@ -1,5 +1,5 @@
 % Some non-linear & Gaussian noise Kalman filters for Vertically Falling Body (VFB)
-% VFB Ref: Athans, M. 'Suboptimal state estimation for continuous-time nonlinear systems 
+% VFB model Ref: Athans, M. 'Suboptimal state estimation for continuous-time nonlinear systems 
 % from discrete noisy measurements'. IEEE Transactions on Automatic Control,1968.
 % See also  vfbfx, vfbhx
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
@@ -45,40 +45,11 @@ for k=1:length(zk)
 end
 myfig; t = err(:,end);
 subplot(3,3,1); plot(xk(:,end), xk(:,1));  xygo('Alt / m');
-subplot(3,3,2); plot(xk(:,end), xk(:,2));  xygo('Vel / m/s');
+subplot(3,3,2); plot(xk(:,end), xk(:,2));  xygo('Vel / m/s'); title('Vertically Falling Body Simulation');
 subplot(3,3,3); plot(xk(:,end), xk(:,3));  xygo('Ballistic-para / (1/m)');
 subplot(3,3,[4,7]); plot(t, err(:,1), nextlinestyle(-1));  xygo('Alt est err / m');
 subplot(3,3,[5,8]); plot(t, err(:,2), nextlinestyle(0));  xygo('Vel est err / m/s');
 subplot(3,3,[6,9]); plot(t, err(:,3), nextlinestyle(0));  xygo('Ballistic-para est err / (1/m)');  lgstr(end+1)={'EKF'};
-%% SR-UKF ********************************************************
-% afa = 1e-3; beta = 2; kappa = 0; lambda = afa^2*(n+kappa)-n; gamma = sqrt(n+lambda);
-% wm = [repmat(1/(2*gamma^2),1,2*n), lambda/gamma^2]; wc = [wm(1:end-1),wm(end)+(1-afa^2+beta)]; swc = sqrt(abs(wc));
-% Xk = Xk0; sPk = chol(Pk0)'; sQk = diag(sqrt(diag(Qk))); sRk = chol(Rk)';
-% L = 2*n+1;
-% for k=1:length(zk)
-%     sP = gamma*sPk;  Xi = [sP, -sP, zeros(n,1)]+repmat(Xk,1,L);
-%     Xkk_1=zeros(n,1);  for k1=1:L, Xi(:,k1) = vfbfx(Xi(:,k1),fpara); Xkk_1 = Xkk_1 + wm(k1)*Xi(:,k1); end;
-%     dX=zeros(n,L);  for k1=1:L, dX(:,k1) = swc(k1)*(Xi(:,k1)-Xkk_1); end;  [q,sPkk_1] = qr([dX(:,1:L-1), sQk]');
-%     sPkk_1 = sPkk_1(1:n,:);
-%     sPkk_1 = cholupdate(sPkk_1,dX(:,end),'-')';
-%     if mod(k,frq)==0
-%         sP = gamma*sPkk_1;  Xi = [sP, -sP, zeros(n,1)]+repmat(Xkk_1,1,L);
-%         XiZ = zeros(m,L); Zkk_1=zeros(m,1);  for k1=1:L, XiZ(:,k1) = vfbhx(Xi(:,k1),hpara); Zkk_1 = Zkk_1 + wm(k1)*XiZ(:,k1); end;
-%         PXZ=zeros(n,m); dZ=zeros(m,L);
-%         for k1=1:L, dX = Xi(:,k1)-Xkk_1; dZ(:,k1) = swc(k1)*(XiZ(:,k1)-Zkk_1); PXZ = PXZ + wc(k1)*dX*dZ(:,k1)'; end;  [q,sPZZ] = qr([dZ(:,1:L-1), sRk]');
-%         sPZZ = sPZZ(1:m,:);
-%         sPZZ = cholupdate(sPZZ,dZ(:,end),'-')';
-%         Kk = PXZ/(sPZZ*sPZZ');
-%         Xk = Xkk_1 + Kk*(zk(k)-Zkk_1);
-%         kpzz=Kk*sPZZ'; for k1=1:m, sPk = cholupdate(sPkk_1', kpzz(:,k1), '-')'; end
-%     else
-%         Xk = Xkk_1;  sPk = sPkk_1;
-%     end
-% 	err(k,:) = [Xk'-xk(k,1:3), k*ts];
-% end
-% subplot(3,3,[4,7]); plot(t, err(:,1), nextlinestyle(1));
-% subplot(3,3,[5,8]); plot(t, err(:,2), nextlinestyle(0));
-% subplot(3,3,[6,9]); plot(t, err(:,3), nextlinestyle(0)); lgstr(end+1)={'SR-UKF'};
 %% DQEKF *********************************************************
 Xk = Xk0;  Pk = Pk0;
 for k=1:length(zk)
@@ -249,6 +220,35 @@ end
 subplot(3,3,[4,7]); plot(t, err(:,1), nextlinestyle(1));
 subplot(3,3,[5,8]); plot(t, err(:,2), nextlinestyle(0));
 subplot(3,3,[6,9]); plot(t, err(:,3), nextlinestyle(0)); lgstr(end+1)={'UKF'};
+%% SR-UKF ********************************************************
+afa = 1e-3; beta = 2; kappa = 0; lambda = afa^2*(n+kappa)-n; gamma = sqrt(n+lambda);
+wm = [repmat(1/(2*gamma^2),1,2*n), lambda/gamma^2]; wc = [wm(1:end-1),wm(end)+(1-afa^2+beta)]; swc = sqrt(abs(wc));
+Xk = Xk0; sPk = chol(Pk0)'; sQk = diag(sqrt(diag(Qk))); sRk = chol(Rk)';
+L = 2*n+1;
+for k=1:length(zk)
+    sP = gamma*sPk;  Xi = [sP, -sP, zeros(n,1)]+repmat(Xk,1,L);
+    Xkk_1=zeros(n,1);  for k1=1:L, Xi(:,k1) = vfbfx(Xi(:,k1),fpara); Xkk_1 = Xkk_1 + wm(k1)*Xi(:,k1); end;
+    dX=zeros(n,L);  for k1=1:L, dX(:,k1) = swc(k1)*(Xi(:,k1)-Xkk_1); end;  [q,sPkk_1] = qr([dX(:,1:L-1), sQk]');
+    sPkk_1 = sPkk_1(1:n,:);
+    sPkk_1 = cholupdate(sPkk_1,dX(:,end),'-')';  % dX1=dX; dX1(:,end)=-dX1(:,end); sPx = chol([dX1, sQk]*[dX1, sQk]')';
+    if mod(k,frq)==0
+        sP = gamma*sPkk_1;  Xi = [sP, -sP, zeros(n,1)]+repmat(Xkk_1,1,L);
+        XiZ = zeros(m,L); Zkk_1=zeros(m,1);  for k1=1:L, XiZ(:,k1) = vfbhx(Xi(:,k1),hpara); Zkk_1 = Zkk_1 + wm(k1)*XiZ(:,k1); end;
+        PXZ=zeros(n,m); dZ=zeros(m,L);
+        for k1=1:L, dX = Xi(:,k1)-Xkk_1; dZ(:,k1) = swc(k1)*(XiZ(:,k1)-Zkk_1); PXZ = PXZ + swc(k1)*dX*dZ(:,k1)'; end;  [q,sPZZ] = qr([dZ(:,1:L-1), sRk]');
+        sPZZ = sPZZ(1:m,:);
+        sPZZ = cholupdate(sPZZ,dZ(:,end),'-')';  % dZ1=dZ; dZ1(:,end)=-dZ1(:,end); sPz = chol([dZ1, sRk]*[dZ1, sRk]')';
+        Kk = PXZ/(sPZZ*sPZZ');
+        Xk = Xkk_1 + Kk*(zk(k)-Zkk_1);
+        kpzz=Kk*sPZZ'; for k1=1:m, sPkk_1 = cholupdate(sPkk_1', kpzz(:,k1), '-')'; end;  sPk = sPkk_1;
+    else
+        Xk = Xkk_1;  sPk = sPkk_1;
+    end
+	err(k,:) = [Xk'-xk(k,1:3), k*ts];
+end
+subplot(3,3,[4,7]); plot(t, err(:,1), nextlinestyle(1));
+subplot(3,3,[5,8]); plot(t, err(:,2), nextlinestyle(0));
+subplot(3,3,[6,9]); plot(t, err(:,3), nextlinestyle(0)); lgstr(end+1)={'SR-UKF'};
 %% CKF3 **********************************************************
 Xk = Xk0; Pk = Pk0;
 L = 2*n; wi = repmat(1/(2*n),1,L);  Xikk_1 = zeros(n,L);  Zikk_1 = zeros(m,L);

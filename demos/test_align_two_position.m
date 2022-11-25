@@ -20,4 +20,5 @@ wvn = [0.01;0.01;0.01];
 [att00, attk, xkpk] = alignvn(imu1, att0, pos0, phi, imuerr, wvn);
 % [att00, attk, xkpk] = alignvn_kfs(imu1, att0, pos0, phi, imuerr, wvn);
 % error compare
-avpcmpplot(attk, avp(:,[1:3,end]), 'phi');
+avpcmpplot(attk(:,[1:3,end]), avp(:,[1:3,end]), 'phi');
+% angaddplot(datacut(attk,130,170));

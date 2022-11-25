@@ -14,6 +14,7 @@ imuerr = imuerrset(0.01, 50, 0.001, 5);
 afa = [-5; 7; 80]*glv.deg;  % large misalignment angles
 qpb = qaddafa(qnb0,afa);  vn = zeros(3,1);
 kf = kfinit(nts, imuerr); kf.s = 1.01; % forgetting factor
+% kf.alpha = 1; kf.beta = 0; kf.kappa = 0;
 len = length(imu); [res, xkpk] = prealloc(fix(len/nn), 6, 2*kf.n+1);
 ki = timebar(nn, len, 'UKF align simulation.');
 for k=1:nn:len-nn+1

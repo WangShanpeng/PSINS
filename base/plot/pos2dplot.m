@@ -28,7 +28,7 @@ function xyz = pos2dplot(pos0, varargin)
     xyz = [(pos0(:,2)-lon0)*eth.clRNh, (pos0(:,1)-lat0)*eth.RMh, pos0(:,3:4)];
     plot(xyz(:,1), xyz(:,2))
     if nargin>1 xy1 = xyz; xyz = []; xyz{1} = xy1; end
-    if nargin>1
+    if nargin>1  % pos2dplot(pos0, pos1, pos2, ...)
         clr = 'rmycgb';
         for k=1:length(varargin)
             pos0 = varargin{k};

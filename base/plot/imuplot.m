@@ -14,6 +14,12 @@ function lost = imuplot(imu, type, t0)
 % 27/08/2013, 09/02/2014, 03/10/2014
 global glv
     dps = glv.dps; g0 = glv.g0;
+    if ischar(imu)  % imu = imuplot('imu.bin', binfileClm);
+        if nargin<2, type=7; end
+        lost = binfile(imu, type); lost = lost(:,[1:6,end]);
+        imuplot(lost);
+        return;
+    end
     if nargin<2, type=0; end
     if ischar(type)  % imuplot(imu, 't/h')
         tscalepush(type);
@@ -21,7 +27,7 @@ global glv
         tscalepop();
         return;
     end
-    if length(type)>=7  % imuplot(imu1, imu2);
+    if length(type)>=7  % err = imuplot(imu1, imu2);
         imuplot(imu);
         imu2 = type;   t = imu2(:,end);  ts = diff(imu2(1:2,end));
         subplot(321), plot(t, imu2(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');
@@ -51,11 +57,13 @@ global glv
         imu(:,1:end-1)=imu(:,1:end-1)/ts;
 %     end
     myfig;
-    if type==1
+    if type==1 || type==11
         subplot(121), plot(t, [imu(:,1:3)]/dps); xygo('w');
         subplot(122), plot(t, [imu(:,4:6)]/g0);  xygo('f');
-%         subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');
-%         subplot(122), plot(t, [imu(:,4:6),normv(imu(:,4:6))]/g0);  xygo('f'); legend('Ax','Ay','Az','|A|');
+        if type==11
+            subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');
+            subplot(122), plot(t, [imu(:,4:6),normv(imu(:,4:6))]/g0);  xygo('f'); legend('Ax','Ay','Az','|A|');
+        end
     elseif type==2
         ax = plotyy(t, imu(:,1:3)/dps, t, imu(:,4:6)/g0); xyygo(ax, 'w', 'f');
     elseif type==3
@@ -102,6 +110,13 @@ global glv
         subplot(324), plot(t, imu(:,5)/g0,  tlost,imu(lost,5)/g0,'ro');  xygo('fy');
         subplot(326), plot(t, imu(:,6)/g0,  tlost,imu(lost,6)/g0,'ro');  xygo('fz');
         lost = find(lost)+1;
+    elseif type==-1
+        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');
+        subplot(323), plot(t, imu(:,2)/dps); xygo('wy');
+        subplot(325), plot(t, imu(:,3)/dps); xygo('wz');
+        subplot(322), plot(t, imu(:,4)/g0);  xygo('fx');
+        subplot(324), plot(t, imu(:,5)/g0);  xygo('fy');
+        subplot(326), plot(t, imu(:,6)/g0);  xygo('fz');
     else % type==0
         dt = diff(t);
         lost = abs(dt)>mean(dt)*1.5; tlost = t(lost)+dt(1);

@@ -4,8 +4,25 @@
 
 void Demo_User(void)
 {
-	double p[]={1,2,3,4,5};
-	double y = polyval(p, 4, 2.3);
+	clock_t t1, t2, t3;
+	double a[]={1,2,3,4,5,6,7,8}, b[]={1,1,1,1,1,1,1,1}, s1, s2;
+    t1 = clock();
+	for(int n1=0; n1<10*1000*1000; n1++)
+	{
+		double *pa=a; s1=1.0;
+		for(int i=8; i; i--)
+		{
+			s1 += s1**pa++;
+		}
+	}
+    t2 = clock();
+	for(int n2=0; n2<10*1000*1000; n2++)
+	{
+		double *pa=a; s2=1.0;
+		s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++;
+	}
+    t3 = clock();
+	printf("%d   %d  %f  %f\n", t2-t1, t3-t2, s1, s2);
 }
 
 void Demo_CIIRV3(void)
@@ -415,5 +432,11 @@ void Demo_CONSOLE_UART(void)
 #endif // PSINS_CONSOLE_UART
 }
 
+void Demo_Cfg(void)
+{
+	short s; int i; float f; double d; CVect3 v; CQuat q; CMat3 m;
+	WriteCfg("psinscfg.cfg")<<"psinscfg"<<(short)12<<23<<1.23f<<3.4<<CVect3(1,4,5)<<CQuat(1,2,3,4)<<CMat3(20);
+	ReadCfg("psinscfg.cfg")>>"psinscfg1">>s>>i>>f>>d>>v>>q>>m;
+}
 
 #endif  // PSINSDemo

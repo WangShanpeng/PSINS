@@ -27,6 +27,7 @@ function [wvm, Dir] = imurfu(wvm0, dirstr)
     wvm = wvm0;    Dir = zeros(3);
     clm = size(wvm, 2);
     for k=1:3
+        if upper(dirstr(k))=='X', return; end  % do nothing
         switch(upper(dirstr(k)))
             case {'R','E'}
                 wvm(:,1) = wvm0(:,k);  if clm>=6, wvm(:,4) = wvm0(:,k+3); end

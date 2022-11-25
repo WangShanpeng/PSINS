@@ -17,7 +17,6 @@ function  avp = ap2avp(ap, ts)
     t = (ap(1,7):ts:ap(end,7))';
     ap(:,1:3) = att2c(ap(:,1:3)); % make sure att is continuous
     avp = zeros(length(t), 10);
-    ap(:,1:3) = att2c(ap(:,1:3));
     for k=1:3  % attitude spline interpolation
         avp(:,k) = spline(ap(:,7), ap(:,k), t);
     end

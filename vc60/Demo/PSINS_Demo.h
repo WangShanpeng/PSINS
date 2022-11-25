@@ -12,7 +12,7 @@
 
 #include "..\PSINSCore\PSINS.h"
 
-#define PSINSDemo 16
+#define PSINSDemo 0
 
 #define psinsdemo()  \
 	switch(PSINSDemo)\
@@ -38,6 +38,7 @@
 	case 17: Demo_CVCFileFind(); break;\
 	case 18: Demo_DSP_main(); break; \
 	case 19: Demo_CONSOLE_UART(); break; \
+	case 20: Demo_Cfg(); break; \
 	}
 void Demo_User(void);
 void Demo_CIIRV3(void);
@@ -59,6 +60,7 @@ void Demo_IMUTempCompensate(void);
 void Demo_CVCFileFind(void);
 void Demo_DSP_main(void);
 void Demo_CONSOLE_UART(void);
+void Demo_Cfg(void);
 
 #ifdef PSINS_IO_FILE
 

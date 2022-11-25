@@ -1,7 +1,7 @@
 function h = myfig(namestr, ylb)
 % Short for myfigure.
 %
-% See also  myfigure.
+% See also  myfigure, nextlinestyle.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

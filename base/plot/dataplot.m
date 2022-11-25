@@ -6,7 +6,7 @@ function res = dataplot(data, clm, typestr)
 %         clm - column index
 %         typestr - type string to show in ylabel
 %
-% See also  xpplot, miniplot, avpidx, subavp.
+% See also  xpplot, miniplot, plotn, avpidx, subavp.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -1,4 +1,4 @@
-function att1 = aligni0vn(imu, pos, t1)
+function [att1, ins] = aligni0vn(imu, pos, t1)
 % SINS initial align based on inertial-frame & vn-meas method.
 %
 % Prototype: att0 = aligni0(imu, pos, t1)
@@ -6,6 +6,7 @@ function att1 = aligni0vn(imu, pos, t1)
 %         pos - position
 %         t1 - inertial-frame align time
 % Output: att1 - attitude align result
+%         ins - SINS struct
 %
 % Example:
 %     glvs;
@@ -40,4 +41,5 @@ global glv
         subplot(211), plot(attk(:,end), attk(:,1:2)/glv.deg, 'linewidth',k+1);
         subplot(212), plot(attk(:,end), attk(:,3)/glv.deg, 'linewidth',k+1);
     end
+    if nargout==2, ins=insinit([att1;pos], ts); end
 

@@ -47,7 +47,7 @@ global glv
 % kf = clbtkfinit(nts);
         t1s = 0; vn1s = zeros(fix(len*ts), 4);  kkv = 1;
         av = zeros(fix(len*ts),7); xkpk = zeros(fix(len*ts), kf.n*2+1);  kk = 1;
-        timebar(nn, len-2*frq2, sprintf('System Calibration of SIUM( iter=%d ).',iter));
+        timebar(nn, len-2*frq2, sprintf('System Calibration of SIMU( iter=%d ).',iter));
         for k=2*frq2:nn:len-frq2
             k1 = k+nn-1;
             wm = imu(k:k1,1:3); vm = imu(k:k1,4:6); t = imu(k1,end); dwb = mean(dotwf(k:k1,1:3),1)';

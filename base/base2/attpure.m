@@ -1,7 +1,7 @@
 function [att, phi] = attpure(imu, avp, t0, t1, att0)
 % Process pure attitude update.
 %
-% Prototype: avp = inspure(imu, avp0, href, isfig)
+% Prototype: [att, phi] = attpure(imu, avp, t0, t1, att0)
 % Inputs: imu - SIMU data array
 %         avp - avp ref, or initial avp0=[att0,vn0,pos0]
 %         t0,t1 - start/end time.
@@ -17,7 +17,8 @@ function [att, phi] = attpure(imu, avp, t0, t1, att0)
 % 12/06/2021
     figcmp = 1;
     if nargin==5, avp=[repmat(att0',length(avp),1),avp]; figcmp=0; end  % attpure(imu, gps, t0, t1, att0);
-    if length(avp)==6, avp=[avp(1:3);0;0;0;avp(4:6)]; figcmp=0; end  % attpure(imu, avp0, t0, t1);
+    if length(avp)==6, avp=[avp(1:3);0;0;0;avp(4:6)]; figcmp=0; end  % attpure(imu, [att0;pos0], t0, t1);
+    if size(avp,2)==4, avp=[avp(:,1:3),zeros(length(avp),6),avp(:,4)]; figcmp=1; end  % attpure(imu, att, t0, t1);
     if size(avp,2)==1,  avp=repmat(avp', length(imu), 1); avp(:,end+1)=imu(:,end); figcmp=0; end
     if nargin<4, t1=min(imu(end,end),avp(end,end)); end
     if nargin<3, t0=max(imu(1,end),avp(1,end)); end

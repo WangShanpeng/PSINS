@@ -15,7 +15,7 @@ function [att1, dKgz, db] = alignsbtp(imu, pos, Y1Y2, T1T2, isfig)
 %    [imu1, att0] = imustatictp([[1;2;10]*glv.deg; glv.pos0], 0.1, 300, 10*glv.dps, 180*glv.deg, imuerr);
 %    [att, dKgz, db] = alignsbtp(imu1, glv.pos0, [10,190]*glv.deg, [130,170]);
 %
-% See also  alignsb, alignvn, aa2dkg.
+% See also  alignsb, alignvn, aa2dkg, alignvntp, alignsbtp1.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -58,8 +58,7 @@ global glv
     dKgz = [mu(2); -mu(1); 0]/2;  % x/y in rad, z in ppm
     if length(Y1Y2)>1, dKgz(3)=-mu(3)/sum(imu(:,3)); end
     db = [-mu(2); mu(1); 0]/2*glv.g0;
-    subplot(333), title(sprintf('dKgz: %.1f, %.1f arcsec, %.1f ppm OR db: %.1f, %.1f ug', ...
-        dKgz(1)/glv.sec,dKgz(2)/glv.sec,dKgz(3)/glv.ppm, db(1)/glv.ug,db(2)/glv.ug));
-
-
-    aa2phimu
+    if isfig==1
+        subplot(333), title(sprintf('dKgz: %.1f, %.1f arcsec, %.1f ppm OR db: %.1f, %.1f ug', ...
+            dKgz(1)/glv.sec,dKgz(2)/glv.sec,dKgz(3)/glv.ppm, db(1)/glv.ug,db(2)/glv.ug));
+    end

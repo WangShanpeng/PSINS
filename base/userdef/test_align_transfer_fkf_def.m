@@ -11,7 +11,7 @@ switch tag
         kf.Pxk = diag([[10;10;10]*glv.deg; imuerr.eb; [10;10;10]; imuerr.db; [10;10;10]*glv.deg])^2;
         out = kf;
     case psinsdef.kffktag,
-        % 21-states: phi(3), eb(3), dV(3), db(3), mu(3)
+        % 15-states: phi(3), eb(3), dV(3), db(3), mu(3)
     case psinsdef.kfhktag,
         % Hk = zeros(6,15); kf.Hk(1:6,[1:3,7:9]) = eye(6);
     case psinsdef.kfplottag,

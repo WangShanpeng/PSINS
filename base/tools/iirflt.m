@@ -6,7 +6,7 @@ function flt = iirflt(flt, x)
 %         x - input data
 % Output: flt - output filter array, flt.y(:,1) is the filter result
 % 
-% See also  N/A.
+% See also  markov1, ar1coefs, ar1filt, iir1.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

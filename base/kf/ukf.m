@@ -22,9 +22,13 @@ function kf = ukf(kf, yk, TimeMeasBoth)
         TimeMeasBoth = 'B';
     end
 
+    if ~isfield(kf, 'alpha')
+        kf.alpha = 1e-3; kf.beta = 2; kf.kappa = 0;
+    end
+    
     if TimeMeasBoth=='T' || TimeMeasBoth=='B'
         if isfield(kf, 'fx')  % nonliear state propagation
-            [kf.xkk_1, kf.Pxkk_1] = ukfUT(kf.xk, kf.Pxk, kf.fx, kf.px, 1e-3, 2, 0);
+            [kf.xkk_1, kf.Pxkk_1] = ukfUT(kf.xk, kf.Pxk, kf.fx, kf.px, kf.alpha, kf.beta, kf.kappa);
             kf.Pxkk_1 = kf.Pxkk_1 + kf.Gammak*kf.Qk*kf.Gammak';
         else
             kf.xkk_1 = kf.Phikk_1*kf.xk;
@@ -41,7 +45,7 @@ function kf = ukf(kf, yk, TimeMeasBoth)
             kf.xkk_1 = kf.xk; kf.Pxkk_1 = kf.Pxk;
         end
         if isfield(kf, 'hx')  % nonliear measurement propagation
-            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ukfUT(kf.xkk_1, kf.Pxkk_1, kf.hx, kf.py, 1e-3, 2, 0);
+            [kf.ykk_1, kf.Pykk_1, kf.Pxykk_1] = ukfUT(kf.xkk_1, kf.Pxkk_1, kf.hx, kf.py, kf.alpha, kf.beta, kf.kappa);
             kf.Pykk_1 = kf.Pykk_1 + kf.Rk;
         else
             kf.ykk_1 = kf.Hk*kf.xkk_1;

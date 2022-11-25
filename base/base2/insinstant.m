@@ -14,9 +14,10 @@ function avp1 = insinstant(imu, avp, t0, t1, avperr, phimu)
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 23/06/2017, 05/10.2021
+% 23/06/2017, 05/10/2021
 global glv
     if size(avp,2)==4, avp=[avp(:,1:3), zeros(length(avp),6), avp(:,end)]; end
+    if size(avp,2)==7, avp=[avp(:,1:6), zeros(length(avp),3), avp(:,end)]; end
     if ~exist('t0', 'var'), t0 = avp(1,end); end
     if ~exist('t1', 'var'), t1 = imu(end,end); end
     if ~exist('avperr', 'var'), avperr = zeros(9,1); end
@@ -34,7 +35,7 @@ global glv
     avp = avp(idx0:idx1,:);
     t = avp(:,end);
 	subplot(321), plot(t, avp(:,1:2)/glv.deg, '-.m', 'linewidth', 2); xygo('pr'); legend('Pitch Pure', 'Roll Pure');
-	subplot(322), plot(t, avp(:,3)/glv.deg, '-.m', 'linewidth', 2); xygo('y');
+	subplot(322), plot(t, avp(:,3)/glv.deg, '-.m', 'linewidth', 2); xygo('y'); legend('Yaw Pure');
     if size(avp,2)>4
         subplot(323), plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+avp(:,6).^2)], '-.m', 'linewidth', 2); xygo('V');
         subplot(325), plot(t, [[avp(:,7)-avp(1,7),(avp(:,8)-avp(1,8))*cos(avp(1,7))]*glv.Re,avp(:,9)-avp(1,9)], '-.m', 'linewidth', 2); xygo('DP');

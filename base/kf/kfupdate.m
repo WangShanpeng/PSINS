@@ -36,6 +36,7 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
     if TimeMeasBoth=='T'            % Time Updating
         kf.xk = kf.Phikk_1*kf.xk;    
         kf.Pxk = kf.Phikk_1*kf.Pxk*kf.Phikk_1' + kf.Gammak*kf.Qk*kf.Gammak';
+        kf.measstop = kf.measstop - kf.nts;  kf.measlost = kf.measlost + kf.nts;
     else
         if TimeMeasBoth=='M'        % Meas Updating
             kf.xkk_1 = kf.xk;    
@@ -43,6 +44,7 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
         elseif TimeMeasBoth=='B'    % Time & Meas Updating
             kf.xkk_1 = kf.Phikk_1*kf.xk;    
             kf.Pxkk_1 = kf.Phikk_1*kf.Pxk*kf.Phikk_1' + kf.Gammak*kf.Qk*kf.Gammak';
+            kf.measstop = kf.measstop - kf.nts;  kf.measlost = kf.measlost + kf.nts;
         else
             error('TimeMeasBoth input error!');
         end
@@ -50,9 +52,10 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
         kf.Py0 = kf.Hk*kf.Pxykk_1;
         kf.ykk_1 = kf.Hk*kf.xkk_1;
         kf.rk = yk-kf.ykk_1;
+        idxbad = [];  % bad measurement index
         if kf.adaptive==1  % for adaptive KF, make sure Rk is diag 24/04/2015
             for k=1:kf.m
-                if yk(k)>1e10, continue; end  % 16/12/2019
+                if yk(k)>1e10, idxbad=[idxbad;k]; continue; end  % 16/12/2019
                 ry = kf.rk(k)^2-kf.Py0(k,k);
                 if ry<kf.Rmin(k,k), ry = kf.Rmin(k,k); end
                 if ry>kf.Rmax(k,k),     kf.Rk(k,k) = kf.Rmax(k,k);
@@ -63,19 +66,13 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
         end
         kf.Pykk_1 = kf.Py0 + kf.Rk;
         kf.Kk = kf.Pxykk_1*invbc(kf.Pykk_1); % kf.Kk = kf.Pxykk_1*kf.Pykk_1^-1;
+        nomeas = union(find(kf.measstop>0),[kf.measmask;idxbad]);    % no measurement update index, 20/11/2022
+        hasmeas = (1:kf.m)';
+        if ~isempty(nomeas), kf.Kk(:,nomeas)=0; hasmeas(nomeas)=[]; end
+        if ~isempty(hasmeas), kf.measlog=bitor(kf.measlog,sum(2.^(hasmeas-1))); kf.measlost(hasmeas)=0; end
         kf.xk = kf.xkk_1 + kf.Kk*kf.rk;
         kf.Pxk = kf.Pxkk_1 - kf.Kk*kf.Pykk_1*kf.Kk';
         kf.Pxk = (kf.Pxk+kf.Pxk')*(kf.fading/2); % symmetrization & forgetting factor 'fading'
-%         if kf.adaptive==1
-%             krrk = kf.Kk*kf.rk*kf.rk'*kf.Kk';
-%             for k=3:3
-%                 krrki = krrk(k,k) + kf.Pxk(k,k) - kf.Pxkk_1(k,k);
-%                 if krrki>kf.Qmax(k,k),     kf.Qk(k,k) = kf.Qmax(k,k);
-%                 elseif krrki<kf.Qmin(k,k), kf.Qk(k,k) = (1-kf.beta)*kf.Qk(k,k) + kf.beta*kf.Qmin(k,k);
-%                 else                	kf.Qk(k,k) = (1-kf.beta)*kf.Qk(k,k) + kf.beta*krrki;
-%                 end
-%             end
-%         end
         if kf.xconstrain==1  % 16/3/2018
             for k=1:kf.n
                 if kf.xk(k)<kf.xmin(k)

@@ -14,7 +14,7 @@ function [b, a] = ar1coefs(ts, tau)
 %   y = filter(b, a, x);
 %   figure; plot([x, y]); grid on;
 %
-% See also  ar1filt, markov1.
+% See also  ar1filt, markov1, iir1.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

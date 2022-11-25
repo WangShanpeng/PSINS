@@ -1,7 +1,7 @@
 function q = mkvq(R0, tau, nq)
 % Calculate the white noise intensity of 1st order Markov process.
 %
-% Prototype: q = mkvq(R0, tau)
+% Prototype: q = mkvq(R0, tau, nq)
 % Inputs: R0 - standard deviation of the process
 %         tau - correlation time
 %         nq - output dimension

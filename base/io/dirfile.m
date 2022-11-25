@@ -1,9 +1,9 @@
 function [fname, m] = dirfile(spc, k)
 % Find files in current directory.
 %
-% Prototype: trj = trjfile(fname, trj)
+% Prototype: [fname, m] = dirfile(spc, k)
 % Inputs: spc - special file name
-%         k - index k
+%         k - just return one file name index by k, or the output file name
 % Output: fname - file names
 %         m - number of files
 % Example:
@@ -18,4 +18,15 @@ function [fname, m] = dirfile(spc, k)
     for m=1:length(d)
         fname{m,1} = d(m).name;
     end
-    if nargin>1; fanme = fname{k}; m=1; end
+    if nargin>1; 
+        if ischar(k)  % dirfile(spc, outputfile)
+            outputfile = k;
+            fid = fopen(outputfile, 'wt');
+            for k=1:m
+                fprintf(fid, '%s \n', fname{k});
+            end
+            fclose(fid);
+        else
+            fanme = fname{k}; m=1;
+        end
+    end

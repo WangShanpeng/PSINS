@@ -22,7 +22,7 @@ function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 %	wvn = [0.01; 0.01; 0.01];
 %	[att0, attk, xkpk] = alignvn(imu, avp0(1:3)', avp0(7:9)', phi, imuerr, wvn);
 %
-% See also  alignfn, aligngps, alignfn9, aligncmps, aligni0, alignWahba, alignsb, insupdate, etm.
+% See also  alignfn, aligngps, alignfn9, aligncmps, aligni0, alignWahba, alignsb, alignvndp, etm.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -37,7 +37,7 @@ global glv
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos); vn = zeros(3,1); Cnn = rv2m(-eth.wnie*nts/2);
     kf = avnkfinit(nts, pos, phi0, imuerr, wvn);
-    [attk, xkpk] = prealloc(fix(len/nn), 4, 2*kf.n+1);
+    [attk, xkpk] = prealloc(fix(len/nn), 7, 2*kf.n+1);
     ki = timebar(nn, len, 'Initial align using vn as meas.');
     for k=1:nn:len-nn+1
         wvm = imu(k:k+nn-1,1:6);  t = imu(k+nn-1,end);
@@ -52,7 +52,7 @@ global glv
         kf = kfupdate(kf, vn);
         qnb = qdelphi(qnb, 0.91*kf.xk(1:3)); kf.xk(1:3) = 0.09*kf.xk(1:3);
         vn = vn-0.91*kf.xk(4:6);  kf.xk(4:6) = 0.09*kf.xk(4:6);
-        attk(ki,:) = [q2att(qnb)', t];
+        attk(ki,:) = [q2att(qnb); vn; t]';
         xkpk(ki,:) = [kf.xk; diag(kf.Pxk); t];
         ki = timebar;
     end
@@ -70,12 +70,13 @@ function kf = avnkfinit(nts, pos, phi0, imuerr, wvn)
 	kf.Pxk = diag([phi0; [1;1;1]; imuerr.eb; imuerr.db])^2;
 	Ft = zeros(12); Ft(1:3,1:3) = askew(-wnie); kf.Phikk_1 = eye(12)+Ft*nts;
 	kf.Hk = [zeros(3),eye(3),zeros(3,6)];
-    [kf.m, kf.n] = size(kf.Hk);
-    kf.I = eye(kf.n);
-    kf.xk = zeros(kf.n, 1);
-    kf.adaptive = 0;
-    kf.xconstrain = 0; kf.pconstrain = 0;
-    kf.fading = 1;
+%     [kf.m, kf.n] = size(kf.Hk);
+%     kf.I = eye(kf.n);
+%     kf.xk = zeros(kf.n, 1);
+%     kf.adaptive = 0;
+%     kf.xconstrain = 0; kf.pconstrain = 0;
+%     kf.fading = 1;
+    kf = kfinit0(kf, nts);
 
 function avnplot(attk, xkpk)
 global glv

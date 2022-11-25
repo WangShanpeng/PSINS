@@ -1,7 +1,7 @@
 function imu = imulever(imu, lv, Ts)
 % 内杆臂补偿，认为三加计敏感轴相交于一点，Ts=1则认为输入是角速率而不是角增量
 %
-% See also  imurfu, imurot.
+% See also  imurfu, imurot, imulvest.
 
 % Copyright(c) 2009-2015, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
