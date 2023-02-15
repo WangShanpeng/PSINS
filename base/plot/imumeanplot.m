@@ -12,11 +12,12 @@ function imu = imumeanplot(imu, n, dph)
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 04/03/2018
+global glv
     ts = diff(imu(1:2,end));
-    if nargin<4, temp=0; end
     if nargin<3, dph=0; end
     if nargin<2, n=fix(1.0/diff(imu(1:2,end))); end
     imu = [meann(imu(:,1:end-1),n)*n,imu(n:n:end,end)];
+    if glv.isfig==0, return; end
     imuplot(imu,dph);
     if size(imu,2)>7,
         imu(:,7:end-1) = imu(:,7:end-1)/n;

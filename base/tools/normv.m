@@ -17,9 +17,12 @@ function res = normv(vects, dim)
         for k=1:size(vects,1)
             res = res + vects(k,:).^2;
         end
-    else
+    elseif dim==2
         for k=1:size(vects,2)
             res = res + vects(:,k).^2;
         end
+    else  % append normv to last column
+        res = [vects,normv(vects)];
+        return
     end
     res = sqrt(res);

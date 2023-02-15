@@ -35,7 +35,7 @@ global glv
     attk = zeros(len/nn, 4); attk_SVD = attk; testA = zeros(len/nn, 7);
     ki = timebar(nn, len, 'Initial align using i0 & Wahba method.');
     for k=1:nn:len-nn+1
-        wvm = imu(k:k+nn-1, 1:6);  kts = (k+nn-1)*ts;
+        wvm = imu(k:k+nn-1, 1:6);  kts = (k+nn-1)*ts;   timu = imu(k+nn-1,end);
         [phim, dvbm] = cnscl(wvm);
         fib0 = qmulv(qib0b, dvbm); vib0 = 1*vib0 + fib0;
         fi0 = [eth.cl*cos(kts*glv.wie); eth.cl*sin(kts*glv.wie); eth.sl]*g0*nts; vi0 = 1*vi0 + fi0;
@@ -45,7 +45,7 @@ global glv
         [v, d] = eig(K);  qi0ib0 = v(:,1); 
         Cni0 = pos2cen([pos(1); kts*glv.wie; 0])'; qni0 = m2qua(Cni0);
         qnb = qmul(qmul(qni0,qi0ib0),qib0b);
-        attk(ki,:) = [q2att(qnb)', kts];
+        attk(ki,:) = [q2att(qnb)', timu];
         A = A + vi0*vib0';  % SVD method
 %         [U, S, V]=svd(A);  qi0ib0_SVD = m2qua(U*V');  % not good
 %         C = svdest(A);  qi0ib0_SVD = m2qua(C);

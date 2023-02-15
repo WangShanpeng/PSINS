@@ -10,7 +10,7 @@ function cep = rms2cep(rmsv, cepn)
 %    rms2cep([1,2, 0.5], 50);
 %    x=randn(10,1)+2; y=3*randn(10,1); rms2cep([x,y], 50);
 %
-% See also  cep.
+% See also  cep, rmsupdate.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

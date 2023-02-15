@@ -4,7 +4,7 @@ function odpplot(odp)
 % Prototype: odpplot(odp)
 % Input: odp - Odometer parameter = [dpitch, Kod, dyaw, t] array.
 %
-% See also  odplot, lvtplot, xpplot.
+% See also  odplot, lvtplot, xpplot, igoplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

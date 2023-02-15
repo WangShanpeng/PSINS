@@ -5,7 +5,7 @@ function att = q2att(qnb)
 % Input: qnb - attitude quaternion
 % Output: att - Euler angles att=[pitch; roll; yaw] in radians
 %
-% See also  a2mat, a2qua, m2att, m2qua, q2mat, q2att1, attsyn, q2rv, incline.
+% See also  a2mat, a2qua, m2att, m2qua, q2mat, q2att1, attsyn, q2rv, q2attBatch, incline.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -5,7 +5,7 @@ function xlimall(x0, x1, fign)
 % Inputs: x0, x1 - xlim value.
 %         fign - figure NO.
 %
-% See also  xygo, mylegend.
+% See also  gridall, scft0, xygo, mylegend.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -14,5 +14,5 @@ function xlimall(x0, x1, fign)
     if nargin<2, x1=x0(2); x0=x0(1); end
     ax = findall(h, 'type', 'axes');
     for k=1:length(ax)
-        xlim(ax(k), [x0, x1]);
+        if isempty(get(ax(k),'Tag')), xlim(ax(k), [x0, x1]); end  % not for legend
     end

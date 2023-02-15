@@ -2,3 +2,4 @@
     clear all;
     close all;
     clc;
+    fclose('all');

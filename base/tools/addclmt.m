@@ -8,7 +8,7 @@ function data = addclmt(data, ts, t0, delt)
 %         delt - delete old time tag
 % Output: data - data after time added
 %
-% See also  adddt.
+% See also  adddt, appendt.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

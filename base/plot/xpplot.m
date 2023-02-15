@@ -24,8 +24,8 @@ global glv
     if nargin<5, untstr = '*'; end
     if nargin<4, unt = 1; end
     if nargin<3, clm = 1:length(x)-1; end
-    if ischar(clm), untstr=clm; clm=1; end
-    if ischar(unt), untstr=unt; unt=1; end
+    if ischar(clm), untstr=clm; clm=1; end   % xpplot(x, p, untstr)
+    if ischar(unt), untstr=unt; unt=1; end   % xpplot(x, p, clm, untstr)
     if strcmp(untstr,'phi')
         if length(clm)<1, clm=1:3; end
         t = p(:,end); x = x(:,clm); p = p(:,clm);

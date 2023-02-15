@@ -1,7 +1,7 @@
 % Figure for C++ processing results
 % Make sure Matlab/PSINS Toolbox have been initialized!
 glvs
-PSINSDemo = 6;
+PSINSDemo = 22;
 switch PSINSDemo
     case -1, %% Demo_SINS/GNSS
         ins = binfile('ins.bin', 16+3);
@@ -78,6 +78,16 @@ switch PSINSDemo
         imuplot(imu);  magplot(mag);  baroplot(bar);
         if ~isempty(gps), gpsplot(gps); end
         templot(temp);
+    case 21, %% Demo_CPolyfit
+        res = binfile([glv.rootpath,'\vc60\Data\res.bin'], 2);
+        polyfit(res(:,2),res(:,1),3)',
+    case 22, %% Demo_CPolyfit
+        att = binfile([glv.rootpath,'\vc60\Data\aln.bin'], 10+9);
+        insplot(att(:,[1:3,end]),'a');
+        subplot(211), plot(att(:,end), att(:,4:5)/glv.deg,'-.');
+        subplot(212), plot(att(:,end), att(:,6)/glv.deg,'-.');
+        myfig;
+        subplot(311), plot(att(:,end), att(:,10:12)); xygo('V')
+        subplot(312), plot(att(:,end), att(:,13:15)); xygo('dV')
+        subplot(313), plot(att(:,end), att(:,16:18)); xygo('dP')
 end
-
-

@@ -8,7 +8,7 @@ function gps = gpsidx(data, idx, isdeg, isnorep)
 %         isnorep - remove repeated data
 % Output: gps - =[vn,pos,t] or [pos,t] 
 %
-% See also: imuidx, avpidx, gpsplot.
+% See also: imuidx, avpidx, ddidx, gpsplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

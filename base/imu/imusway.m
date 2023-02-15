@@ -13,6 +13,7 @@ function [imu, avp0, avp] = imusway(avp0, swayA, swayTau, ts, T, imuerr)
 %          avp = [att,vn,pos,t] array
 %
 % Example:
+%   glvs;
 %   [imu, avp0, avp] = imusway([1;1;10]*glv.deg, [2*glv.deg;1], [5;7;8; 5;6.1;9], 0.01, 100);
 %   imuplot(imu);  insplot(avp);
 %   avp1 = inspure(imu, avp0);  avpcmpplot(avp, avp1);

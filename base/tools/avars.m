@@ -3,11 +3,12 @@ function [sigma, tau, Err] = avars(y0, tau0)
 %
 % Prototype: [sigma, tau, Err] = avars(y0, tau0, isfig)
 %
-% See also  avar, avar2.
+% See also  avar, avar2, hrgbi.
 
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 16/12/2019
+global glv
     str = ['-+b'; '-xk'; '-*m'; '-oy'];
     myfig;
     sigma = []; tau = []; Err = [];
@@ -20,4 +21,5 @@ function [sigma, tau, Err] = avars(y0, tau0)
     grid on;
     xlabel('\itt \rm/ s'); ylabel('\it\sigma_A\rm( \tau ) \rm (\circ)/h');
     title(sstr);
+    if glv.isfig==0, close(gcf); end
 

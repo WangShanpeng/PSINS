@@ -6,7 +6,7 @@ function res = subavp(avped, substr)
 %         substr - sub setting string
 % Output: res - result
 %
-% See also: avpidx, insplot, avccmpplot.
+% See also: avpidx, insplot, avpcmpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -22,5 +22,5 @@ function res = subavp(avped, substr)
             case 'd', idx = [idx,13:15];
         end
     end
-    res = avped(:,[idx,end]);
+    res = avped(:,[sort(idx),end]);
     

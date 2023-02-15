@@ -1,6 +1,16 @@
 function vo = amulvBatch(att, vi)
-% vn transform by att to get vb i.e. vb = qmulv(qconj(a2qua(att)),vn). 
-% See also a2qua, qconj, qmulv.
+% vn transformation by att to get vb i.e. vb = qmulv(qconj(a2qua(att)),vn). 
+%
+% Prototype: vo = amulvBatch(att, vi)
+% Inputs: att - Euler angles att=[pitch, roll, yaw] nX3 array in radians
+%         vi - vector input nx3 array
+% Output: vo - vector output nx3 array
+%
+% See also a2qua, qconj, qmulv, a2matBatch, xyz2blhBatch, gkpinvBatch, satPosBatch.
+
+% Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
+% Northwestern Polytechnical University, Xi An, P.R.China
+% 08/11/2021
     att2 = att*0.5;
     s = sin(att2); c = cos(att2);
     sp = s(:,1); sr = s(:,2); sy = s(:,3); 

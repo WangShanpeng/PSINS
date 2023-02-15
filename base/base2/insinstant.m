@@ -10,7 +10,7 @@ function avp1 = insinstant(imu, avp, t0, t1, avperr, phimu)
 %         phimu - in avperr, phi is phi or mu error flag.
 % Output: avp1 - navigation results, avp1 = [att,vn,pos,t]
 %
-% See also  inspure, attpure, drinstant, trjsimu, insupdate.
+% See also  insinterm, inspure, attpure, drinstant, trjsimu, insupdate.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

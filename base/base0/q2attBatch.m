@@ -1,11 +1,11 @@
 function att = q2attBatch(qnb)
 % Convert nX4 attitude quaternion to nX3 Euler attitude angles.
 %
-% Prototype: att = q2att(qnb)
+% Prototype: att = q2attBatch(qnb)
 % Input: qnb - attitude quaternion, nX4 array
 % Output: att - Euler angles att=[pitch, roll, yaw] nX3 array in radians
 %
-% See also  q2att.
+% See also  q2att, a2matBatch, amulvBatch.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

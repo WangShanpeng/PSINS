@@ -49,6 +49,10 @@ global glv
     %% constant bias & random walk
     if ~exist('web', 'var'), web=0; end
     if ~exist('wdb', 'var'), wdb=0; end
+    if length(eb)==2, eb=[eb(1);eb(1);eb(2)]; end
+    if length(db)==2, db=[db(1);db(1);db(2)]; end
+    if length(web)==2, web=[web(1);web(1);web(2)]; end
+    if length(wdb)==2, wdb=[wdb(1);wdb(1);wdb(2)]; end
     imuerr.eb(1:3) = eb*glv.dph;   imuerr.web(1:3) = web*glv.dpsh;
     imuerr.db(1:3) = db*glv.ug;    imuerr.wdb(1:3) = wdb*glv.ugpsHz;
     %% correlated bias

@@ -72,7 +72,12 @@ function kf = kfupdate(kf, yk, TimeMeasBoth)
         if ~isempty(hasmeas), kf.measlog=bitor(kf.measlog,sum(2.^(hasmeas-1))); kf.measlost(hasmeas)=0; end
         kf.xk = kf.xkk_1 + kf.Kk*kf.rk;
         kf.Pxk = kf.Pxkk_1 - kf.Kk*kf.Pykk_1*kf.Kk';
-        kf.Pxk = (kf.Pxk+kf.Pxk')*(kf.fading/2); % symmetrization & forgetting factor 'fading'
+        if length(kf.fading)>1  % 09/02/2023
+            s = diag(sqrt(kf.fading/2));
+            kf.Pxk = s*(kf.Pxk+kf.Pxk')*s;
+        else
+            kf.Pxk = (kf.Pxk+kf.Pxk')*(kf.fading/2); % symmetrization & forgetting factor 'fading'
+        end
         if kf.xconstrain==1  % 16/3/2018
             for k=1:kf.n
                 if kf.xk(k)<kf.xmin(k)

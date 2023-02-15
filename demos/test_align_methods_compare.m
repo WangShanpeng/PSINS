@@ -17,7 +17,7 @@ avp = avpadderr(avp0, davp);
 phi = [aa2phi(attsb,[0;0;0]), [[-imuerr.db(2);imuerr.db(1)]/glv.g0;-imuerr.eb(1)/(cos(avp(7))*glv.wie)]]
 %% i0 method
 [atti0, resi0] = aligni0(imu, avp(7:9));
-% resfit = aligni0fit(resi0, resi0.lat, resi0.nts);
+% resfit = aligni0fitv(resi0, resi0.lat, resi0.nts);
 %% i0 & Wahba method
 [att0w, attkw] = alignWahba(imu, avp(7:9));
 %% coarse align

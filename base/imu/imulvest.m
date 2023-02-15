@@ -49,13 +49,13 @@ global glv
         SS = lvS(Cba, wb, dwb); % fL = SS*[rx;ry;rz];  % lever arm
         fn = qmulv(qnb, fb); % - Cnb*fL;
         an = rotv(-wnie*nts/2, fn) + gn;
-        vn = vn + an*nts;  % vel updt
+        vn = vn + an*nts;  % vel update
         Cnb = q2mat(qnb);
         if     t>rott(1,1) && t<rott(1,2), H1 = H1 + Cnb*SS*nts;
         elseif t>rott(2,1) && t<rott(2,2), H2 = H2 + Cnb*SS*nts;
         elseif t>rott(3,1) && t<rott(3,2), H3 = H3 + Cnb*SS*nts;  
         else vn=zeros(3,1);  end
-        qnb = qupdt2(qnb, phim, wnie*nts);  % att updt
+        qnb = qupdt2(qnb, phim, wnie*nts);  % att update
         av(kk,:) = [q2att(qnb); vn; t];  kk=kk+1;
         timebar(nn);
         for s=1:3

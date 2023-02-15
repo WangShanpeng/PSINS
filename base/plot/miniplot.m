@@ -11,7 +11,7 @@ function miniplot(data, str)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 29/07/2017
 global glv
-    sz = size(data,2);
+    sz = size(data,2);  sz1=sz-1;
     myfig;
     switch str
         case 'w',

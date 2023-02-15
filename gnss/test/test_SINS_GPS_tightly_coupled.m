@@ -8,7 +8,7 @@ psinstypedef('test_SINS_GPS_tightly_def');
 load insgpseo_tc.mat;  % vars: imu ephs obss t0
 [nn, ts, nts] = nnts(1, diff(imu(1:2,end)));  % imuplot(imu);  
 vp = getgnssvp(ephs, obss, 185500, 1);
-att=aligni0(datacut(imu,0,50), vp(4:6)); 
+att = aligni0(datacut(imu,0,50), vp(4:6)); 
 avp0 = [att; vp]; % avp=inspure(imu, [att;vp]); 
 davp = avperrset([10;10;60], 1, 100);
 imuerr = imuerrset(0.05,1000,0.001,10);

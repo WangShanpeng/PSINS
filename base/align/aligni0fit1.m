@@ -1,5 +1,6 @@
 function [att0, res] = aligni0fit(imu, pos, ts)
 % SINS initial align based on inertial frame method & using polynomial fit.
+% Ref: Zhao C, A Gravity-Based Anti-Interference Coarse Alignment Algorithm, 2010, JOA
 %
 % Prototype: [att0, res] = aligni0fit(imu, pos, ts)
 % Inputs: imu - IMU data
@@ -8,6 +9,11 @@ function [att0, res] = aligni0fit(imu, pos, ts)
 % Output: att0 - attitude align result
 %         res - some other paramters for debug
 %
+% Example:
+%     ts = 0.1;
+%     imu = imustatic([0;0;10]*glv.deg, ts, 300);  imu([1:10,end-10:end],4:5)=1*ts; % acc disturb at start&end
+%     [att0, res] = aligni0fit(imu, glv.pos0, ts);
+%     
 % See also  aligni0, alignfn, alignvn, aligncmps, alignWahba, alignsb.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
@@ -20,15 +26,15 @@ global glv
     eth = earth(pos);  lat = pos(1);  g0 = -eth.gn(3);
     qib0b = [1; 0; 0; 0];
     [vib0, vi0, pib0, pi0, vib0_1, vi0_1] = setvals(zeros(3,1));
-    [pib0k, pi0k, vi0k, vib0k, fi0k, fib0k, attk, attkv] = prealloc(len/nn, 3);
+    [pib0k, pi0k, vi0k, vib0k, fi0k, fib0k, attk, attkv] = prealloc(len/nn, 3);  tk = vib0k(:,1);
     k0 = fix(5/ts); % exculde the first 5s
-    ki = timebar(nn, len, 'Initial align based on inertial frame.');
+    ki = timebar(nn, len, 'Initial align based on inertial frame & ployfit.');
     Ax2 = g0*glv.wie*eth.cl/2; Ay3 = g0*glv.wie^2*eth.sl*eth.cl/6; Az1 = g0; Az3 = -g0*glv.wie^2*eth.cl^2/6;
-    kfx.xk = zeros(4,1); kfx.Pxk = eye(4); kfx.Hk = [1, 0, 0, 0];
+    kfx.xk = zeros(4,1); kfx.Pxk = eye(4)*1e8; kfx.Hk = [1, 0, 0, 0];
     kfy = kfx; kfz = kfx;
     c = eye(3);
     for k=1:nn:len-nn+1
-        wvm = imu(k:k+nn-1, 1:6);  kts = (k+nn-1)*ts;
+        wvm = imu(k:k+nn-1, 1:6);  kts = (k+nn-1)*ts;  tk(ki) = kts;
         [phim, dvbm] = cnscl(wvm);
         fib0 = qmulv(qib0b, dvbm)/nts;   % f
         vib0 = vib0 + fib0*nts;          % vel
@@ -51,22 +57,25 @@ global glv
                 -eth.sl*cwiet,-eth.sl*swiet,eth.cl; 
                 eth.cl*cwiet,eth.cl*swiet,eth.sl];
             qni0 = m2qua(Cni0);
-            c(1,3) = kfx.xk(2)/Az1; c(2,3) = kfy.xk(2)/Az1; c(3,3) = kfz.xk(2)/Az1; 
-            c(1,1) = kfx.xk(3)/Ax2; c(2,1) = kfy.xk(3)/Ax2; c(3,1) = kfz.xk(3)/Ax2; 
-            c(1,2) = (kfx.xk(4)-c(1,3)*Az3)/Ay3; c(2,2) = (kfy.xk(4)-c(2,3)*Az3)/Ay3; c(3,2) = (kfz.xk(4)-c(3,3)*Az3)/Ay3; 
-            c(abs(c)>1) = 0.1;
-            c = mnormlz(c);
-            qnib0 = m2qua(c');
-            qnb = qmul(qnib0,qib0b);
-            attkv(ki,:) = q2att(qnb)';    % using vel
+%             c(1,3) = kfx.xk(2)/Az1; c(2,3) = kfy.xk(2)/Az1; c(3,3) = kfz.xk(2)/Az1; 
+%             c(1,1) = kfx.xk(3)/Ax2; c(2,1) = kfy.xk(3)/Ax2; c(3,1) = kfz.xk(3)/Ax2; 
+%             c(1,2) = (kfx.xk(4)-c(1,3)*Az3)/Ay3; c(2,2) = (kfy.xk(4)-c(2,3)*Az3)/Ay3; c(3,2) = (kfz.xk(4)-c(3,3)*Az3)/Ay3; 
+%             c(abs(c)>1) = 0.1;
+%             c = mnormlz(c);
+%             qnib0 = m2qua(c');
+%             qnb = qmul(qnib0,qib0b);
+            pcoef = flipud([kfx.xk,kfy.xk,kfz.xk])';  pcoef(:,4)=0;
+            qi0ib0 = dv2atti(vi0k(k1,:)', vi0, polyvaln(pcoef,tk(k1)), polyvaln(pcoef,tk(ki)));  % 16/01/2023
+            qnb = qmul(qmul(qni0,qi0ib0),qib0b);
+            attkv(ki,:) = q2att(qnb)';    % using vib0 fit
+            
             qi0ib0 = dv2atti(pi0k(k1,:)', pi0, pib0k(k1,:)', pib0);
             qnb = qmul(qmul(qni0,qi0ib0),qib0b);
             attk(ki,:) = q2att(qnb)';     % using pos
        end
        ki = timebar;
     end
-    tk = imu(nn:nn:length(attk)*nn,7);
-    figure, plot(tk, [vib0k(:,1:3)- [polyval(flipud(kfx.xk),tk), polyval(flipud(kfy.xk),tk), polyval(flipud(kfz.xk),tk)]]); xygo('\deltav fit err / m/s');
+%     figure, plot(tk, [vib0k(:,1:3)- [polyval(flipud(kfx.xk),tk), polyval(flipud(kfy.xk),tk), polyval(flipud(kfz.xk),tk)]]); xygo('\deltav fit err / m/s');
     k0 = fix(k0/nn)+1;
 %     attk(1:k0,:) = repmat(attk(k0+1,:),k0,1);
     Cni0 = [0,1,0; -eth.sl,0,eth.cl;  eth.cl,0,eth.sl];

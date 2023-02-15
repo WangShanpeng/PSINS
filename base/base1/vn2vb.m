@@ -12,6 +12,10 @@ function vb = vn2vb(av, isavpflag)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 24/06/2021
     if nargin<2, isavpflag=0; end
+    if length(isavpflag)>1,  % vb = vn2vb(vn, att);
+        att = isavpflag; isavpflag = 0;
+        av = nonan([interp1(att(:,end), att(:,1:3), av(:,end), 'nearest'), av],1);
+    end
     s = sin(av(:,1:3)); c = cos(av(:,1:3));
     si = s(:,1); sj = s(:,2); sk = s(:,3); 
     ci = c(:,1); cj = c(:,2); ck = c(:,3);

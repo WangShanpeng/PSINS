@@ -3,22 +3,22 @@ function [imu, avp] = seawavesimu(dA, pA, dP, pP, ts, T, pos0, yaw0)
 %
 % Prototype: [imu, avp] = seawavesimu(dA, wA, dP, wP, ts, T, pos0, yaw0)
 % Inputs: dA - wave angular amplitudes (in rad), [pitch,roll,yaw]
-%        pA - wave angular period (in second)
-%        dP - wave linear amplitudes (in meter), [right,front,up]
-%        pP - wave linear period (in second)
-%        ts - sampling interval (in second)
-%        T - total simulation time (in second)
-%        pos0 - initial position [lat,lon,hgt] (in rad & m)
-%        yaw0 - initial body yaw (in rad)
+%         pA - wave angular period (in second)
+%         dP - wave linear amplitudes (in meter), [right,front,up]
+%         pP - wave linear period (in second)
+%         ts - sampling interval (in second)
+%         T - total simulation time (in second)
+%         pos0 - initial position [lat,lon,hgt] (in rad & m)
+%         yaw0 - initial body yaw (in rad)
 % Outputs: imu - IMU data
 %          avp - AVP parameter
 %
 % Example:
-%        glvs;
-%        [imu, avp0] = seawavesimu([5;5;3]*glv.deg, [5;7;10], [1;1;0.5], [5;7;10], 0.01, 60, 34*glv.deg, 30*glv.deg);
-%        avp = inspure(imu, avp0(1,:)', 'f'); 
-%        avperr = avpcmp(avp, avp0);
-%        inserrplot(avperr);
+%    glvs;
+%    [imu, avp0] = seawavesimu([5;5;3]*glv.deg, [5;7;10], [1;1;0.5], [5;7;10], 0.01, 60, 34*glv.deg, 30*glv.deg);
+%    avp = inspure(imu, avp0(1,:)', 'f'); 
+%    avperr = avpcmp(avp, avp0);
+%    inserrplot(avperr);
 
 % See also  swaysimu, ap2avp, avp2imu.
 

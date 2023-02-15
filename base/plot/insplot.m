@@ -5,7 +5,7 @@ function insplot(avp, ptype, varargin)
 % Inputs: avp - may be [att], [att,vn] or [att,vn,pos]
 %         ptype - plot type define
 %          
-% See also  miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, addyawplot.
+% See also  attplot, miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, addyawplot.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -73,7 +73,7 @@ global glv
             subplot(3,2,[4,6]), plot(0, 0, 'rp');   % 19/04/2015
                 hold on, plot(dxyz(:,1), dxyz(:,2)); xygo('est', 'nth');
 %                 hold on, plot((avp(:,8)-avp(1,8))*glv.Re*cos(avp(1,7)), (avp(:,7)-avp(1,7))*glv.Re); xygo('est', 'nth');
-            legend(sprintf('LON0:%.2f, LAT0:%.2f (DMS)', r2dms(avp(1,8)),r2dms(avp(1,7))));
+            legend(sprintf('LON0:%.2f, LAT0:%.2f (DMS), H0:%.1f (m)', r2dms(avp(1,8)),r2dms(avp(1,7)),avp(1,9)));
         case {'t/m', 't/h', 't/d'},  % AVP-plot where t-axis in day
             tscalepush(ptype);
             insplot([avp(:,1:9),avp(:,end)/tscaleget()],'avp');

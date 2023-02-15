@@ -3,7 +3,7 @@ function yaw = yawcvt(yaw, cvstr)
 %
 % Prototype: yaw = yawcvt(yaw, cvstr)
 % Inputs: yaw - input yaw angles, in rad
-%         dirstr - convention descript string
+%         cvstr - convention descript string
 % Output: yaw - output yaw angles in new convention
 %
 % Examples:

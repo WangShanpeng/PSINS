@@ -18,7 +18,8 @@ global glv
         if n<6,        	ptype = 'a';
         elseif n<9,    	ptype = 'av';
         elseif n<15,   	ptype = 'avp';
-        elseif n<18,   	ptype = 'avped';
+        elseif n<16,   	ptype = 'avped';
+        elseif n<17,    ptype = 'avpedkgzz';
         elseif n<19,   	ptype = 'avpedl';
         elseif n<21,   	ptype = 'avpedlt';
         elseif n<24,   	ptype = 'avpedlv';
@@ -52,6 +53,15 @@ global glv
             subplot(324), plot(t, [err(:,7:8)*glv.Re,err(:,9)]); xygo('dP');
             subplot(325), plot(t, err(:,10:12)/glv.dph); xygo('eb');
             subplot(326), plot(t, err(:,13:15)/glv.ug); xygo('db');
+        case 'avpedkgzz'
+            myfigure;
+            subplot(421), plot(t, err(:,1:2)/glv.sec); xygo('phiEN');
+            subplot(422), plot(t, err(:,3)/glv.min); xygo('phiU');
+            subplot(423), plot(t, err(:,4:6)); xygo('dV');
+            subplot(424), plot(t, [err(:,7:8)*glv.Re,err(:,9)]); xygo('dP');
+            subplot(425), plot(t, err(:,10:12)/glv.dph); xygo('eb');
+            subplot(426), plot(t, err(:,13:15)/glv.ug); xygo('db');
+            subplot(427), plot(t, err(:,16)/glv.ppm); xygo('dKgzz');
         case 'avpedl'
             myfigure;
             subplot(421), plot(t, err(:,1:2)/glv.sec); xygo('phiEN');
@@ -124,6 +134,10 @@ global glv
             subplot(325), plot(t, err(:,3)); ylabel('\it\delta h\rm / m'); xlgo
             subplot(3,2,[4,6]), plot(err(:,5)/glv.deg, err(:,4)/glv.deg);
             hold on, plot(err(:,8)/glv.deg, err(:,7)/glv.deg, 'r'); xlabel('\it\lambda\rm / \circ'); ylabel('\itL\rm / \circ'); grid on;  
+        case 'vp',
+            myfigure;
+            subplot(211), plot(t, err(:,1:3)); xygo('dV'); mylegend('dVE','dVN','dVU');
+            subplot(212), plot(t, [err(:,4:5)*glv.Re,err(:,6)]); xygo('dP'); mylegend('dlat','dlon','dH');
         case 'p',
             myfigure;
             plot(t, [err(:,1:2)*glv.Re,err(:,3)]); xygo('dP'); mylegend('dlat','dlon','dH');

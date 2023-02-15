@@ -29,7 +29,7 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % ins = insinit([yaw;pos], ts);
 % avperr = avperrset([60;300], 1, 100);
 % imuerr = imuerrset(0.03, 100, 0.001, 1);
-% Pmin = [avperrset([0.1,1],0.001,0.01); gabias(0.1, [10,30]); [0.01;0.01;0.01]; 0.0001].^2;
+% Pmin = [avperrset([0.1,1],0.001,0.01); gabias(0.001, [10,30]); [0.01;0.01;0.01]; 0.0001].^2;
 % Rmin = vperrset(0.001, 0.01).^2;
 % [avp1, xkpk, zkrk, sk, ins1, kf1] = sinsgps(imu, gps, ins, avperr, imuerr, [rep3(1);1;1], [0.01;1], vperrset(0.1,10), Pmin, Rmin, 'avp');
 %
@@ -50,7 +50,8 @@ function [avp, xkpk, zkrk, sk, ins, kf] = sinsgps(imu, gps, ins, davp, imuerr, l
 % 09/10/2013, 06/02/2021, 02/11/2021, 30/08/2022
 global glv
     [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
-    if size(gps,2)<=5, gpspos_only=1; pos0=gps(1,1:3)'; else, gpspos_only=0; pos0=gps(1,4:6)'; end 
+    clmgps = size(gps,2); SatNum = 20; DOP = 1.0;
+    if clmgps<=5, gpspos_only=1; pos0=gps(1,1:3)'; else, gpspos_only=0; pos0=gps(1,4:6)'; end 
     if ~exist('rk', 'var'),
         if gpspos_only==1, rk=poserrset([10,30]);
         else, rk=vperrset([0.1;0.3],[10,30]); end
@@ -87,7 +88,7 @@ global glv
         end
     end
     if exist('fbstr', 'var'), kf.fbstr=fbstr; end
-    kf.xtau = [ [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; 1]*1;
+    kf.xtau = [ [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; 1]*0.1;
     imugpssyn(imu(:,end), gps(:,end));
     len = length(imu); [avp, xkpk, zkrk, sk] = prealloc(fix(len/nn), 16, 2*kf.n+1, 2*kf.m+1, 2);
     if len<101, return; end;  % return kf struct
@@ -100,6 +101,10 @@ global glv
         kf = kfupdate(kf);
         [kgps, dt] = imugpssyn(k, k1, 'F');
         ins = inslever(ins); 
+        if kgps>0 && (clmgps==5||clmgps==8)  % having SatNum.DOP
+            SatNum = gps(kgps,end-1); DOP = (SatNum-fix(SatNum))*1000;
+            if SatNum<10||DOP>1.5, kgps=0; end  % disable meas
+        end
         if kgps>0
             dtpos=+vn2dpos(ins.eth,ins.vnL,ins.tDelay);
             if gpspos_only==1
@@ -107,6 +112,10 @@ global glv
                 kf.Hk = [zeros(3,6), eye(3), zeros(3,6), -ins.MpvCnb,-ins.Mpvvn];
             else
                 zk = [ins.vnL+ins.tDelay*ins.anbar;ins.posL+dtpos]-gps(kgps,1:6)';
+%                 if gps(kgps,7)<10 || (gps(kgps,7)-fix(gps(kgps,7)))*1000>1.2
+%                     zv = ins.Cnb'*zk(1:3); zv(1)=0; zp = ins.MpvCnb^-1*zk(4:6); %zp(1)=0;
+%                     zk = [ins.Cnb*zv; ins.MpvCnb*zp];
+%                 end
                 kf.Hk = [zeros(6,3), eye(6), zeros(6,6), [-ins.CW,-ins.anbar;-ins.MpvCnb,-ins.Mpvvn]];
             end
             kf = kfupdate(kf, zk, 'M');

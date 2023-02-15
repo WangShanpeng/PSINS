@@ -14,11 +14,12 @@ function [sigma, tau, Err] = avar(y0, tau0, str, isfig)
 %     y = randn(100000,1) + 0.00001*[1:100000]';
 %     [sigma, tau, Err] = avar(y, 0.1, 2);
 %
-% See also  avarsimu, avarfit, avar2, avars, oavar, meann, sumn.
+% See also  avarsimu, avarfit, avar2, avars, oavar, meann, hrgbi.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 22/08/2012, 16/12/2019, 30/5/2021
+global glv
     N = length(y0);
     y = y0; NL = N;
     for k = 1:log2(N)
@@ -33,8 +34,8 @@ function [sigma, tau, Err] = avar(y0, tau0, str, isfig)
     end
     if nargin<4, isfig=1; end
     if nargin<3, str=[]; end
-    if isnumeric(str), isfig=str; str=[]; end  % avar(y0, tau0, 1)
-    if isfig
+    if (~isempty(str)) && isnumeric(str), isfig=str; str=[]; end  % avar(y0, tau0, 1)
+    if isfig && glv.isfig==1
         figure('Color','White');
         if isempty(str), str = '\itx \rm/ ( (\circ) / h )'; end
         subplot(211), plot(tau0*(1:N)', y0); grid

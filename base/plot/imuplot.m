@@ -20,6 +20,15 @@ global glv
         imuplot(lost);
         return;
     end
+    if size(imu,2)>10  % 5-axis redundancy IMU plot
+        myfig;
+        ts = diff(imu(1:2,end));  t = imu(:,end);
+        subplot(221), plot(t, imu(:,1:3)/ts/dps); xygo('w');
+        subplot(223), plot(t, imu(:,4:5)/ts/dps); xygo('wS/T');
+        subplot(222), plot(t, imu(:,6:8)/ts/g0);  xygo('f');
+        subplot(224), plot(t, imu(:,9:10)/ts/g0);  xygo('fS/T');
+        return;
+    end
     if nargin<2, type=0; end
     if ischar(type)  % imuplot(imu, 't/h')
         tscalepush(type);

@@ -1,4 +1,4 @@
-function [clbt, av] = sysclbt(imu, pos, g0, Cba)
+function [clbt, av] = sysclbt(imu, pos0, g0, Cba, itertion)
 % SIMU systemtic calibration processing under specific rotating operation.
 %
 % Prototype: clbt = sysclbt(imu, pos, g0, Cba)
@@ -6,6 +6,7 @@ function [clbt, av] = sysclbt(imu, pos, g0, Cba)
 %         pos - geographical position = [latitude; longitude; height]
 %         g0  - local gravity magnitude
 %         Cba - accelerometer installation direction matrix, always I3x3.
+%         itertion - calibration processing itertion times.
 % Output: clbt - SIMU fine calibration result array after this porcessing,
 %               inculde fields:
 %                 'Kg, Ka, eb, db, Ka2, rx, ry, rz, tGA', such that
@@ -20,8 +21,9 @@ function [clbt, av] = sysclbt(imu, pos, g0, Cba)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/08/2016
 global glv
+    if nargin<5, itertion=5; end
     if nargin<4, Cba=eye(3); end
-    if nargin<3, eth=earth(pos); g0=eth.g; end
+    if nargin<3, eth=earth(pos0); g0=eth.g; end
     [nn,ts,nts] = nnts(2, diff(imu(1:2,end)));  frq2 = fix(1/ts/2)-1;
     for k=(frq2+1):(2*frq2):(5*60*2*frq2)
         ww = mean(imu(k-frq2:k+frq2,1:3),1); ww = norm(ww)/ts;
@@ -29,16 +31,15 @@ global glv
     end
     if k<10*frq2,  error('Not find static state in the first 5 second to make valid INS alignment.'); end
     kstatic = k-3*frq2;
-    wnie = glv.wie*[0;cos(pos(1));sin(pos(1))]; gn = [0;0;-g0];
+    wnie = glv.wie*[0;cos(pos0(1));sin(pos0(1))]; gn = [0;0;-g0];
     clbt.Kg = eye(3); clbt.Ka = eye(3); clbt.Ka2 = zeros(3,1); clbt.eb = zeros(3,1); clbt.db = zeros(3,1);
     clbt.rx = zeros(3,1); clbt.ry = zeros(3,1); clbt.rz = zeros(3,1); clbt.tGA = 0;
     len = length(imu);  imu1 = imu;
-    itertion = 5;
     for iter=1:itertion
         imu1(:,1:6) = [imu(:,1:3)*clbt.Kg', imu(:,4:6)*clbt.Ka'];    % IMU calibration for alignment
         imu1(:,1:6) = [imu1(:,1)-clbt.eb(1)*ts,imu1(:,2)-clbt.eb(2)*ts,imu1(:,3)-clbt.eb(3)*ts, ...  % 20181102
                        imu1(:,4)-clbt.db(1)*ts,imu1(:,5)-clbt.db(2)*ts,imu1(:,6)-clbt.db(3)*ts];
-        qnb = a2qua(alignsb(imu1(frq2:kstatic,:), pos)); vn = zeros(3,1);  % qnb=setyaw(qnb,0); % align
+        qnb = a2qua(alignsb(imu1(frq2:kstatic,:), pos0)); vn = zeros(3,1);  % qnb=setyaw(qnb,0); % align
 %         if iter==1, qnb0 = qnb;  else, qnb0 = qdelphi(qnb0, kf.xk(1:3)); end
 %         att = q2att(qnb); att0 = q2att(qnb0); qnb = a2qua([att(1:2);att0(3)]);
         dotwf = imudot(imu1, 5.0);
@@ -99,7 +100,7 @@ function clbt = clbtkffeedback(kf, clbt)   % kffeedback
     clbt.tGA = clbt.tGA+kf.xk(43);
 
 function Ft = getFt(fb, wb, Cnb, wnie, SS)   % kffk
-    o33 = zeros(3); o31 = zeros(3,1);
+    o33 = zeros(3); o31 = zeros(3,1);  %wb=[1;2;3]; fb=[1;2;10];
     wX = askew(wnie); fX = askew(Cnb*fb);
     wx = wb(1); wy = wb(2); wz = wb(3); fx = fb(1); fy = fb(2); fz = fb(3);
     CDf2 = Cnb*diag(fb.^2); CwXf = Cnb*cross(wb,fb);

@@ -2,7 +2,7 @@
 % 15-state included:
 %       phi(3), dvn(3), dpos(3), eb(3), db(3)
 % Please run 'test_SINS_trj.m' to generate 'trj10ms.mat' beforehand!!!
-% See also  test_SINS_GPS_153.
+% See also  test_SINS_GPS_153, test_SINS_GPS_153_SE3.
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 28/08/2022
@@ -60,7 +60,7 @@ avperr_st = avpcmpplot(trj.avp, avp_st);
 kfplot(xkpk_st, avperr_st, imuerr);
 inserrplot(avperr);
 err = avperr_st; t = err(:,end);
-subplot(221), plot(t, err(:,1:2)/glv.sec, 'm');  subplot(222), plot(t, err(:,3)/glv.min, 'm');
+subplot(221), plot(t, err(:,1:2)/glv.sec, 'm');  subplot(222), plot(t, err(:,3)/glv.min, 'm');  legend('\it\phi\rm_{U,EKF}', '\it\phi\rm_{U,STEKF}');
 subplot(223), plot(t, err(:,4:6), 'm');  subplot(224), plot(t, [err(:,7:8)*glv.Re,err(:,9)], 'm');
 
 

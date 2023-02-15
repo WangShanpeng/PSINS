@@ -11,6 +11,7 @@ function Cen = pos2cen(pos)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 05/05/2010
+    if length(pos)<2, pos = [pos(1);0;0]; end  % pos2cen(lat)
     slat = sin(pos(1)); clat = cos(pos(1));
     slon = sin(pos(2)); clon = cos(pos(2));
     Cen = [ -slon,  -slat*clon,  clat*clon

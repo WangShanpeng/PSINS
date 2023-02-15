@@ -8,7 +8,7 @@ function demo_sagnac_effect
     for k=0:11
         if ~ishandle(hfig),  break;  end
         hold off;
-        drawOneStep(k, -1);  % 0 for static, 1 for CW, -1 for CCW
+        drawOneStep(k, 1);  % 0 for static, 1 for CW, -1 for CCW
         pause(0.5);
     end
 

@@ -14,7 +14,7 @@ function lmc(line1, line2, unit, iscut, idx)
 %
 % Example: lmc(randn(10,1), randn(11,1));
 % 
-% See also ladd, avplmc, lmrs, avarfit.
+% See also ladd, avplmc, lmrs, lstyle, avarfit.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

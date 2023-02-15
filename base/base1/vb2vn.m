@@ -6,7 +6,7 @@ function vn = vb2vn(av, isavpflag)
 %        isavpflag - avp flag for output, vb = [att, vb, pos, t] 
 % Output: vn - =[vE,vN,vU,t] or avp array
 %
-% See also  vn2vb, vn2vbl, vn2att, a2mat.
+% See also  vy2vn, vn2vb, vn2vbl, vn2att, a2mat.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

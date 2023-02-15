@@ -8,7 +8,7 @@ function imu = imuidx(data, idx, gunit, aunit, ts)
 %         ts - sampling interval
 % Output: imu - =[gyro,acc,t] angular- & velocity- increment & time tag
 %
-% See also: imurfu, gpsidx, avpidx.
+% See also: imurfu, gpsidx, avpidx, ddidx.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -23,6 +23,6 @@ global glv
     imu(:,1:3) = imu(:,1:3)*gunit*ts;
     imu(:,4:6) = imu(:,4:6)*aunit*ts;
     for k=1:6
-        if(idx(k))<0, imu(:,k)=-imu(:,k); end
+        if (idx(k))<0, imu(:,k)=-imu(:,k); end
     end
     

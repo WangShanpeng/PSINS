@@ -8,7 +8,7 @@ function [fi0, vi0, pi0] = i0fvp(t, lat)
 %          vi0 - ideal apparent velocity vector in i0-frame
 %          pi0 - ideal apparent position vector in i0-frame
 %
-% See also  aligni0, alignWahba.
+% See also  aligni0, aligni0fit, alignWahba.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -17,7 +17,8 @@ global glv
     cL = cos(lat); tL = tan(lat);
     wt = glv.wie*t;
     swt = sin(wt); cwt = cos(wt); 
-    fcL = glv.g0*cL;
+    fcL = glv.g0*cL;  fcLw = fcL/glv.wie;
     fi0 = fcL*[cwt; swt; tL];
-    vi0 = fcL/glv.wie*[swt; 1-cwt; tL*wt];
-    pi0 = fcL/glv.wie^2*[1-cwt; wt-swt; tL*wt^2/2];
+    vi0 = fcLw*[swt; 1-cwt; tL*wt];
+    pi0 = fcLw/glv.wie*[1-cwt; wt-swt; tL*wt^2/2];
+    

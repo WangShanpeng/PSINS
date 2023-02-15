@@ -5,7 +5,7 @@ function Cnb = a2matBatch(att)
 % Input: att - =[pitch, roll, yaw, t]
 % Output: Cnb - =[C11, C12, C13, C21, C22, C23, C31, C32, C33, t]
 %
-% See also  a2mat, m2att.
+% See also  a2mat, m2att, q2attBatch.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

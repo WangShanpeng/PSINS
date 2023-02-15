@@ -6,7 +6,7 @@ function kf = RLS(kf, zk)
 %         zk - measurement vector
 % Output: kf - filter structure array after filtering
 %
-% See also  kfupdate.
+% See also  kfupdate, RLSPot, RLSUD.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

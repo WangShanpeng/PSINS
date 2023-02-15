@@ -6,7 +6,7 @@ function xyz = pos2dplot(pos0, varargin)
 %         varargin - other pos parameter
 % Onput: xyz - [x/East, y/North, hgt, t]
 %          
-% See also  pos3vplot, inserrplot, kfplot, gpsplot, imuplot, pos2dxyz.
+% See also  pos3vplot, inserrplot, kfplot, gpsplot, imuplot, pos2dxyz, pos2bd.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

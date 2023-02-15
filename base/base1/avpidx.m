@@ -8,7 +8,7 @@ function avp = avpidx(data, idx, isdeg, isyawcvt)
 %         isyawcvt - if yaw is in clockwise 0-360degree convension
 % Output: avp - =[att,vn,pos,t]
 %
-% See also: subavp, avpcvt, yawcvt, imuidx, gpsidx, insplot.
+% See also: subavp, avpcvt, yawcvt, imuidx, gpsidx, ddidx, insplot.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

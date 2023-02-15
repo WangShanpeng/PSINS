@@ -25,7 +25,7 @@ global psinsdef
         end
     end
     switch psinsdef.kfplot
-        case {15,18,19} % psinsdef.kfplotxx
+        case {15,16,18,19} % psinsdef.kfplotxx
             inserrplot(xkpk(:,[1:psinsdef.kfplot,end]));
             if nargin>1
                 if psinsdef.kfplot==15

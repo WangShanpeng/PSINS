@@ -6,7 +6,7 @@ function ladd(x, y, isabs)
 %         isabs - is absolute x,y flag
 % Output: N/A
 % 
-% See also lmc, avplmc, tshift.
+% See also lneg, lmul, laddy, lmc, lstyle, avplmc, tshift, scft0.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

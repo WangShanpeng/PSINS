@@ -12,7 +12,10 @@
 
 #include "..\PSINSCore\PSINS.h"
 
-#define PSINSDemo 0
+#define FRQ	FRQ100
+#define TS	(1.0/FRQ)
+
+#define PSINSDemo 23
 
 #define psinsdemo()  \
 	switch(PSINSDemo)\
@@ -39,6 +42,9 @@
 	case 18: Demo_DSP_main(); break; \
 	case 19: Demo_CONSOLE_UART(); break; \
 	case 20: Demo_Cfg(); break; \
+	case 21: Demo_CPolyfit(); break; \
+	case 22: Demo_CAligni0(); break; \
+	case 23: Demo_SysClbt(); break; \
 	}
 void Demo_User(void);
 void Demo_CIIRV3(void);
@@ -61,6 +67,9 @@ void Demo_CVCFileFind(void);
 void Demo_DSP_main(void);
 void Demo_CONSOLE_UART(void);
 void Demo_Cfg(void);
+void Demo_CPolyfit(void);
+void Demo_CAligni0(void);
+void Demo_SysClbt(void);
 
 #ifdef PSINS_IO_FILE
 
@@ -83,6 +92,35 @@ public:
 		t += ts;
 		return 1;
 	};
+};
+
+class CFileIMU7:public CFileRdWt  // read the 7-column IMU bin-file
+{
+public:
+	CVect3 *pwm, *pvm;
+	double t0, ts, t;
+	CFileIMU7(const char *fname0):CFileRdWt(fname0, -7) {
+		load(1);	t0 = buff[6];
+		load(1);	ts = buff[6]-t0;
+		fseek(rwf, 0L, SEEK_SET);
+		pwm=(CVect3*)&buff[0], pvm=(CVect3*)&buff[3];
+		t = t0;
+	};
+	int load(int lines=1) {
+		if(!CFileRdWt::load(lines)) return 0;
+		t = buff[6];
+		return 1;
+	};
+	void sumIMU(int len, CVect3 &wmm, CVect3 &vmm) {
+		long pos=ftell(rwf);
+		wmm = vmm = O31;
+		for(int i=0; i<len; i++) {
+			load(1);
+			wmm += *pwm;  vmm += *pvm;
+		}
+		fseek(rwf, pos, SEEK_SET);
+		load(0);
+	}
 };
 
 class CFileIMUGNSS:public CFileRdWt  // read the 13-column IMU/GPS bin file created by 'binfile.m'

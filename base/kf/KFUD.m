@@ -1,7 +1,7 @@
-function [U, D, K] = UDKF(U, D, Phi, Tau, Q, H, R)
+function [U, D, K] = KFUD(U, D, Phi, Tau, Q, H, R)
 % UDUT square root Kalman filter.
 %
-% Prototype: [U, D, K] = UDKF(U, D, Phi, Tau, Q, H, R)
+% Prototype: [U, D, K] = KFUD(U, D, Phi, Tau, Q, H, R)
 % Inputs: U - unit upper-triangular matrix
 %         D - vector representation of diagonal matrix
 %         Phi, Tau, Q - system matrix, processing noise distribusion matrix
@@ -11,7 +11,7 @@ function [U, D, K] = UDKF(U, D, Phi, Tau, Q, H, R)
 %          D - vector representation of diagonal matrix
 %          K - Kalman filter gain
 %
-% See also  chol1, qrmgs.
+% See also  RLSUD, UDUT, chol1, qrmgs.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

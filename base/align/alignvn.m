@@ -80,6 +80,7 @@ function kf = avnkfinit(nts, pos, phi0, imuerr, wvn)
 
 function avnplot(attk, xkpk)
 global glv
+    if glv.isfig==0, return; end
     t = attk(:,end);
     myfigure;
 	subplot(421); plot(t, attk(:,1:2)/glv.deg); xygo('pr'); title('Xi');

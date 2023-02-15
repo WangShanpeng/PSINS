@@ -14,6 +14,11 @@ function att = vn2att(vn, th, isfig)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 21/12/2019
 global glv
+    if size(vn,1)==1 || size(vn,2)==1 
+        vl = norm(vn(1:3));
+        att = [atan2(vn(3), vl), 0, atan2(-vn(1), vn(2))]';
+        return;
+    end
     if nargin<3, isfig = 0; end
     if nargin<2, th = []; end
     if isempty(th), th = diff(vn(1:2,end)); end

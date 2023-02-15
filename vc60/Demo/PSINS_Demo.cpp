@@ -439,4 +439,77 @@ void Demo_Cfg(void)
 	ReadCfg("psinscfg.cfg")>>"psinscfg1">>s>>i>>f>>d>>v>>q>>m;
 }
 
+void Demo_CPolyfit(void)
+{
+	CFileRdWt::Dir("..\\Data\\", ".\\Data\\");	CFileRdWt res("res.bin");
+	double a[] = {1, 2, 3, 4};
+	int n = sizeof(a)/8;
+	CPolyfit pfit;
+	pfit.Init(1.0, n);
+	for(double t=1; t<100; t+=1.0)
+	{
+		double Zk=0, tj=1.0;
+		for(int j=0; j<n; j++)	{ Zk+=a[j]*tj;  tj *= t; }
+		Zk += randn(0.0);
+		pfit.Update(Zk);
+		res << Zk << t;
+	}
+	double Zk1 = pfit.eval(t);
+}
+
+void Demo_CAligni0(void)
+{
+	CFileRdWt::Dir("..\\Data\\", ".\\Data\\");
+	CFileIMU6 fimu("lasergyro.imu"); CFileRdWt faln("aln.bin");
+	CAligni0 aln(fimu.pos0);
+	CAligni0fit alnfit(fimu.pos0);
+	fimu.load(0);
+	for(int i=0; i<1800*100; i++)
+	{
+		if(!fimu.load(1)) break;
+		if(i<100) { fimu.pvm->i-=1.0*fimu.ts; fimu.pvm->j-=1.0*fimu.ts; }  // disturb
+		if(i>1799*100) { fimu.pvm->i+=1.0*fimu.ts; fimu.pvm->j+=1.0*fimu.ts; }  // disturb
+		aln.Update(fimu.pwm, fimu.pvm, 1, fimu.ts);
+		alnfit.Update(fimu.pwm, fimu.pvm, 1, fimu.ts);
+		faln<<q2att(aln.qnb)<<q2att(alnfit.qnb)<<alnfit.vib0<<alnfit.vn0<<alnfit.vnt<<alnfit.xyzt<<fimu.t;
+		disp(i, 100, 100);
+	}
+}
+
+void Demo_SysClbt(void)
+{
+	CFileRdWt::Dir("E:\\ygm2023\\16\\五轴标定数据\\处理后数据\\");
+	CFileIMU7 fimu("imu2.bin"); CFileRdWt fclbt("clbt.bin"), fins("ins.bin");
+	CVect3 wmm, vmm;
+	CSysClbt kf;
+	fimu.load(50*FRQ);
+	fimu.savepos();
+	fimu.sumIMU(100*FRQ, wmm, vmm);
+	CMat3  Cba = CMat3( 0.999999999999999,   0.000078247261346,  -0.600142802656321,
+						0.000259235255995,   1.000000000000000,   0.405111202819736,
+						0.002073882047959,  -0.002269170579030,  -0.689719892253198 );
+	kf.Init(CSINS(PRY(-0.000024,-0.003955,2.602628), O31, LLH(34.176694,108.95115,400), fimu.t), 9.794060384, Cba);
+psinslog.LogSet(1);
+for(int n=0; n<4; n++)
+{
+	fimu.restorepos();
+	kf.att0 = Alignsb(kf.sins.Kg*wmm-kf.sins.eb*100.0, kf.sins.Ka*vmm-kf.sins.db*100.0, kf.sins.pos.i);
+	psinslog<<"\n("<<n<<") Align att (deg): "<<kf.att0/glv.deg<<"\n";
+	kf.NextIter();
+	for(int i=0; i<3500*FRQ; i++)
+	{
+		if(!fimu.load(1)) break;
+		kf.Update(fimu.pwm, fimu.pvm, 1, fimu.ts);
+		if(i%50==0) {
+			fclbt<<kf;
+			fins<<kf.sins;
+		}
+		disp(i, FRQ, 100);
+	}
+	kf.Correct();
+	kf.Log();
+}
+psinslog.LogRunTime();
+}
+
 #endif  // PSINSDemo

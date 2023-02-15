@@ -17,10 +17,11 @@ global glv
         case 'imu',  imuplot(res);
         case 'avp',  insplot(res,typestr, 'mu');
         case 'avped',  insplot(res,typestr, 'mu');
+        case 'v',  insplot(res,typestr);
         case 'vp',  insplot(res,typestr);
         case 'yaw',  myfig; plot(res(:,end),res(:,1)/glv.deg); xygo('y');
         case 'gps',  res=no0(res,1); gpsplot(res);
-        case 'lever',  myfig; plot(res(:,end),res(:,1:3)); xygo('lever');
+        case 'lever',  myfig; plot(res(:,end),res(:,1:3)); xygo('L');
         case 'dT',  myfig; plot(res(:,end),res(:,1)); xygo('dT');
         case 'od',   odplot(res);
         case 'odv',    myfig; plot(res(:,end),res(:,1:3)); xygo('dV');

@@ -2,6 +2,9 @@ function data = adddt(data, dt)
 % Add the time tag data(:,end) with dt.
 %
 % Prototype: data = adddt(data, dt)
+% Inputs: data - data input
+%         dt - time to shift
+% Output; data - data output
 %
 % See also  getat, sortt, tshift, delbias, scalet, addclmt.
 
@@ -9,4 +12,5 @@ function data = adddt(data, dt)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 23/11/2020
     if nargin<2, dt=-data(1,end); end
+    if dt==0, return; end
     data(:,end) = data(:,end)+dt;

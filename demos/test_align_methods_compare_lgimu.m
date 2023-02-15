@@ -5,11 +5,11 @@
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 10/03/2014
 glvs
-[imu, avp0, ts] = imufile('lasergyro');
+[imu, avp0, ts] = imufile('lasergyro');  % imumeanplot(imu,10);
 idx = (1/ts:300/ts)';
 %% i0 method
 [atti0, resi0] = aligni0(imu(idx,:), avp0(7:9), ts);
-% resfit = aligni0fit(resi0, resi0.lat, resi0.nts);
+% [atti0fit, resi0fit] = aligni0fit4(imu(idx,:), avp0(7:9), ts);
 %% i0 & Wahba method
 [att0w, attkw] = alignWahba(imu(idx,:), avp0(7:9), ts);
 %% coarse align

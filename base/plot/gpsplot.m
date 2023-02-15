@@ -6,7 +6,7 @@ function gpsplot(vpGPS, ts)
 %              the tag column may not exist.
 %         ts - GPS sampling interval
 %          
-% See also  imuplot, insplot, inserrplot, kfplot, gpsload, gpssimu, avpfile, igsplot, pos2dplot.
+% See also  imuplot, insplot, gpsload, gpssimu, avpfile, igsplot, gpssatplot, pos2dplot, pos2bd.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

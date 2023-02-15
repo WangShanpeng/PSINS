@@ -1,10 +1,11 @@
 function [dist, od] = distance(pos, timax)
 % Get traveling distance from position(lat,lon,hgt) curve.
 %
-% Prototype: dist = distance(pos, timax)
+% Prototype: [dist, od] = distance(pos, timax)
 % Inputs: pos - [lat, lon, hgt, t], must be sampled at same frequency.
 %         timax - the max calculated time interval
 % Outputs: dist - distances with different time interval
+%          od - OD simulator output
 %
 % See also  pos2dxyz.
 
