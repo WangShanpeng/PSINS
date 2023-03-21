@@ -18,8 +18,6 @@ function rv = m2rv(m)
 %         afa = phi/sqrt(rv'*rv);
         rv = afa*rv;
         return;
-    rv = q2rv(m2qua(m));
-    m1 = m - eye(3);
 %     rv = iaskew(m-glv.I33);  % coarse init is ok when rv is small, otherwise may fail
 %     rvx = askew(rv); % good! the following iteration due to the
     for k=1:2        % accuracy deduce of sqrt(.) in function m2qua

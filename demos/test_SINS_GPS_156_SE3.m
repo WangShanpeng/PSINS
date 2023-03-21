@@ -19,7 +19,7 @@ imugpssyn(imu(:,7), gps(:,7));
 ins = insinit(trj.avp0(1:9), ts, davp0);
 %% kf
 r0 = vperrset(0.1, 1);
-kf = kfinit(ins, davp0, imuerr, r0);
+kf = kfinit(ins, davp0, imuerr, r0);   % kf.Pxk(10:15,10:15)=0;
 len = length(imu); [avp, xkpk] = prealloc(fix(len/nn), 10, 2*kf.n+1);
 timebar(nn, len, '15-state SINS/GPS EKF & SE(3) comparision simulation.'); ki = 1;
 ins_se = ins; kf_se = kf; avp_se = avp; xkpk_se = xkpk;  % SE(3)

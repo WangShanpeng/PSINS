@@ -1,4 +1,4 @@
-function [dxyz,ddxyz] = pos2dxyz(pos, pos0)
+function [dxyz,ddxyz,od] = pos2dxyz(pos, pos0)
 % Transfer [lat,lon,hgt] to [dx,dy,dz].
 %
 % Prototype: dxyz = pos2dxyz(pos, pos0)
@@ -6,7 +6,7 @@ function [dxyz,ddxyz] = pos2dxyz(pos, pos0)
 %         pos0 - see as original position
 % Output: dxyz - [dx/East, dy/North, dz/Up] , Cartesian coordinates(E-N-U in meters) relative to pos0
 %
-% See also  dxyz2pos, RMRN, pos2dplot, pos3vplot, dpos2dxyz.
+% See also  dxyz2pos, RMRN, pos2dplot, pos3vplot, dpos2dxyz, odsimu.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -16,5 +16,6 @@ function [dxyz,ddxyz] = pos2dxyz(pos, pos0)
     [RMh, clRNh] = RMRN(pos(:,1:3));
     ddxyz = [dpos(:,2).*clRNh, dpos(:,1).*RMh, dpos(:,3)];
     dxyz = cumsum(ddxyz,1);
-    if size(pos,2)==4, dxyz(:,4) = pos(:,4); end  % add time tag
+    od = normv(ddxyz);
+    if size(pos,2)==4, dxyz(:,4) = pos(:,4); od = [od,pos(:,4)]; end  % add time tag
 

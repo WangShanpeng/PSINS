@@ -22,7 +22,7 @@ function stext = labeldef(stext)
         'phiE',  '\it\phi\rm_E / ( \prime\prime )';
         'phiN',  '\it\phi\rm_N / ( \prime\prime )';
         'phiU',  '\it\phi\rm_U / ( \prime )';
-        'phiEN', '\it\phi \rm_{E,N} / ( \prime\prime )';
+        'phiEN', '\it\phi\rm_E,\it\phi\rm_N / ( \prime\prime )';
         'phix',  '\it\phi_x\rm / ( \circ )';
         'phiy',  '\it\phi_y\rm / ( \circ )';
         'phiz',  '\it\phi_z\rm / ( \circ )';

@@ -2,7 +2,7 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
 % For MEMS-grade IMU and using static-base condition within time interval
 % [t0,t1], correct the gyro output by deleting their bias.
 %
-% Prototype: [imu, eb] = imudeldrift(imu, t0, t1, avp)
+% Prototype: [imu, eb] = imudeldrift(imu, t0, t1, avp, yaw0)
 % Inputs: imu - raw SIMU data
 %         t0,t1 - assuming a static-base condition time interval
 % Output: imu - new SIMU date with gyro bias deleted

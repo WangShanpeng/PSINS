@@ -6,7 +6,7 @@ function t0 = scft0(t0, minTh)
 %         minTh - minimum threshold for not modify the xdata
 % Output: NA
 %
-% See also  gcft0, xlimall, ladd.
+% See also  gcft0, xlimall, ladd, tshift, adddt.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

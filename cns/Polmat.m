@@ -1,6 +1,10 @@
 function CW = Polmat(xp, yp)
 % Polar motion matrix.
 %
+% Prototype: CW = Polmat(xp, yp)
+% Inputs: xp,yp - polar motion in rad
+% Output: CW - polar motion matirx (C^e_E)
+%
 % See also  Precmat, Nutmat.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.

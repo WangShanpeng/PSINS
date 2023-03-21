@@ -17,7 +17,7 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
 %              installation errors, besides, the Odometer increment field
 %              'od' is attached to this structure.
 %          
-% See also  trjsimu, bhsimu, gpssimu.
+% See also  trjsimu, bhsimu, gpssimu, pos2dxyz.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

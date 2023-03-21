@@ -26,6 +26,7 @@ global glv
         pos = [pos; 0; 0];
     end
     eth = earth(pos);
+    if norm(eth.wnie)<7.29e-06, eth.wnie=[0;1;0]; end
     [qnb, att] = dv2atti(eth.gn, eth.wnie, -fbsf, wbib);
     if nargin<2 && isfig
         resdisp('Coarse align resusts (att,lat_estimated/arcdeg)', ...

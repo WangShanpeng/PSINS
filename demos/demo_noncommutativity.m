@@ -3,7 +3,6 @@
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 16/07/2020
-clear all
 glvs
 Wt = randn(3,5);        % poly angular rate coefficients
 ts = 0.05;              % sampling interval

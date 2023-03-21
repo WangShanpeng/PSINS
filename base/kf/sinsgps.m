@@ -88,7 +88,7 @@ global glv
         end
     end
     if exist('fbstr', 'var'), kf.fbstr=fbstr; end
-    kf.xtau = [ [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; 1]*0.1;
+    kf.xtau = [ [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; [1;1;1]; 1]*1;
     imugpssyn(imu(:,end), gps(:,end));
     len = length(imu); [avp, xkpk, zkrk, sk] = prealloc(fix(len/nn), 16, 2*kf.n+1, 2*kf.m+1, 2);
     if len<101, return; end;  % return kf struct

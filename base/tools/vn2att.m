@@ -8,7 +8,7 @@ function att = vn2att(vn, th, isfig)
 % Output: att - tracking attitude
 %               [pitch,roll,yaw] = [atan(VU/|VEN|),0,atan(-VE/VN)]
 %
-% See also  pp2att, vn2dpos, vn2vbl, gps2avp.
+% See also  pp2att, vn2dpos, vn2vbl, gps2avp, vn2phiu.
 
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -56,14 +56,15 @@ function kf = afnkfinit(nts, pos, phi0, imuerr)
     kf.Phikk_1 = eye(5)+Ft*nts;
     kf.Hk = [ 0  -g  0  0  0
               g   0  0  0  0 ];
-    [kf.m, kf.n] = size(kf.Hk);
-    kf.I = eye(kf.n);
-    kf.xk = zeros(kf.n, 1);
-    kf.adaptive = 0;
-    kf.fading = 1;
-    kf.Gammak = 1;
-    kf.xconstrain = 0;
-    kf.pconstrain = 0;
+	kf = kfinit0(kf, nts);
+%     [kf.m, kf.n] = size(kf.Hk);
+%     kf.I = eye(kf.n);
+%     kf.xk = zeros(kf.n, 1);
+%     kf.adaptive = 0;
+%     kf.fading = 1;
+%     kf.Gammak = 1;
+%     kf.xconstrain = 0;
+%     kf.pconstrain = 0;
 
 function afnplot(ts, attk, xkpk)
 global glv

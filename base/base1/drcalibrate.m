@@ -4,7 +4,7 @@ function [inst, kod] = drcalibrate(pos0, pos1Real, pos1DR, distance)
 % Prototype: dr = drcalibrate(pos0, pos1Real, pos1DR)
 % Inputs: pos0 - start position
 %         pos1Real - real end position
-%         pos1Real - DR end position
+%         pos1DR - DR end position
 %         distance - driving distance from pos0 to pos1
 % Output: inst - ints=[dpitch;0;dyaw] for OD installation error angles(in rad)
 %         kod - odometer scale factor in meter/pulse.

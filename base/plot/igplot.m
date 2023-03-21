@@ -18,7 +18,7 @@ function ig = igplot(ig, flag)
 % 09/01/2023
 global glv
     if nargin<2, flag=0; end
-    if ischar(ig), ig=adddt(binfile(igo,27),-flag); flag=0; end  % igplot(ig_fname, t0);
+    if ischar(ig), ig=adddt(binfile(ig,27),-flag); flag=0; end  % igplot(ig_fname, t0);
 	t = ig(:,end);
     if flag==0 || flag==1
         insplot(ig(:,[1:15,end]));

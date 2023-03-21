@@ -10,7 +10,7 @@ function avp = drpure(imuod, avp0, inst, kod)
 %         kod - odometer scale factor in meter/pulse.
 % Output: avp - [att, vn, pos] output array
 %
-% See also  dratt, drinit, drupdate, inspure.
+% See also  dratt, drinit, drupdate, drcalibrate, inspure.
 
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -11,12 +11,13 @@ function avp = gps2avp(gps, isfig)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 25/06/2021
     if nargin<2, isfig=0; end
-    if size(gps,2)==4  % gps=[pos,t]
+    n = size(gps,2);
+    if n==4 || n==5 % gps=[pos,t]
         vn = pp2vn(gps);
-        avp = gps2avp([vn(:,1:3), gps]);
+        avp = gps2avp([vn(:,1:3), gps(:,[1:3,end])]);
         if isfig, insplot(avp); subplot(321); title('GNSS pos to AVP'); end
-    elseif size(gps,2)==7  % gps=[vn,pos,t]
+    elseif n==7 || n==8  % gps=[vn,pos,t]
         att = vn2att(gps(:,[1:3,end]),0.3);
-        avp = [att(:,1:3), gps];
+        avp = [att(:,1:3), gps(:,[1:6,end])];
         if isfig, insplot(avp); subplot(321); title('GNSS vn-pos to AVP'); end
     end

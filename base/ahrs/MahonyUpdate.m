@@ -8,7 +8,7 @@ function ahrs = MahonyUpdate(ahrs, imu, mag, ts)
 %        ts - sample interval
 % Output: ahrs - output AHRS structure array
 %
-% See also  MahonyInit, QEAHRSUpdate.
+% See also  MahonyInit, Mahony, QEAHRSUpdate.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

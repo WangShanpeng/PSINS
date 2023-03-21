@@ -56,10 +56,10 @@ global glv
             wnc(1) = -dVN*(1+gc1.kz2)/glv.Re;
             wnc(3) = (dVN*gc1.kz3*nts/wN+wnc(3))/(1+gc1.kz4*nts);
         end
-        attk(ki,:) = [q2att(qnb);imu(k:k+nn-1,end)]';
+        attk(ki,:) = [q2att(qnb);imu(k+nn-1,end)]';
         ki = timebar;
     end
     att0 = attk(end,:)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
-    if isfig, insplot([attk, (1:length(attk))'*nts]);  end
+    if isfig, insplot(attk);  end
     

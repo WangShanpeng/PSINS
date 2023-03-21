@@ -1,10 +1,11 @@
-function data = adddt(data, dt)
+function [data,dt] = adddt(data, dt)
 % Add the time tag data(:,end) with dt.
 %
-% Prototype: data = adddt(data, dt)
+% Prototype: [data,dt] = adddt(data, dt)
 % Inputs: data - data input
 %         dt - time to shift
 % Output; data - data output
+%         dt - time to shift
 %
 % See also  getat, sortt, tshift, delbias, scalet, addclmt.
 

@@ -13,7 +13,7 @@ function attc = att2c(att)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 15/10/2013, 15/03/2014
-    attc = [angle2c(att(:,1)), angle2c(att(:,2)), angle2c(att(:,3))];
+    attc = [angle2c(att(:,1)), angle2c(att(:,2)), angle2c(att(:,3)), att(:,4:end)];
 
 function ang = angle2c(ang)
     df = diff(ang);    % find discontinuous points

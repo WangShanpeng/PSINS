@@ -13,7 +13,7 @@ function ahrs = MahonyInit(tau, att0, t0)
 %         t0   - initial time
 % Output: ahrs - output AHRS structure array
 %
-% See also  MahonyUpdate, QEAHRSInit.
+% See also  MahonyUpdate, Mahony, QEAHRSInit.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

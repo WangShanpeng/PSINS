@@ -13,11 +13,11 @@ function ttest(t, xist)
     if nargin<2, xist=0; end
     t = t(:,end);  dt = diff(t);
     myfigure,
-    subplot(211), plot(t-t(1));  xygo('k', 't / s');
+    subplot(211), plot(t-t(1));  xygo('k / dt', 't / s');
     if xist,
         subplot(212), plot(t(2:end), dt); xygo('dt / s');
     else
-        subplot(212), plot(dt); xygo('k', 'dt / s');
+        subplot(212), plot(dt); xygo('k / dt', 'dt / s');
     end
     title(sprintf('mean(dt) = %f (s)', mean(dt)));
 

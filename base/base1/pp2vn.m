@@ -16,7 +16,9 @@ global glv
     if nargin==1
         vn = pos0; vn(1,1:3) = 0;
         for k=2:size(pos0,1)
-            vn(k,1:3) = pp2vn(pos0(k-1,1:3), pos0(k,1:3), pos0(k,4)-pos0(k-1,4));
+            ts = pos0(k,4)-pos0(k-1,4);
+            vn(k,1:3) = pp2vn(pos0(k-1,1:3), pos0(k,1:3), ts);
+            if size(vn,2)>3, vn(k,4)=vn(k,4)-ts/2; end
         end
         return;
     end

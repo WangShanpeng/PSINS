@@ -35,7 +35,7 @@ wvn = [0.01;0.01;0.01];
 ctl0 = [20; 30]; ctl1 = [50; 300];
 [att0c, attkc] = aligncmps(imu, avp0(1:3), avp0(7:9), ctl0, ctl1);
 %% compare & show different methods
-[phii0p,phii0v,phii0w,phikf,phikv,phic] = setvals(zeros(size(attkc)));
+[phii0p,phii0v,phii0w,phikf,phikv,phic] = setvals(zeros(size(attkc(:,1:3))));
 for k=1:length(attkc)
     phii0p(k,:) = aa2phi(resi0.attk(k,:)',avp0(1:3))';
     phii0v(k,:) = aa2phi(resi0.attkv(k,:)',avp0(1:3))';
