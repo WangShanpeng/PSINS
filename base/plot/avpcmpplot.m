@@ -113,8 +113,8 @@ global glv
                 subplot(221), hold on, plot(t, avp(:,1:2)/glv.deg, strk, 'LineWidth',2), xygo('pr');
                 subplot(223), hold on, plot(t, avp(:,3)/glv.deg, strk, 'LineWidth',2), xygo('y');
                 err = avpcmp(avp(:,[1:3,end]), avp0(:,[1:3,end]), phi_mu); t = err(:,end);
-                subplot(222), hold on, plot(t, err(:,1:2)/glv.min, strk, 'LineWidth',2); xygo(phi_mu);   if phi_mu(1)=='p', mylegend('phiE','phiN'); else, mylegend('mux','muy'); end
-                subplot(224), hold on, plot(t, err(:,3)/glv.min, strk, 'LineWidth',2); xygo(phi_mu);   if phi_mu(1)=='p', mylegend('phiU'); else, mylegend('muz'); end
+                subplot(222), hold on, plot(t, err(:,1:2)/glv.min, strk, 'LineWidth',2); xygo(phi_mu);   if phi_mu(1)=='p', mylegend('phiE','phiN'); elseif phi_mu(1)=='m', mylegend('mux','muy'); else, mylegend('dpch','drll'); end
+                subplot(224), hold on, plot(t, err(:,3)/glv.min, strk, 'LineWidth',2); xygo(phi_mu);   if phi_mu(1)=='p', mylegend('phiU'); elseif phi_mu(1)=='m', mylegend('muz'); else, mylegend('dyaw'); end
             end
          case 'av',
             for k=1:kk

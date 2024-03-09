@@ -8,7 +8,7 @@ function [imu1, hd] = imu2imr(fname, imu, varargin)
 % Outputs: imu1 - SIMU data array.
 %          hd - IMR file header.
 %
-% See also  od2dmr, imufile.
+% See also  od2dmr, imufile, cgfrmvp.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

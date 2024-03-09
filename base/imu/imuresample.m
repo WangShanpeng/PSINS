@@ -8,9 +8,9 @@ function imu = imuresample(imu0, ts, t1, method, temflag)
 %    t1 - sampling time for first SIMU record
 %    method - resampling interpolation method
 %    temflag - temperature flag
-% Output: imu - new SIMU date with sampling interval ts
+% Output: imu - new SIMU data with sampling interval ts
 %
-% See also  imu2imu1, trjsimu, imufile, imuplot.
+% See also  imu2imu1, trjsimu, imufile, imuplot, imurepair.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China

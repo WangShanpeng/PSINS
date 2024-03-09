@@ -1,7 +1,7 @@
 % Figure for C++ processing results
 % Make sure Matlab/PSINS Toolbox have been initialized!
 glvs
-PSINSDemo = 22;
+PSINSDemo = 6;
 switch PSINSDemo
     case -1, %% Demo_SINS/GNSS
         ins = binfile('ins.bin', 16+3);
@@ -90,4 +90,7 @@ switch PSINSDemo
         subplot(311), plot(att(:,end), att(:,10:12)); xygo('V')
         subplot(312), plot(att(:,end), att(:,13:15)); xygo('dV')
         subplot(313), plot(att(:,end), att(:,16:18)); xygo('dP')
+    case 23,
+        [xk, pk, zk, rk, sk] = igkfplot('clbt.bin', 3703, 0);
+        ins = binfile('ins.bin', 16); insplot(ins); addmark(ins(end,end)*[1;2]/3);
 end

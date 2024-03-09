@@ -7,7 +7,7 @@ function m = rv2m(rv)
 %     m = I + sin(|rv|)/|rv|*(rvx) + [1-cos(|rv|)]/|rv|^2*(rvx)^2
 %     where rvx is the askew matrix or rv.
 % 
-% See also  m2rv, rv2q, q2rv, a2mat, rotv.
+% See also  m2rv, rv2q, q2rv, a2mat, rotv, rv2J.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -19,7 +19,7 @@ function [X1, Phik, D] = vfbfx(X0, tpara)
     x1 = X0(1); x2 = X0(2); x3 = X0(3);
     %% X0->X1
     egx1 = exp(-gamma*x1);
-    X1 = [ x1 - x2*Ts;   % Euler1
+    X1 = [ x1 - x2*Ts;   % Euler1 discretization
            x2 + (g-egx1*x2^2*x3)*Ts;
            x3 ];
 %     k1 = [-X0(2);  g-exp(-gamma*X0(1))*X0(2)^2*X0(3);    0];  X01 = X0+k1*Ts/2;  % RK4

@@ -20,7 +20,7 @@ wt = [zeros(10/ts,3);       % uniform
 at = zeros(size(wt));
 wat = [zeros(length(wt),2), wt, at];  
 wat(:,1) = ts; wat(:,2) = vel0;
-trj = trjsimu(avp0, wat, ts, 2);
+trj = trjsimu(avp0, wat, ts, 1);
 save([glv.datapath,'trj_transfer.mat'], 'trj');
 insplot(trj.avp);
 imuplot(trj.imu);

@@ -4,6 +4,12 @@
 
 void Demo_User(void)
 {
+	double aa[]={11,2,3,4,  1,22,3,4,   1,2,33,4,  1,2,3,44};
+	CMat m(4,4,aa), mm, I;
+	mm = inv4(m);
+	I = m*mm;
+	return;
+
 	clock_t t1, t2, t3;
 	double a[]={1,2,3,4,5,6,7,8}, b[]={1,1,1,1,1,1,1,1}, s1, s2;
     t1 = clock();
@@ -101,12 +107,12 @@ void Demo_CSINS_static(void)
 	for(int i=0; i<1*24*3600; i+=2)
 	{
 		sins.Update(wm, vm, 2, ts);  sins.vn.k=0; sins.pos.k = pos0.k;
-		if(i%36000==0) {
-			double T1 = cns.TT + i/(3600*24*36525.0);
+		if(i%360==0) {
+/*			double T1 = cns.TT + i/(3600*24*36525.0);
 			cns.Precmat(T1), cns.Nutmat(T1);
 			CMat3 NP = cns.CN*cns.CP;
 			CVect3 rv = q2rv(m2qua(NP0*(~NP)));  NP0=NP;
-			wm[1] = wm[0]+rv;
+			wm[1] = wm[0]+rv;*/
 			fins<<sins;
 		}
 		else
@@ -478,38 +484,110 @@ void Demo_CAligni0(void)
 
 void Demo_SysClbt(void)
 {
-	CFileRdWt::Dir("E:\\ygm2023\\16\\五轴标定数据\\处理后数据\\");
-	CFileIMU7 fimu("imu2.bin"); CFileRdWt fclbt("clbt.bin"), fins("ins.bin");
-	CVect3 wmm, vmm;
-	CSysClbt kf;
-	fimu.load(50*FRQ);
+	CVect3 pos0=LLH(34.197473, 108.854275, 400.1);
+	CFileRdWt::Dir("E:\\ygm2023\\16\\");
+	CFileRdWt fclbt("clbt.bin"), fins("ins.bin");
+	CSysClbt kf(pos0, 9.79410756, 0);  // 1 for ka2, 0 for kapn
+	CFileIMUClbt fimu("imu_jialin.bin", kf.sins.imu);
 	fimu.savepos();
-	fimu.sumIMU(100*FRQ, wmm, vmm);
-	CMat3  Cba = CMat3( 0.999999999999999,   0.000078247261346,  -0.600142802656321,
-						0.000259235255995,   1.000000000000000,   0.405111202819736,
-						0.002073882047959,  -0.002269170579030,  -0.689719892253198 );
-	kf.Init(CSINS(PRY(-0.000024,-0.003955,2.602628), O31, LLH(34.176694,108.95115,400), fimu.t), 9.794060384, Cba);
-psinslog.LogSet(1);
-for(int n=0; n<4; n++)
-{
-	fimu.restorepos();
-	kf.att0 = Alignsb(kf.sins.Kg*wmm-kf.sins.eb*100.0, kf.sins.Ka*vmm-kf.sins.db*100.0, kf.sins.pos.i);
-	psinslog<<"\n("<<n<<") Align att (deg): "<<kf.att0/glv.deg<<"\n";
-	kf.NextIter();
-	for(int i=0; i<3500*FRQ; i++)
+	kf.sins.Init(O31, O31, pos0, *fimu.pt);  kf.sins.mvnT=0.2;  kf.sins.isOpenloop=1;
+	psinslog.LogSet(1);
+	for(int n=0; n<=2; n++)
 	{
-		if(!fimu.load(1)) break;
-		kf.Update(fimu.pwm, fimu.pvm, 1, fimu.ts);
-		if(i%50==0) {
-			fclbt<<kf;
-			fins<<kf.sins;
+		fimu.restorepos();
+		kf.att0 = fimu.aligni0(110, pos0);
+		kf.NextIter();
+		for(int i=0; i<36000*FRQ; i++)
+		{
+			if(!fimu.load(1)) break;
+			kf.Update((CVect3*)fimu.pGyro, (CVect3*)fimu.pAcc, 1, TS);
+			if(i%50==0) {
+				fclbt<<kf;
+				fins<<kf.sins;
+			}
+			disp(i, FRQ, 100);
 		}
-		disp(i, FRQ, 100);
+		kf.FeedbackAll();
+		psinslog<<kf.FBTotal.dd[2]/glv.min<<"\n";
 	}
-	kf.Correct();
-	kf.Log();
 }
-psinslog.LogRunTime();
+
+void Demo_GKP(void)
+{
+	CGKP gkp;
+	gkp.Init(glv.Re, glv.f);
+	for(double lat=60; lat<89; lat+=100.0) {
+		for(double lon=0; lon<6; lon+=0.1) {
+			CVect3 xyz = gkp.GKP(CVect3(lat*DEG, lon*DEG, 100.0));
+			CVect3 pos = gkp.IGKP(xyz);
+			printf("%.8f,%.8f \t%.6f %.6f\n", lat, lon, (pos.i-lat*DEG)*RE, (pos.j-lon*DEG)*RE);
+		}
+	}
+}
+
+void Demo_CIMUInc(void)
+{
+	CVect3 wm(-0.1*SEC,1*SEC,0.1*SEC), vm(-0.0001,0.001,0.0001);
+	CIMUInc imu;
+	imu.fTotalGx=-(2147483648.0-15), imu.fTotalGy=imu.fTotalGz=2147483648.0-15;
+	imu.fTotalAx=-(2147483648.0-15), imu.fTotalAy=imu.fTotalAz=2147483648.0-15;
+	for(int i=0; i<20; i++) {
+		imu.Update(wm, vm);
+		printf("%d,%d,%d\t%d,%d,%d \t%d,%d,%d\t%d,%d,%d\n",
+			imu.diGx, imu.diGy, imu.diGz, imu.diAx, imu.diAy, imu.diAz,
+			imu.iTotalGx, imu.iTotalGy, imu.iTotalGz, imu.iTotalAx, imu.iTotalAy, imu.iTotalAz);
+	}
+}
+
+void Demo_Extract_Txt_File(void)
+{
+	char str[1024], hdr[]="GR,";  int len=strlen(hdr), n=0;
+	FILE *fIn =fopen("E:\\ygm2023\\FAST\\202306280731db2.log","rt"), 
+		 *fOut=fopen("E:\\ygm2023\\FAST\\gps0628.log","wt");
+	for(int i=0; i<1000000000; i++) {
+		fgets(str, 1024, fIn);
+		if(feof(fIn)) break;
+		if(chkhdr(str, hdr)) {
+			fprintf(fOut, "%s", &str[len]);
+			disp(n, 10, 100);  n++;
+		}
+	}
+	fclose(fIn); fclose(fOut);
+}
+
+void Demo_operator_pointer_run_time(void)
+{
+	CVect3 v1=randn(O31)*0.001, v2=randn(O31), v, vv1,vv2;
+	CMat3 m1=randn(O33), m2=randn(O33), m;
+	CQuat q1(1,0,0,0), q;
+	int len=10000*1000, i;
+	for(i=0; i<len; i++) {
+//		m = m1*m2;
+//		v = m1*v1;
+//		v = v1*v2;
+//		q = q1-v1;
+//		v = m1*v1+v1*2.0;
+		vv1 = v1*2.0+v2*3.0;
+//		v = m2att(m1);
+//		v = v1+v2*3.0;
+//		q1 -= v1;
+//		v1 -= v1;
+	}
+	glv.toc(1);
+	for(i=0; i<len; i++) {
+//		mul(m, m1, m2);
+//		mul(v, m1, v1);
+//		cros(v, v1, v2);
+//		qdelphi(q1, v1);
+//		AXbt(v, m1, v1, v1, 2.0);
+//		v1.i = asin(v1.k*v1.k/1000.0);
+		VADDff(vv2, v1, 2.0, v2, 3.0);
+//		m2att(v, m1);
+//		VADDf(v, v1, v2, 3.0);
+//		qdelphi(q1, v1);
+//		sub(v1,v1,v1);
+//		VSUB(v,v1,v2);
+	}
 }
 
 #endif  // PSINSDemo

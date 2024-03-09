@@ -1,7 +1,7 @@
 /* PSINS_Demo c++ hearder file KFApp.h */
 /*
 	By     : Yan Gongmin @ NWPU
-	Date   : 2021-01-21
+	Date   : 2023-04-25
 	From   : College of Automation, 
 	         Northwestern Polytechnical University, 
 			 Xi'an 710072, China
@@ -12,7 +12,7 @@
 
 #include "..\PSINSCore\PSINS.h"
 
-#define FRQ	FRQ100
+#define FRQ	FRQ200
 #define TS	(1.0/FRQ)
 
 #define PSINSDemo 23
@@ -45,6 +45,10 @@
 	case 21: Demo_CPolyfit(); break; \
 	case 22: Demo_CAligni0(); break; \
 	case 23: Demo_SysClbt(); break; \
+	case 24: Demo_GKP(); break; \
+	case 25: Demo_CIMUInc(); break; \
+	case 26: Demo_Extract_Txt_File(); break; \
+	case 27: Demo_operator_pointer_run_time(); break; \
 	}
 void Demo_User(void);
 void Demo_CIIRV3(void);
@@ -70,6 +74,10 @@ void Demo_Cfg(void);
 void Demo_CPolyfit(void);
 void Demo_CAligni0(void);
 void Demo_SysClbt(void);
+void Demo_GKP(void);
+void Demo_CIMUInc(void);
+void Demo_Extract_Txt_File(void);
+void Demo_operator_pointer_run_time(void);
 
 #ifdef PSINS_IO_FILE
 
@@ -120,6 +128,35 @@ public:
 		}
 		fseek(rwf, pos, SEEK_SET);
 		load(0);
+	}
+};
+
+class CFileIMUClbt:public CFileRdWt
+{
+public:
+	CIMU *pimu;
+	double *pt, *pGyro, *pAcc;
+	CFileIMUClbt(const char *fname0, CIMU &imu0):CFileRdWt(fname0, -7) {
+		pimu = &imu0;
+		pGyro = &buff[0], pAcc = &buff[3];  pt=&buff[6];
+		load(1);
+	};
+	int load(int lines=1) {
+		if(!CFileRdWt::load(lines)) return 0;
+		return 1;
+	};
+	CVect3 aligni0(int len, CVect3 &pos0) {
+		long pos=ftell(rwf);  int line0=linek;
+		CAligni0fit afit(pos0);  // afit.imu=*pimu;  afit.imu.tk=0.0;
+		for(int a=0; a<len*FRQ; a++)  {
+			load(1);
+			pimu->Update((CVect3*)pGyro, (CVect3*)pAcc, 1, TS);
+			afit.Update(&pimu->wmm, &pimu->vmm, 1, TS); 
+		}
+		fseek(rwf, pos, SEEK_SET);  linek=line0;
+		CVect3 a1=q2att(afit.qnb)/glv.deg, a2=q2att(afit.qnbsb)/glv.deg;
+		psinslog<<"\n Align att (deg): "<<a1<<a2<<"\n";
+		return q2att(afit.qnb);
 	}
 };
 

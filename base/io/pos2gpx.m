@@ -9,7 +9,7 @@ function pos2gpx(fname, pos)
 %   2) in Google Earth menu: File->Open
 %   3) in Open dialog: Select this generated *.gpx file->Open
 %
-% See also  gpsplot, avpfile.
+% See also  pos2bd, gpsplot, avpfile.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

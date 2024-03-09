@@ -3,7 +3,7 @@ function [sigma, tau, Err] = avars(y0, tau0)
 %
 % Prototype: [sigma, tau, Err] = avars(y0, tau0, isfig)
 %
-% See also  avar, avar2, hrgbi.
+% See also  avar, avarimu, avar2, hrgbi.
 
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -19,7 +19,7 @@ global glv
         sstr = [sstr,' / ',str(k,:)];
     end
     grid on;
-    xlabel('\itt \rm/ s'); ylabel('\it\sigma_A\rm( \tau ) \rm (\circ)/h');
+    xlabel('\it\tau \rm/ s'); ylabel('\it\sigma_A\rm( \tau ) \rm (\circ)/h');
     title(sstr);
     if glv.isfig==0, close(gcf); end
 

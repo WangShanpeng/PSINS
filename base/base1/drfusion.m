@@ -32,9 +32,10 @@ function posdr = drfusion(posdr1, posdr2, isinv, ext)
     end
     h = posdr(:,3);
     posdr = [posstart(1:end-2,:); posdr; posend(3:end,:)];
-    xyz1 = pos2dxyz(posdr1,posdr(1,1:3)');  xyz2 = pos2dxyz(posdr2,posdr(1,1:3)'); xyz = pos2dxyz(posdr,posdr(1,1:3)');
+    xyz1 = pos2dxyz(posdr1,posdr1(1,1:3)');  xyz2 = pos2dxyz(posdr2,posdr1(1,1:3)'); xyz = pos2dxyz(posdr,posdr1(1,1:3)');
     myfig,
-    subplot(121), plot(xyz1(:,1), xyz1(:,2), xyz2(:,1), xyz2(:,2), xyz(:,1), xyz(:,2)); xygo('E / m', 'N / m'); legend('DR1', 'DR2', 'DRfusion');
+    subplot(121), plot(xyz1(:,1), xyz1(:,2), xyz2(:,1), xyz2(:,2), xyz(:,1), xyz(:,2)); xygo('E / m', 'N / m'); legend('DRforward', 'DRbackward', 'DRfusion');
+        hold on, plot(xyz1(1,1), xyz1(1,2), 'o', xyz1(end,1), xyz1(end,2), 'o');
     subplot(122), plot(dist, pos1(:,3), dist, pos2(:,3), dist, h); xygo('dist / m', 'h / m');
 %     pos2dplot(posdr1, posdr2, posdr);  legend('Start', 'DR1', 'DR2', 'DRfusion');
 %     myfig, plot(dist, pos1(:,3), dist, pos2(:,3), dist, h); xygo('dist / m', 'h / m');

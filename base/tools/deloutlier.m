@@ -2,11 +2,11 @@ function [x, outlierIdx] = deloutlier(x, bound, clm, nSmooth)
 % Delete outlier.
 %
 % Prototype:  [x, outlierIdx] = deloutlier(x, bound, clm, nSmooth)
-% Inputs: x_in - input date with bias
+% Inputs: x_in - input data with bias
 %         bound - outlier lower&upper bound
 %         clm - data column to find outlier
 %         nSmooth - n points to find outlier
-% Outputs: x_out - output date with no bias
+% Outputs: x_out - output data with no bias
 %          outlierIdx - outlier index found
 %
 % Example:

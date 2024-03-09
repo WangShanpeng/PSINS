@@ -2,7 +2,7 @@ function [yerr, y0, p] = deltrend(y, order, isfig)
 % Delete trend.
 %
 % Prototype:  [yerr, y0] = deltrend(y, order)
-% Inputs: y - input date
+% Inputs: y - input data
 %         order - polyfit order, or polynomial coefficients array
 %         isfig - figure flag
 % Outputs: yerr,y0 - y=y0+yerr, y0 to be the trend

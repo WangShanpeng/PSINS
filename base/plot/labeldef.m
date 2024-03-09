@@ -22,6 +22,7 @@ function stext = labeldef(stext)
         'phiE',  '\it\phi\rm_E / ( \prime\prime )';
         'phiN',  '\it\phi\rm_N / ( \prime\prime )';
         'phiU',  '\it\phi\rm_U / ( \prime )';
+        'phiUsec',  '\it\phi\rm_U / ( \prime\prime )';
         'phiEN', '\it\phi\rm_E,\it\phi\rm_N / ( \prime\prime )';
         'phix',  '\it\phi_x\rm / ( \circ )';
         'phiy',  '\it\phi_y\rm / ( \circ )';
@@ -43,6 +44,9 @@ function stext = labeldef(stext)
         'r',     '\it\gamma\rm / ( \circ )';
         'y',     '\it\psi\rm / ( \circ )';
         'att',   '\itAtt\rm / ( \circ )';
+        'dpch'   '\delta\it\theta \rm / ( \prime )';
+        'drll'   '\delta\it\gamma \rm / ( \prime )';
+        'dyaw'   '\delta\it\psi \rm / ( \prime )';
         'datt',  '\itdAtt\rm / ( \prime )';
         'VEN',   '\itV \rm_{E,N} / ( m/s )';
         'VE',   '\itV \rm_E / ( m/s )';
@@ -73,7 +77,7 @@ function stext = labeldef(stext)
         'Ka2',   'Ka2 / ug/g^2';
         'dbU',   '\it\nabla \rm_U / \mu\itg';
         'L',     '\itLever\rm / m';
-        'dT',    '\delta\it T_{asyn}\rm / s';
+        'dT',    '\delta\it T_{asyn}\rm / ms';
         'dKgzz',   '\delta\it Kgzz\rm / ppm';
         'dKg',   '\delta\it Kg\rm / ppm';
         'dAg',   '\delta\it Ag\rm / ( \prime\prime )';

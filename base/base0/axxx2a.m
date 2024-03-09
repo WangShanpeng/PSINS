@@ -8,7 +8,7 @@ function att = axxx2a(axxx, axxstr)
 % Test:
 %    attr=[10;20;30]*glv.deg; [axxx2a(attr,'1x3z2y'), attrf(attr)]/glv.deg
 %
-% See also  a2mat, attrf, attrfu.
+% See also  a2mat, attrf, attrfu, atttrans.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

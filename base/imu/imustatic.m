@@ -22,6 +22,7 @@ function [imu, eth] = imustatic(avp0, ts, T, imuerr)
 global glv;
     if ~exist('imuerr', 'var'), imuerr = imuerrset(0,0,0,0); end
     if length(avp0)<3, avp0 = [0; 0; avp0(1)]; end
+    if length(avp0)==3, avp0 = [zeros(6,1);avp0]; end
     if length(avp0)<6, avp0 = [avp0(1:3); glv.pos0]; end
     if length(avp0)<9, avp0 = [avp0(1:3); zeros(3,1); avp0(4:6)]; end
     Cbn = a2mat(avp0(1:3))';

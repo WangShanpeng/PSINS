@@ -1,4 +1,4 @@
-function [U, wm, wc] = utpoint(n, afa, beta, kappa)
+function [U, wm, wc, gamma] = utpoint(n, afa, beta, kappa)
 % Calculate 3th or 5th-order cubature points.
 %
 % Prototype: [U, wm, wc] = utpoint(n, afa, beta, kappa)
@@ -6,6 +6,7 @@ function [U, wm, wc] = utpoint(n, afa, beta, kappa)
 %         afa,beta,kappa - parameters
 % Outputs: U - UT points
 %          wm,wc - weights
+%         gamma - gamma parameter
 %
 % See also  cubpoint, ghpoint, ukf.
 

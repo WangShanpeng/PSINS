@@ -27,6 +27,6 @@ function [fname, m] = dirfile(spc, k)
             end
             fclose(fid);
         else
-            fanme = fname{k}; m=1;
+            fname = fname{k}; m=length(k);
         end
     end

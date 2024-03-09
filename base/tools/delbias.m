@@ -2,10 +2,10 @@ function [x, b1] = delbias(x, b, clm)
 % Delete bias.
 %
 % Prototype:  [x, b1] = delbias(x, b, clm)
-% Inputs: x_in - input date with bias
+% Inputs: x_in - input data with bias
 %         b - bias
 %         clm - data column to delete bias
-% Outputs: x_out - output date with no bias
+% Outputs: x_out - output data with no bias
 %          b1 - bias output
 %
 % See also  deltrend, imudeldrift, mulsf, adddt, sumn, meann.

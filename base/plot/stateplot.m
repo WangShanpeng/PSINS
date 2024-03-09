@@ -13,7 +13,7 @@ function sstate = stateplot(state, maxst)
     state = state(state(:,1)>0,:);
     [n, m] = size(state);
     if m==1,  t = (1:n)';
-    else      t = state(:,end); state = state(:,end-1); end
+    else      t = state(:,end)/tscaleget; state = state(:,end-1); end
     sstate = [];
     for k=0:31
         tmp = bitand(state,2^k);

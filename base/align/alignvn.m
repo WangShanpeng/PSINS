@@ -15,7 +15,7 @@ function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 %         attk, xkpk - for debug
 %
 % Example:
-%	avp0 = [[0;0;0], zeros(3,1), glv.pos0];
+%	avp0 = [[0;0;0]; zeros(3,1); glv.pos0];
 %	imuerr = imuerrset(0.03, 100, 0.001, 10);
 %	imu = imustatic(avp0, 1, 300, imuerr);
 %	phi = [.5; .5; 5]*glv.deg;

@@ -7,7 +7,7 @@ function data = datahalf(data, n, N)
 %         N - total fraction
 % Output: data - the n^th fration of the output data
 %
-% See also  datacut.
+% See also  datacut, datacuts.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

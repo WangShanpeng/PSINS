@@ -1,9 +1,9 @@
 
 /* PSINS(Precise Strapdown Inertial Navigation System) C++ algorithm source file PSINS.cpp
 
-Copyright(c) 2015-2022, by YanGongmin, All rights reserved.
+Copyright(c) 2015-2023, by YanGongmin, All rights reserved.
 Northwestern Polytechnical University, Xi'an, P.R.China.
-Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022
+Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022, 23/08/2023
 */
 
 #include "PSINS.h"
@@ -14,7 +14,9 @@ const CMat3  I33(1,0,0, 0,1,0, 0,0,1), O33(0,0,0, 0,0,0, 0,0,0), One33(1.0);
 const CVect  On1(MMD,0.0), O1n=~On1, Onen1(MMD,1.0);
 CVect3       Vrbs(0.0);
 CGLV		 glv;
+#ifdef PSINS_IO_FILE
 CFileLog	 psinslog;
+#endif
 int			 psinslasterror = 0;
 int			 psinsstack0 = 0, psinsstacksize = 0;
 
@@ -45,8 +47,27 @@ CGLV::CGLV(double Re, double f, double g0, double wie0)
     mpspsh = 1/1/sqrt(hur);
     ppmpsh = ppm/sqrt(hur);
     secpsh = sec/sqrt(hur);
+#ifdef PSINS_IO_FILE
+	t0 = clock();
+#endif
 }
 
+#ifdef PSINS_IO_FILE
+int CGLV::toc(BOOL disp)
+{
+	clock_t t1 = clock();
+	int res = t1-t0;  t0 = t1;
+	if(disp) printf("\n\tPSINS elasped time (ms): %d.\n\n", res);
+	return res;
+}
+
+CGLV::~CGLV(void)
+{
+	toc(1);
+}
+#endif
+
+#ifdef PSINS_COMPLEX
 //***************************  class CComplex  *********************************/
 CComplex::CComplex(double a0, double b0)
 {
@@ -217,6 +238,8 @@ CVect3 ShengJin(double a, double b, double c)
 	return sort(CVect3(x1-a3, x2-a3, x3-a3));
 }
 
+#endif  //PSINS_COMPLEX
+
 //***************************  class CVect3  *********************************/
 CVect3::CVect3(void)
 {
@@ -350,6 +373,11 @@ double& CVect3::operator()(int r)
 	return (&this->i)[r];
 }
 
+double crossXY(const CVect3 &v1, const CVect3 &v2)
+{
+	return v1.i*v2.j-v1.j*v2.i;
+}
+
 CMat3 vxv(const CVect3 &v1, const CVect3 &v2)
 {
 	return CMat3(v1.i*v2.i, v1.i*v2.j, v1.i*v2.k, 
@@ -440,17 +468,17 @@ CVect3 dotdiv(const CVect3 &v1, const CVect3 &v2)
 
 CQuat rv2q(const CVect3 &rv)
 {
-#define F1	(   2 * 1)		// define: Fk=2^k*k! 
-#define F2	(F1*2 * 2)
-#define F3	(F2*2 * 3)
-#define F4	(F3*2 * 4)
-#define F5	(F4*2 * 5)
+#define rvF1	(     2 * 1)		// define: Fk=2^k*k! 
+#define rvF2	(rvF1*2 * 2)
+#define rvF3	(rvF2*2 * 3)
+#define rvF4	(rvF3*2 * 4)
+#define rvF5	(rvF4*2 * 5)
 	double n2 = rv.i*rv.i+rv.j*rv.j+rv.k*rv.k, c, f;
 	if(n2<(PI/180.0*PI/180.0))	// 0.017^2 
 	{
 		double n4=n2*n2;
-		c = 1.0 - n2*(1.0/F2) + n4*(1.0/F4);
-		f = 0.5 - n2*(1.0/F3) + n4*(1.0/F5);
+		c = 1.0 - n2*(1.0/rvF2) + n4*(1.0/rvF4);
+		f = 0.5 - n2*(1.0/rvF3) + n4*(1.0/rvF5);
 	}
 	else
 	{
@@ -499,8 +527,15 @@ CVect3 pp2vn(const CVect3 &pos1, const CVect3 &pos0, double ts, CEarth *pEth)
     return CVect3(vn.j*clRNh/ts, vn.i*RMh/ts, vn.k/ts);
 }
 
-double sinAng(const CVect3 &v1, const CVect3 &v2)
+CVect3 pp2att(const CVect3 &pos1, const CVect3 &pos0)
 {
+	return vn2att(pp2vn(pos1, pos0, 1.0));
+}
+
+double sinAng(const CVect3 &v1, const CVect3 &v2, const CVect3 &v0)
+{
+	if(&v0!=&O31)
+		return sinAng(v1-v0,v2-v0);
 	if(IsZero(v1)||IsZero(v2)) return 0.0;
 	return norm(v1*v2)/(norm(v1)*norm(v2));
 }
@@ -577,6 +612,81 @@ CVect3 sort(const CVect3 &v)
 	if(vtmp.i<vtmp.k) swapt(vtmp.i,vtmp.k,double);
 	if(vtmp.j<vtmp.k) swapt(vtmp.j,vtmp.k,double);
 	return vtmp;
+}
+
+double median(const double &f1, const double &f2, const double &f3)
+{
+	return median(CVect3(f1,f2,f3));
+}
+
+double median(const CVect3 &v)
+{
+	double res;
+	if(v.i>v.j) {
+		if(v.j>v.k) res=v.j;
+		else if(v.k>v.i) res=v.i;
+		else res=v.k;
+	}
+	else { // v.i<=v.j
+		if(v.j<v.k) res=v.j;
+		else if(v.i>v.k) res=v.i;
+		else res=v.k;
+	}
+	return res;
+}
+
+CVect3 dm2r(const CVect3 &v, int typ)
+{
+	if(typ==2) return CVect3(dm2r(v.i), dm2r(v.j), v.k);
+	return CVect3(dm2r(v.i), dm2r(v.j), dm2r(v.k));
+}
+
+CVect3 v3mmm(const CVect3 &p1, const CVect3 &p2, const CVect3 &p3, CVect3 *pmm, BOOL isMean, const CVect3 &th)
+{
+	CVect3 res, mm;
+	double *pf0=&res.i, *pm=&mm.i; const double *pf1=&p1.i, *pf2=&p2.i, *pf3=&p3.i;
+	for(int i=0; i<3; i++,pf0++,pm++,pf1++,pf2++,pf3++) {
+		if(*pf1>*pf2) {
+			if(*pf2>*pf3) { *pf0=*pf2, *pm=*pf1-*pf3; }
+			else if(*pf3>*pf1) { *pf0=*pf1, *pm=*pf3-*pf1; }
+			else { *pf0=*pf3, *pm=*pf1-*pf2; }
+		}
+		else { // pf1<pf2
+			if(*pf2<*pf3) { *pf0=*pf2, *pm=*pf3-*pf1; }
+			else if(*pf1>*pf3) { *pf0=*pf1, *pm=*pf2-*pf3; }
+			else { *pf0=*pf3, *pm=*pf2-*pf1; } 
+		}
+	}
+	if(pmm) *pmm=mm;  // max-min
+	if(isMean) {
+		if(mm.i<th.i) res.i=(p1.i+p2.i+p3.i)/3.0;
+		if(mm.j<th.j) res.j=(p1.j+p2.j+p3.j)/3.0;
+		if(mm.k<th.k) res.k=(p1.k+p2.k+p3.k)/3.0;
+	}
+	return res;
+}
+
+CVect3 fopp(const CVect3 &a, const CVect3 &b, const CVect3 &c)  // point c to line a-b
+{
+	CVect3 ab=b-a;
+	double u=dot(c-a,ab), n2=ab.i*ab.i+ab.j*ab.j+ab.k*ab.k;
+	return n2<1.0e-20 ? a : a+ab*u/n2;
+}
+
+CVect3 fopp(const CVect3 &a, const CVect3 &b, const CVect3 &c, const CVect3 &d)  // point d to plane a-b-c, https://www.docin.com/p-2324716540.html
+{
+	CVect3 ABC=-inv(CMat3(a,b,c))*One31, ab=b-a, ac=c-a;
+	return inv(CMat3(ab,ac,ABC))*CVect3(dot(d,ab),dot(d,ac),-1);
+}
+
+CVect3 tp2att(const CVect3 &a, const CVect3 &b, const CVect3 &c)  // a-b-c in couter-clockwise
+{
+	CVect3 d=fopp(a, b, c);
+	CVect3 att = dv2att(c-d,a-d, CVect3(1,0,0),CVect3(0,1,0));  // Att of c-d-a(x-o-y)
+	CVect3 vo = fopp(a, b, c, O31);  // orthocenter
+//	CVect3 vo = (a+b+c)/3.0;  // center of gravity
+	double afa=asin(sinAng(vo, b, a));
+	return q2att(a2qua(att)*a2qua(CVect3(0,0,afa)));  // Att of *-fop-a(x-o-y)
 }
 
 CVect3 attract(const CVect3 &v, const CVect3 &th, const CVect3 &center)
@@ -822,6 +932,14 @@ CVect3 vn2att(const CVect3 &vn)
     return CVect3(atan2(vn.k, vel), 0, atan2(-vn.i, vn.j));
 }
 
+CVect3 atss(CVect3 &att, CVect3 &vn)
+{
+	CVect3 att1 = vn2att(vn);
+	CVect3 as(att1.i-att.i, 0.0, att1.k-att.k);
+	if(as.k>PI) as.k-=_2PI; else if(as.k<-PI) as.k+=_2PI;
+	return as;
+}
+
 CMat3 operator-(const CMat3 &m)
 {
 	return CMat3(-m.e00,-m.e01,-m.e02,-m.e10,-m.e11,-m.e12,-m.e20,-m.e21,-m.e22);
@@ -926,6 +1044,12 @@ CMat3 Rot(double angle, char axis)
 	if(axis=='x'||axis=='X')		return CMat3(1,  0, 0,   0, c, -s,   0, s, c);
 	else if(axis=='y'||axis=='Y')	return CMat3(c,  0, s,   0, 1,  0,  -s, 0, c);
 	else							return CMat3(c, -s, 0,   s, c,  0,   0, 0, 1);
+}
+
+CVect3 rotz(const CVect3 &v, double angle)
+{
+	double s=sin(angle), c=cos(angle);
+	return CVect3(v.i*c-v.j*s, v.i*s+v.j*c, v.k);
 }
 
 CMat3 rcijk(const CMat3 &m, int ijk)
@@ -1143,6 +1267,53 @@ void Kpn2Ka2(const CVect3 &Kap, const CVect3 &Kan, CVect3 &Ka1, CVect3 &Ka2)
 	Ka2 = (dotdiv(Kap,Ka1)-One31)*(1/G0);
 }
 
+void KgMdf(CMat3 &Kg, const double *dKg, int typ)
+{
+//	CMat3 IdKG = I33-(~(*(CMat3*)&FBXk.dd[12]));
+//	sins.imu.Kg = IdKG*sins.imu.Kg;			// dKG
+	CMat3 Cbg0, Cbg; CVect3 Sfg0, Sfg;
+	if(typ) Cbg0 = Ka2Cba(Kg, Sfg0);
+	double de00=1.0-dKg[0], de11=1.0-dKg[4], de22=1.0-dKg[8], e00, e01, e02, e10, e11, e12;
+	   e00 =  de00  *Kg.e00 - dKg[3]*Kg.e10 - dKg[6]*Kg.e20;
+	   e01 =  de00  *Kg.e01 - dKg[3]*Kg.e11 - dKg[6]*Kg.e21;
+	   e02 =  de00  *Kg.e02 - dKg[3]*Kg.e12 - dKg[6]*Kg.e22;
+	   e10 = -dKg[1]*Kg.e00 + de11  *Kg.e10 - dKg[7]*Kg.e20;
+	   e11 = -dKg[1]*Kg.e01 + de11  *Kg.e11 - dKg[7]*Kg.e21;
+	   e12 = -dKg[1]*Kg.e02 + de11  *Kg.e12 - dKg[7]*Kg.e22;
+	Kg.e20 = -dKg[2]*Kg.e00 - dKg[5]*Kg.e10 + de22  *Kg.e20;
+	Kg.e21 = -dKg[2]*Kg.e01 - dKg[5]*Kg.e11 + de22  *Kg.e21;
+	Kg.e22 = -dKg[2]*Kg.e02 - dKg[5]*Kg.e12 + de22  *Kg.e22;
+	Kg.e00=e00, Kg.e01=e01, Kg.e02=e02, Kg.e10=e10, Kg.e11=e11, Kg.e12=e12;
+	if(typ) {  // bad
+		Cbg = Ka2Cba(Kg, Sfg);
+		Kg = typ==1 ? Cba2Ka(Cbg, Sfg0) : Cba2Ka(Cbg0, Sfg);
+	}
+}
+
+void KaMdf(CMat3 &Ka, const double *dKa, int typ)
+{
+//	CMat3 IdKA(1.0-FBXk.dd[21],            0.0,           0.0,
+//			      -FBXk.dd[22],1.0-FBXk.dd[24],           0.0,
+//				  -FBXk.dd[23],   -FBXk.dd[25],1.0-FBXk.dd[26]);
+//	sins.imu.Ka = IdKA*sins.imu.Ka;			// dKA
+	CMat3 Cba0, Cba; CVect3 Sfa0, Sfa;
+	if(typ) Cba0 = Ka2Cba(Ka, Sfa0);
+	double de00=1.0-dKa[0], de11=1.0-dKa[3], de22=1.0-dKa[5];
+	Ka.e20 = -dKa[2]*Ka.e00 - dKa[4]*Ka.e10 + de22  *Ka.e20;
+	Ka.e21 = -dKa[2]*Ka.e01 - dKa[4]*Ka.e11 + de22  *Ka.e21;
+	Ka.e22 = -dKa[2]*Ka.e02 - dKa[4]*Ka.e12 + de22  *Ka.e22;
+	Ka.e10 = -dKa[1]*Ka.e00 + de11  *Ka.e10;
+	Ka.e11 = -dKa[1]*Ka.e01 + de11  *Ka.e11;
+	Ka.e12 = -dKa[1]*Ka.e02 + de11  *Ka.e12;
+	Ka.e00 =  de00  *Ka.e00;
+	Ka.e01 =  de00  *Ka.e01;
+	Ka.e02 =  de00  *Ka.e02;
+	if(typ) {
+		Cba = Ka2Cba(Ka, Sfa);
+		Ka = typ==1 ? Cba2Ka(Cba, Sfa0) : Cba2Ka(Cba0, Sfa);
+	}
+}
+
 CMat3 adj(const CMat3 &m)
 {
 	CMat3 mtmp;
@@ -1173,6 +1344,11 @@ CVect3 diag(const CMat3 &m)
 CMat3 diag(const CVect3 &v)
 {
 	return CMat3(v.i,0,0, 0,v.j,0, 0,0,v.k);
+}
+
+CMat3 diag(double ii, double jj, double kk)
+{
+	return CMat3(ii,0,0, 0,jj,0, 0,0,kk);
 }
 
 CMat3 askew(const CMat3 &m, int I)
@@ -1261,15 +1437,15 @@ CMat3 sfoam(const CMat3 &B, int iter)
 //***************************  class CMat  *********************************/
 CMat::CMat(void)
 {
-#ifdef MAT_COUNT_STATISTIC
-	#pragma message("  MAT_COUNT_STATISTIC")
+#ifdef PSINS_MAT_COUNT
+	#pragma message("  PSINS_MAT_COUNT")
 	if(iMax<++iCount) iMax = iCount;
 #endif
 }
 	
 CMat::CMat(int row0, int clm0)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	if(iMax<++iCount) iMax = iCount;
 #endif
 	row=row0; clm=clm0; rc=row*clm;
@@ -1277,7 +1453,7 @@ CMat::CMat(int row0, int clm0)
 
 CMat::CMat(int row0, int clm0, double f)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	if(iMax<++iCount) iMax = iCount;
 #endif
 	row=row0; clm=clm0; rc=row*clm;
@@ -1286,7 +1462,7 @@ CMat::CMat(int row0, int clm0, double f)
 
 CMat::CMat(int row0, int clm0, double f, double f1, ...)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	if(iMax<++iCount) iMax = iCount;
 #endif
 	row=row0; clm=clm0; rc=row*clm;
@@ -1299,14 +1475,27 @@ CMat::CMat(int row0, int clm0, double f, double f1, ...)
 
 CMat::CMat(int row0, int clm0, const double *pf)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	if(iMax<++iCount) iMax = iCount;
 #endif
 	row=row0; clm=clm0; rc=row*clm;
 	memcpy(dd, pf, rc*sizeof(double));
 }
 
-#ifdef MAT_COUNT_STATISTIC
+CMat::CMat(int clm0, const CVect *pv, ...)
+{
+//	this->CMat(pv->row, clm0);
+	row=pv->row; clm=clm0; rc=row*clm;
+	va_list vl;
+	va_start(vl, pv);
+	for(int i=0; i<clm; i++) {
+		SetClm(i, *pv);
+		pv = va_arg(vl, const CVect*);
+	}
+	va_end(vl);
+}
+
+#ifdef PSINS_MAT_COUNT
 int CMat::iCount=0, CMat::iMax=0;
 CMat::~CMat(void)
 {
@@ -1326,16 +1515,16 @@ void CMat::Clear(void)
 
 CMat CMat::operator*(const CMat &m0) const
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++iCount;
 #endif
 	psinsassert(this->clm==m0.row);
 	CMat mtmp(this->row,m0.clm);
 	int m=this->row, k=this->clm, n=m0.clm;
 	double *p=mtmp.dd; const double *p1i=this->dd, *p2=m0.dd;
-	for(register int i=0; i<m; i++,p1i+=k)
+	for(int i=0; i<m; i++,p1i+=k)
 	{
-		for(register int j=0; j<n; j++)
+		for(int j=0; j<n; j++)
 		{
 			double f=0.0; const double *p1is=p1i, *p1isEnd=&p1i[k], *p2sj=&p2[j];
 			for(; p1is<p1isEnd; p1is++,p2sj+=n)
@@ -1349,7 +1538,7 @@ CMat CMat::operator*(const CMat &m0) const
 
 CMat CMat::operator*(const CMat3 &m0) const
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++iCount;
 #endif
 	psinsassert(this->clm==3);
@@ -1374,7 +1563,7 @@ CVect CMat::operator*(const CVect &v) const
 
 CMat CMat::operator+(const CMat &m0) const
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++iCount;
 #endif
 	psinsassert(row==m0.row&&clm==m0.clm);
@@ -1396,7 +1585,7 @@ CMat& CMat::operator+=(const CVect &v)
 
 CMat CMat::operator-(const CMat &m0) const
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++iCount;
 #endif
 	psinsassert(row==m0.row&&clm==m0.clm);
@@ -1409,7 +1598,7 @@ CMat CMat::operator-(const CMat &m0) const
 
 CMat CMat::operator*(double f) const
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++iCount;
 #endif
 	CMat mtmp(row,clm);
@@ -1461,13 +1650,13 @@ CMat& CMat::operator++()
 
 CMat operator~(const CMat &m0)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++CMat::iCount;
 #endif
 	CMat mtmp(m0.clm,m0.row);
 	const double *pm=m0.dd;
-	for(register int i=0; i<m0.row; i++)
-	{ for(register int j=i; j<m0.rc; j+=m0.row) mtmp.dd[j] = *pm++; }
+	for(int i=0; i<m0.row; i++)
+	{ for(int j=i; j<m0.rc; j+=m0.row) mtmp.dd[j] = *pm++; }
 	return mtmp;
 }
 
@@ -1677,12 +1866,46 @@ CVect CMat::GetRow(int i) const
 	return v;
 }
 
+void CMat::GetRow(CVect &v, int i)
+{
+	v.row=1, v.clm=v.rc=clm;
+	const double *p1=&dd[i*clm], *pEnd=p1+clm;
+	for(double *p=v.dd; p1<pEnd; p++,p1++) *p = *p1;
+}
+
 CVect CMat::GetClm(int j) const
 {
 	CVect v(row, 1);
 	const double *p1=&dd[j], *pEnd=&dd[rc];
 	for(double *p=v.dd; p1<pEnd; p++,p1+=clm) *p = *p1;
 	return v;
+}
+
+CMat CMat::GetClm(int j1, int j2, ...) const
+{
+	va_list vl;
+	va_start(vl, j1); int j=j1, n;
+	for(n=0; n<MMD; n++) { 
+		if(j<0) break;  j=va_arg(vl, int);
+	}
+	va_end(vl);
+	//
+	CMat m(row, n);
+	va_start(vl, j1); j=j1;
+	for(int i=0; i<n; i++) {
+		const double *p1=&dd[j], *pEnd=&dd[rc];
+		for(double *p=&m.dd[i]; p1<pEnd; p+=n,p1+=clm) *p = *p1;
+		j=va_arg(vl, int);
+	}
+	va_end(vl);
+	return m;
+}
+
+void CMat::GetClm(CVect &v, int j)
+{
+	v.row=v.rc=row, v.clm=1;
+	const double *p1=&dd[j], *pEnd=&dd[rc];
+	for(double *p=v.dd; p1<pEnd; p++,p1+=clm) *p = *p1;
 }
 
 void CMat::ZeroRow(int i)
@@ -1759,7 +1982,7 @@ CMat inv4(const CMat &m)
 	double A22=m.dd[15], iA22;
 	iA11 = inv(A11);  iA22 = 1.0/(A22-dot(A21*iA11,A12));
 	CMat M(4,4);
-	M.SetMat3(0,0, iA11+iA11*A12*iA22*A21*iA11);  // by using matrix-inversion-lemma
+	M.SetMat3(0,0, iA11+vxv(iA11*A12*iA22,A21)*iA11);  // by using matrix-inversion-lemma
 	M.SetClmVect3(0,3, -iA11*A12*iA22);
 	M.SetRowVect3(3,0, -iA22*A21*iA11);
 	M.dd[15]=iA22;
@@ -1820,7 +2043,7 @@ void RowMulT(CMat &m, const CMat &m0, const CMat &m1, int r, int fast)
 
 CMat diag(const CVect &v)
 {
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	++CMat::iCount;
 #endif
 	int rc = v.row>v.clm ? v.row : v.clm, rc1=rc+1;
@@ -1860,7 +2083,7 @@ CVect::CVect(int row0, int clm0)
 CVect::CVect(int row0, double f)
 {
 	row=row0; clm=1; rc=row*clm;
-	for(register int i=0;i<row;i++) dd[i]=f;
+	for(int i=0;i<row;i++) dd[i]=f;
 }
 
 CVect::CVect(int row0, const double *pf)
@@ -1876,7 +2099,7 @@ CVect::CVect(int row0, double f, double f1, ...)
 	dd[0] = f;
 	va_list vl;
 	va_start(vl, f1);
-	for(register int i=1, rc=row>clm?row:clm; i<rc; i++)
+	for(int i=1, rc=row>clm?row:clm; i<rc; i++)
 	{ if(f>2*INF) break;  dd[i] = f1;  f1 = va_arg(vl, double);	}
 	va_end(vl);
 }
@@ -1896,7 +2119,7 @@ CVect::CVect(const CVect3 &v1, const CVect3 v2)
 
 void CVect::Clear(void)
 {
-	for(register int i=0;i<rc;i++) dd[i]=0.0;
+	for(int i=0;i<rc;i++) dd[i]=0.0;
 }
 
 void CVect::Reset(int row0, int clm0)
@@ -1944,7 +2167,7 @@ CMat CVect::operator*(const CVect &v) const
 	if(row==1 && v.clm==1)  // (1x1) = (1xn)*(nx1)
 	{
 		double f = 0.0;
-		for(register int i=0; i<clm; i++)  f += dd[i]*v.dd[i];
+		for(int i=0; i<clm; i++)  f += dd[i]*v.dd[i];
 		mtmp.dd[0] = f;
 	}
 	else    // (nxn) = (nx1)*(1xn)
@@ -2048,7 +2271,7 @@ CVect pow(const CVect &v, int k)
 {
 	CVect pp = v;
 	double *p, *pEnd=&pp.dd[pp.rc];
-	for(register int i=1; i<k; i++)
+	for(int i=1; i<k; i++)
 	{
 		p=pp.dd;
 		for(const double *p1=v.dd; p<pEnd; p++,p1++)
@@ -2122,15 +2345,20 @@ void CVect::SetAscend(double f0, double df)
 
 void CVect::SetBit(unsigned int bit, double f)
 {
-	for(register int i=0; i<rc; i++)		// assert(rc<32)
+	for(int i=0; i<rc; i++)		// assert(rc<32)
 		if(bit&(0x01<<i)) dd[i]=f;
 }
 
 void CVect::SetBit(unsigned int bit, const CVect3 &v)
 {
 	const double *p=&v.i;
-	for(register int i=0; i<rc; i++)		// assert(rc<32)
+	for(int i=0; i<rc; i++)		// assert(rc<32)
 		if(bit&(0x01<<i)) { dd[i]=*p++;  if(p>&v.k) p=&v.i; }
+}
+
+void CVect::Seti2j(int i, int j, double val)
+{
+	for(double *p=&dd[i], *pEnd=&dd[mmin(j,MMD-1)]; p<=pEnd; p++) *p = val;
 }
 
 CVect3 CVect::GetVect3(int i) const
@@ -2284,7 +2512,7 @@ double CIIR::Update(double x0)
 //	a(1)*y(n) = b(1)*x(n) + b(2)*x(n-1) + ... + b(nb+1)*x(n-nb)
 //                        - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
 	double y0 = 0.0;
-	for(register int i=n-1; i>0; i--)
+	for(int i=n-1; i>0; i--)
 	{
 		x[i] = x[i-1]; y[i] = y[i-1];
 		y0 += b[i]*x[i] - a[i]*y[i];
@@ -2439,7 +2667,7 @@ BOOL CVARn::Update(const double *pf)
 	if (!pData[0])  return FALSE;
 	if (++rowcnt > row) rowcnt = row;
 	int idxnext = (idxpush >= row - 1) ? 0 : idxpush + 1;
-	for(register int i = 0; i < clm; i++)
+	for(int i = 0; i < clm; i++)
 	{
 		double f=*pf++;  if(f>1e5) f=1e5; else if(f<-1e5) f=-1e5;
 		pData[i][idxpush] = f;
@@ -2808,7 +3036,7 @@ void CKalman::SetMeasMask(unsigned int mask, int type)
 
 void CKalman::SetMeasStop(unsigned int meas, double stop)
 {
-	for(register int i=0; i<measstop.rc; i++)  {	// assert(rc<32)
+	for(int i=0; i<measstop.rc; i++)  {	// assert(rc<32)
 		if( meas&(0x01<<i) && (measstop.dd[i]<stop||stop<=0.0) ) measstop.dd[i]=stop;
 	}
 //	measstop.SetBit(meas, stop);
@@ -2999,10 +3227,11 @@ void CKalman::Feedback(int nnq, double fbts)
 
 void CKalman::FeedbackAll(void)
 {
-	CVect oldFB=FBTau, oldFBOne=FBOne;
-	FBTau = 0.0;  FBOne = INF;
+	CVect oldFB=FBTau, oldFBOne=FBOne, oldFBMax=FBMax;
+	FBTau = 0.0;  FBOne = INF;  FBMax = INF;
 	Feedback(nq, 1.0);
-	FBTau = oldFB;  FBOne = oldFBOne;
+	FBTau = oldFB;  FBOne = oldFBOne;  FBMax = oldFBMax;
+	measflag = 0;
 }
 
 void CKalman::RtFading(int i, double fdts)
@@ -3067,7 +3296,7 @@ void CSINSTDKF::Init(const CSINS &sins0)
 {
 	sins = sins0;  kftk = sins.tk;
 	Fk = eye(nq);  Pk1 = CMat(nq,nq, 0.0);
-	Pxz = Qk = Kk = tmeas = CVect(nr, 0.0);
+	Pxz = Qk = Kk = tmeas = CVect(nq, 0.0);
 	meantdts = 1.0; tdts = 0.0;
 	maxStep = 2*(nq+nr)+3;
 	TDReset();
@@ -3107,7 +3336,8 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 	tdStep = nStep;
 
 	tdts += sins.nts; kftk = sins.tk;  kfcount++;
-	meanfn = meanfn+sins.fn; ifn++;
+//	meanfn = meanfn+sins.fn; ifn++;
+	VADDE(meanfn, sins.fn); ifn++;
 	for(int i=0; i<nStep; i++)
 	{
 		if(iter==-2)			// -2: set measurements
@@ -3133,7 +3363,11 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 				Pxz.dd[jj] = f;  // Pxz just for store data
 			}
 			for(jj=0; jj<cststt; jj++)  Xk.dd[jj] = Pxz.dd[jj];
+#ifndef PSINS_FAST_CALCULATION
 			Qk = Qt*tdts;
+#else
+			mul(Qk, Qt, tdts);
+#endif
 //			RtFading(tdts);
 			meantdts = tdts; tdts = 0.0;
 		}
@@ -3158,14 +3392,18 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 //				if((iter-2*Ft.row)%2==0)
 				if(iter%2==0)
 				{
-					Hi = Hk.GetRow(row);  int hi=hi1[row];
+					Hk.GetRow(Hi, row);  int hi=hi1[row];
 					if(hi>=0) {
-						Pxz = Pk.GetClm(hi);
+						Pk.GetClm(Pxz, hi);
 						Pz0 = Pxz.dd[hi];
 						innovation = Zk.dd[row]-Xk.dd[hi];  Zk_1.dd[row] = Zk.dd[row];
 					}
 					else {
+#ifndef PSINS_FAST_CALCULATION
 						Pxz = Pk*(~Hi);
+#else
+						mul(Pxz, Pk, Hi);
+#endif
 						Pz0 = dot(Hi,Pxz);
 						innovation = Zk.dd[row]-dot(Hi,Xk);  Zk_1.dd[row] = Zk.dd[row];
 					}
@@ -3184,11 +3422,17 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 						if(Rb.dd[row]>0.0 && Rstop.dd[row]<=0.0) {
 							adptOKi=RAdaptive(row, innovation, Pz0);
 						}
+						if(row==5)
+							int a=1;
 						if(Rset.dd[row]>0.0) {
 							Rt.dd[row]=Rset.dd[row];  Rset.dd[row]=-1.0;  adptOKi=1;
 						}
 						double Pzz = Pz0 + Rt.dd[row]/rts.dd[row];
+#ifndef PSINS_FAST_CALCULATION
 						Kk = Pxz*(1.0/Pzz);
+#else
+						mul(Kk, Pxz, (1.0/Pzz));
+#endif
 					}
 					else
 					{
@@ -3201,10 +3445,22 @@ int CSINSTDKF::TDUpdate(const CVect3 *pwm, const CVect3 *pvm, int nSamples, doub
 					if(adptOKi && measstop.dd[row]<EPS)
 					{
 						measRes |= flag;
+#ifndef PSINS_FAST_CALCULATION
 						Pk -= Kk*(~Pxz);
+#else
+						double *pPk=Pk.dd, *pKk=Kk.dd, *pKkEnd=&Kk.dd[Kk.row], *pPxzEnd=&Pxz.dd[Pxz.row];
+						for(; pKk<pKkEnd; pKk++) {
+							for(double *pPxz=Pxz.dd; pPxz<pPxzEnd; pPxz++)
+								*pPk++ -= *pKk * *pPxz;
+						}
+#endif
 						if(flag&030) Kk.dd[2]*=Kkp2y;  // disable pos2yaw
 						else if(flag&003) Kk.dd[2]*=Kkv2y;
+#ifndef PSINS_FAST_CALCULATION
 						Xk += Kk*innovation;
+#else
+						for(double *pXk=Xk.dd,*pXkEnd=&Xk.dd[Xk.row],*pKk1=Kk.dd; pXk<pXkEnd; pXk++,pKk1++) *pXk += *pKk1 * innovation;
+#endif
 						measlost.dd[row] = 0.0;
 					}
 					if(Zfd0.dd[row]<INFp5)
@@ -3395,12 +3651,21 @@ void CSINSGNSS::SetFt(int nnq)
 		Ft.SetMat3(0,19, Cwz);				// 19-21 dKG*z
 	}
 	else if(nnq>=28) {
+#ifndef PSINS_FAST_CALCULATION
 		CMat3 Cwx=-sins.wib.i*sins.Cnb, Cwy=-sins.wib.j*sins.Cnb, Cwz=-sins.wib.k*sins.Cnb; 
+#else
+		double wi=-sins.wib.i, wj=-sins.wib.j, wk=-sins.wib.k;
+		CMat3 Cwx, Cwy, Cwz; MMULf(Cwx,sins.Cnb,wi); MMULf(Cwy,sins.Cnb,wj); MMULf(Cwz,sins.Cnb,wk);
+#endif
 //		Ft.SetMat3(0,19, Cwx);  Ft.SetMat3(0,22, Cwy);  Ft.SetMat3(0,25, Cwz);  // 19-27 dKG
 		Ft.SetMat3(0,19, Cwx, Cwy, Cwz);  // 19-27 dKG
 	}
 	if(nnq>=34) {
+#ifndef PSINS_FAST_CALCULATION
 		CMat3 Cfx= sins.fb.i *sins.Cnb, Cfy= sins.fb.j *sins.Cnb, Cfz= sins.fb.k *sins.Cnb;
+#else
+		CMat3 Cfx, Cfy, Cfz; MMULf(Cfx,sins.Cnb,sins.fb.i); MMULf(Cfy,sins.Cnb,sins.fb.j); MMULf(Cfz,sins.Cnb,sins.fb.k);
+#endif
 		Cfz.e00=Cfy.e01,	Cfz.e01=Cfy.e02; 
 		Cfz.e10=Cfy.e11,	Cfz.e11=Cfy.e12; 
 		Cfz.e20=Cfy.e21,	Cfz.e21=Cfy.e22;
@@ -3528,71 +3793,152 @@ void CSINSGNSS::operator<<(CFileRdWt &f)
 		<<sins.vnL<<sins.posL<<lvGNSS   // 16-24
 		<<dtGNSSdelay<<dyawGNSS <<kftk; // 25-27
 }
+
+void CSINSGNSS::LogXk(void)
+{
+	psinslog.MArray("phi", &Xk.dd[0], 3, 1, 1/glv.min, "arcmin");
+	psinslog.MArray("dVn", &Xk.dd[3], 3, 1, 1.0, "m/s");
+	CVect3 dpos=*(CVect3*)&Xk.dd[6]; dpos.i*=sins.eth.RMh, dpos.j*=sins.eth.clRNh;
+	psinslog.MArray("dPos", &dpos.i, 3, 1, 1.0, "m");
+	psinslog.MArray("eb", &Xk.dd[9], 3, 1, 1/glv.dph, "dph");
+	psinslog.MArray("db", &Xk.dd[12], 3, 1, 1/glv.ug, "ug");
+	if(nq==16) {
+		psinslog.MArray("dKGzz", &Xk.dd[15], 1, 1, 1/glv.ppm, "ppm");
+	}
+	if(nq>=18) {
+		psinslog.MArray("Lvr", &Xk.dd[15], 3, 1, 100, "cm");
+	}
+	if(nq>=19) {
+		psinslog.MArray("dt", &Xk.dd[18], 1, 1, 1000, "ms");
+	}
+	if(nq==20) {
+		psinslog.MArray("dKGzz", &Xk.dd[19], 1, 1, 1/glv.ppm, "ppm");
+	}
+	else if(nq==22) {
+		CVect3 dKGz=*(CVect3*)&Xk.dd[19]; dKGz.i*=1/glv.sec,dKGz.j*=1/glv.sec,dKGz.k*=1/glv.ppm;
+		psinslog.MArray("dKG*z", &Xk.dd[19], 3, 1, 1, "arcsec|ppm");
+	}
+	else if(nq>=28) {
+		CMat3 dKG = ~(*(CMat3*)&Xk.dd[19]);
+		dKG.e00*=1/glv.ppm*glv.sec, dKG.e11*=1/glv.ppm*glv.sec, dKG.e22*=1/glv.ppm*glv.sec;
+		psinslog.MArray("dKG", &dKG.e00, 3, 3, 1/glv.sec, "arcsec|ppm");
+	}
+	if(nq>=34) {
+		CMat3 dKA(Xk.dd[28], 0.0,       0.0,
+			      Xk.dd[29], Xk.dd[31], 0.0,
+				  Xk.dd[30], Xk.dd[32], Xk.dd[33]);
+		dKA.e00*=1/glv.ppm*glv.sec, dKA.e11*=1/glv.ppm*glv.sec, dKA.e22*=1/glv.ppm*glv.sec;
+		psinslog.MArray("dKA", &dKA.e00, 3, 3, 1/glv.sec, "arcsec|ppm");
+	}
+}
 #endif
 
 //***************************  class CSysClbt  *********************************/
-CSysClbt::CSysClbt(const CVect3 &pos0, double g00):CSINSTDKF(37, 3)
+CSysClbt::CSysClbt(const CVect3 &pos0, double g00, int ka2pn):CSINSTDKF(39, 3)
 {
 	iter = 0;
 	wibStatic = 0.1*DPS;
 	Hk.SetMat3(0, 3, I33);  hi1[0]=3,hi1[1]=4,hi1[2]=5;
 	SetMeasMask(07);
 	this->pos0 = pos0;
+	ka2ORpn = ka2pn;
 	Init(g00);
 }
 
-void CSysClbt::Init(double g00, const CMat3 &Cba0, const CVect3 &Sfg0, const CVect3 &Sfa0)
+void CSysClbt::Init(double g00)
 {
 	CSINSTDKF::Init(CSINS(0.0));  sins.mvnT = 0.2;
-	sins.imu.SetSf(Sfg0, Sfa0);  sins.imu.SetCba(Cba0);  sins.imu.SetKa2(O31);
-	sins.isOpenloop = 1;  gn = CVect3(0,0,-g00);  sins.eth.pgn = &gn;  sins.eth.Update(pos0);
+	sins.isOpenloop = 1;
+	sins.eth.Update(pos0);	gn = g00>9.0 ? CVect3(0,0,-g00) : sins.eth.gn;  sins.eth.pgn = &gn;
+	sins.imu.SetKga();
+	ka2ORpn ? sins.imu.SetKa2() : sins.imu.SetKapn();
+	sins.imu.SetCba();
+	sins.imu.SetLvtGA();
 	// KF para
-	Pmin.Set2(fPHI(0.01,0.1),  fXXX(0.0001),  fDPH3(0.0001),  fUG3(1.0),
-		fdKGA15(1.0,1.0,1.0,1.0), fdKa23(0), fInLv6(0.001), 0.00001);
-	Pk.SetDiag2(fPHI(10,60),  fXXX(0.1),  fDPH3(0.1),  fUG3(100.0),
-		fdKGA15(10000.0,3600.0,10000.0,3600.0), fdKa23(0), fInLv6(1), 0.001);
-	Qt.Set2(fDPSH3(0.001), fUGPSHZ3(1.0), fOO6,  fOO9,fOO6,  fOOO,fOO6,0.0);
+	Pmin.Set2(fPHI(0.01,0.1),  fdVEL(0.0001),  fDPH3(0.0001),  fUG3(1.0),
+		fdKGA15(1.0,1.0,1.0,1.0), fdKapn3(0), fInLv6(0.001), 0.00001, 0.0, 0.0);
+	Pk.SetDiag2(fPHI(10,60),  fdVEL(0.1),  fDPH3(0.1),  fUG3(100.0),
+		fdKGA15(10000.0,3600.0,10000.0,3600.0), fdKapn3(0), fInLv6(1), 0.001, 10*glv.ugpg2,10*glv.ugpg2);
+	Qt.Set2(fDPSH3(0.001), fUGPSHZ3(1.0), fOO6,  fOO9,fOO6,  fOOO,fOO6,0.0, 0.0, 0.0);
 	Rt.Set2(fXXZ(0.01,0.01));
+	FBMax.Set(fPHI(60,60),  fdVEL(1000.0),  fDPH3(1.0),  fMG3(10.0),
+		fdKGA15(10000.0,3600.0,10000.0,3600.0), fdKapn3(100), fInLv6(20), 0.01, 100*glv.ugpg2,100*glv.ugpg2);
+	if(ka2ORpn==1) {
+		Pmin.Set2Vect3(27, CVect3(fdKa23(0)));
+		Pk.SetMat3(27, 27, pow(diag(fdKa23(100)),2));
+		FBMax.SetVect3(27, CVect3(fdKa23(100)));
+	}
 	FBTau = 1.0;
+//Pk.SetDiag2(fPHI(1,6),  fdVEL(0.1),  fDPH3(0.01),  fUG3(100.0),
+//	fdKGA15(00.0, 60.0,100.0,60.0), fdKapn3(100), fInLv6(0.1), 0.001, 10*glv.ugpg2, 10*glv.ugpg2);
+//Pmin.Set2(fPHI(0.01,0.1),  fdVEL(0.0001),  fDPH3(0.0001),  fUG3(1.0),
+//	fdKGA15(0.0, 1.0,1.0,1.0), fdKapn3(0), fInLv6(0.001), 0.00001, 0.0, 0.0);
+//FBTau(12)=FBTau(16)=FBTau(20)=INF;
+//FBTau = INF;
+FBTau(37)=FBTau(38) = INF;
+
 }
 
 void CSysClbt::NextIter(void)
 {
 	sins.qnb = a2qua(att0);  sins.vn = O31;  sins.pos = pos0;
 	TDReset();  sins.imu.Reset();
+	FBTotal = 0.0;
 	if(iter==1) {
-		Pk.SetDiag2(fPHI(1,16),  fXXX(0.1),  fDPH3(0.02),  fUG3(100.0),
-			fdKGA15(1000.0,600.0,1000.0,600.0), fdKa23(10), fInLv6(10), 0.01);
+		Pk.SetDiag2(fPHI(1,16),  fdVEL(0.1),  fDPH3(0.02),  fUG3(100.0),
+			fdKGA15(1000.0,600.0,1000.0,600.0), fdKapn3(10), fInLv6(10), 0.01, 10*glv.ugpg2, 10*glv.ugpg2);
+		if(ka2ORpn==1) Pk.SetMat3(27, 27, pow(diag(fdKa23(10)),2));
 	}
 	else if(iter>=2) {
-		FBTau = INF;
-		Pk.SetDiag2(fPHI(1,6),  fXXX(0.1),  fDPH3(0.01),  fUG3(100.0),
-			fdKGA15(100.0,60.0,100.0,60.0), fdKa23(100), fInLv6(0.1), 0.001);
+		FBMax = FBTau = INF;
+		Pk.SetDiag2(fPHI(1,6),  fdVEL(0.1),  fDPH3(0.01),  fUG3(100.0),
+			fdKGA15(100.0,60.0,100.0,60.0), fdKapn3(100), fInLv6(0.1), 0.001, 10*glv.ugpg2, 10*glv.ugpg2);
+		if(ka2ORpn==1) Pk.SetMat3(27, 27, pow(diag(fdKa23(100)),2));
 	}
+//Pk.SetDiag2(fPHI(1,6),  fdVEL(0.1),  fDPH3(0.01),  fUG3(100.0),
+//	fdKGA15(00.0, 60.0,100.0,60.0), fdKapn3(100), fInLv6(0.1), 0.001, 10*glv.ugpg2, 10*glv.ugpg2);
+//Pmin.Set2(fPHI(0.01,0.1),  fdVEL(0.0001),  fDPH3(0.0001),  fUG3(1.0),
+//	fdKGA15(0.0, 1.0,1.0,1.0), fdKapn3(0), fInLv6(0.001), 0.00001, 0.0, 0.0);
+//FBTau(12)=FBTau(16)=FBTau(20)=INF;
+//FBTau = INF;
+FBTau(37)=FBTau(38) = INF;
+
 	iter++;
 }
 
 void CSysClbt::SetFt(int nnq)
 {
-    CMat3 CDf2 = sins.Cnb*diag(pow(sins.fb,2));
+	CVect3 fa=sins.fb*sins.imu.Cba; CMat3 Cna=sins.Cnb*sins.imu.iTCba;
+	CMat3 CDf2 = sins.imu.pKa2 ? Cna*diag(pow(fa,2)) : Cna*diag(abs(fa));
+//    CMat3 CDf2 = sins.imu.pKa2 ? sins.Cnb*diag(pow(sins.fb,2)) : sins.Cnb*diag(abs(sins.fb));
 	CVect3 CwXf = sins.Cnb*(sins.wib*sins.fb);
 	CMat3 Cfx = sins.fb.i*sins.Cnb, Cfy = sins.fb.j*sins.Cnb, Cfz = sins.fb.k*sins.Cnb;
 	Cfz.e00=Cfy.e01,	Cfz.e01=Cfy.e02; 
 	Cfz.e10=Cfy.e11,	Cfz.e11=Cfy.e12; 
 	Cfz.e20=Cfy.e21,	Cfz.e21=Cfy.e22;
-    //        0  3   6  9   12       15       18       21       24        26       27   30 33 36    
-    //states: fi dvn eb db  dKg(:,1) dKg(:,2) dKg(:,3) dKa(:,1) dKa(yz,2) dKa(z,3) dKa2 ry rz tGA
+    //        0  3   6  9   12       15       18       21       24        26       27   30 33 36   37 38
+    //states: fi dvn eb db  dKg(:,1) dKg(:,2) dKg(:,3) dKa(:,1) dKa(yz,2) dKa(z,3) dKa2 ry rz tGA  io ip
 	Ft.SetMat3(0,0, -askew(sins.eth.wnie));	Ft.SetMat3(0,6, -sins.Cnb); 
 	Ft.SetMat3(0,12, -sins.wib.i*sins.Cnb, -sins.wib.j*sins.Cnb, -sins.wib.k*sins.Cnb);
 	Ft.SetMat3(3,0, askew(sins.fn)), Ft.SetMat3(3,9, sins.Cnb); 
 	Ft.SetMat3(3,21, Cfx, Cfz, CDf2); 
 	Ft.SetMat3(3,30, sins.Cnb*sins.imu.SSy, sins.Cnb*sins.imu.SSz);  Ft.SetClmVect3(3,36, CwXf);
+
+	CVect3 vi = sins.imu.Cba.GetClm(2);
+	CVect3 vo = CVect3(vi.j, -vi.i, 0);  normlize(&vo);
+	CVect3 vp = vi*vo;
+	double fi=dot(vi,sins.fb), fo=dot(vo,sins.fb), fp=dot(vp,sins.fb), fio=fi*fo, fip=fi*fp;
+	CVect3 Vio = CVect3(fio*Cna.e02,fio*Cna.e12,fio*Cna.e22);  // Cna*[0;0;dbi]
+	CVect3 Vip = CVect3(fip*Cna.e02,fip*Cna.e12,fip*Cna.e22);
+	Ft.SetClmVect3(3,37, Vio, Vip); 
+
 	cststt = 6;
 }
 
 void CSysClbt::Feedback(int nnq, double fbts)
 {
 	CKalman::Feedback(nq, fbts);
+#ifndef PSINS_FAST_CALCULATION
 	sins.qnb -= *(CVect3*)&FBXk.dd[0];  sins.vn -= *(CVect3*)&FBXk.dd[3];
 	sins.imu.eb  += *(CVect3*)&FBXk.dd[6];	sins.imu.db += *(CVect3*)&FBXk.dd[9];
 	CMat3 IdKG = I33-(~(*(CMat3*)&FBXk.dd[12]));
@@ -3601,18 +3947,30 @@ void CSysClbt::Feedback(int nnq, double fbts)
 			      -FBXk.dd[22],1.0-FBXk.dd[24],           0.0,
 				  -FBXk.dd[23],   -FBXk.dd[25],1.0-FBXk.dd[26]);
 	sins.imu.Ka = IdKA*sins.imu.Ka;			// dKA
-	sins.imu.Ka2 += *(CVect3*)&FBXk.dd[27];	// dKa2
+	if(sins.imu.pKa2) sins.imu.Ka2 += *(CVect3*)&FBXk.dd[27];  // dKa2
+	else			  sins.imu.Kapn += *(CVect3*)&FBXk.dd[27]; // dKapn
 	sins.imu.lvy += *(CVect3*)&FBXk.dd[30];	sins.imu.lvz += *(CVect3*)&FBXk.dd[33];	// Inner lever
 	sins.imu.tGA += FBXk.dd[36];	// tGA
+#else
+	qdelphi(sins.qnb, *(CVect3*)&FBXk.dd[0]);  VSUBE(sins.vn, (*(CVect3*)&FBXk.dd[3]));
+	VADDE(sins.imu.eb, (*(CVect3*)&FBXk.dd[6]));  VADDE(sins.imu.db, (*(CVect3*)&FBXk.dd[9]));
+	KgMdf(sins.imu.Kg, &FBXk.dd[12], 0);			// dKG
+	KaMdf(sins.imu.Ka, &FBXk.dd[21], 0);			// dKA
+	if(sins.imu.pKa2) { VADDE(sins.imu.Ka2, (*(CVect3*)&FBXk.dd[27])); } // dKa2
+	else			  { VADDE(sins.imu.Kapn, (*(CVect3*)&FBXk.dd[27])); }// dKapn
+	VADDE(sins.imu.lvy, (*(CVect3*)&FBXk.dd[30]));	VADDE(sins.imu.lvz, (*(CVect3*)&FBXk.dd[33]));	// Inner lever
+	sins.imu.tGA += FBXk.dd[36];	// tGA
+#endif
 }
 
-int CSysClbt::Update(const CVect3 *pwm, const CVect3 *pvm, int nn, double ts)
+int CSysClbt::Update(const CVect3 *pwm, const CVect3 *pvm, int nn, double ts, int isStatic)
 {
-	int isStatic = norm(sins.wib)<wibStatic;
+	if(isStatic==-1) isStatic=norm(sins.wib)<wibStatic;
 	int nStep = isStatic ? 2 : 40;
 	int res = TDUpdate(pwm, pvm, nn, ts, nStep);
 	if(sins.mvnk==0) {
-		*(CVect3*)&Zk.dd[0] = sins.mvn;  sins.pos = pos0;
+//		*(CVect3*)&Zk.dd[0] = sins.mvn;  sins.pos = pos0;
+		*(CVect3*)&Zk.dd[0] = sins.vn;  sins.pos = pos0;
 		if(isStatic) SetMeasFlag(07);
 	}
 	if(!isStatic) measflag=0;
@@ -3624,6 +3982,29 @@ void CSysClbt::Log(void)
 {
 	psinslog<<"Kg=["<<sins.imu.Kg<<"];\neb=["<<sins.imu.eb/glv.dph<<"]'; %dph\nKa=["<<sins.imu.Ka<<"];\ndb=["<<sins.imu.db/glv.ug<<"]'; %ug\n";
 	psinslog<<"Ka2=["<<sins.imu.Ka2/glv.ugpg2<<"]'; %ugpg2\nlvy=["<<sins.imu.lvy*100<<"]'; %cm\nlvz=["<<sins.imu.lvz*100<<"]';\ntGA="<<sins.imu.tGA*1000<<"; %ms\n";
+}
+
+void CSysClbt::LogXk(void)
+{
+	psinslog.MArray("phi", &Xk.dd[0], 3, 1, 1/glv.min, "arcmin");
+	psinslog.MArray("dVn", &Xk.dd[3], 3, 1, 1.0, "m/s");
+	psinslog.MArray("eb", &Xk.dd[6], 3, 1, 1/glv.dph, "dph");
+	psinslog.MArray("db", &Xk.dd[9], 3, 1, 1/glv.ug, "ug");
+	CMat3 dKG = ~(*(CMat3*)&Xk.dd[12]);
+	dKG.e00*=1/glv.ppm*glv.sec, dKG.e11*=1/glv.ppm*glv.sec, dKG.e22*=1/glv.ppm*glv.sec;
+	psinslog.MArray("dKG", &dKG.e00, 3, 3, 1/glv.sec, "ppm|arcsec");
+	CMat3 dKA(Xk.dd[21], 0.0,       0.0,
+			  Xk.dd[22], Xk.dd[24], 0.0,
+			  Xk.dd[23], Xk.dd[25], Xk.dd[26]);
+	dKA.e00*=1/glv.ppm*glv.sec, dKA.e11*=1/glv.ppm*glv.sec, dKA.e22*=1/glv.ppm*glv.sec;
+	psinslog.MArray("dKA", &dKA.e00, 3, 3, 1/glv.sec, "ppm|arcsec");
+	if(sins.imu.pKa2)
+		psinslog.MArray("dKa2", &Xk.dd[27], 3, 1, 1/glv.ugpg2, "ug/g^2");
+	else
+		psinslog.MArray("dKapn", &Xk.dd[27], 3, 1, 1/glv.ppm, "ppm");
+	psinslog.MArray("Lvy", &Xk.dd[30], 3, 1, 100, "cm");
+	psinslog.MArray("Lvz", &Xk.dd[33], 3, 1, 100, "cm");
+	psinslog.MArray("tGA", &Xk.dd[36], 1, 1, 1000, "ms");
 }
 #endif
 
@@ -3718,8 +4099,10 @@ void CPOS618::Forward(void)
 void CPOS618::Backward(void)
 {
 	printf("--- Backward processing & Fusion ---\n");
-	pIG=(ImuGnssData*)pmemImuGnss->get(records), pXP1 = (FXPT*)pmemFusion1->get(records);
-	for(--iter,--pIG,--pXP,--pXP1; iter>=0; iter--,pIG--,pXP--,pXP1--)
+//	pIG=(ImuGnssData*)pmemImuGnss->get(records), pXP1 = (FXPT*)pmemFusion1->get(records);
+//	for(--iter,--pIG,--pXP,--pXP1; iter>=0; iter--,pIG--,pXP--,pXP1--)
+	pIG=(ImuGnssData*)pmemImuGnss->get(-1), pXP=(FXPT*)pmemFusion->get(-1), pXP1=(FXPT*)pmemFusion1->get(-1);
+	for(--iter,pIG,pXP,pXP1; iter>=0; iter--,pIG--,pXP--,pXP1--)
 	{
 		// fusion
 		pXP1->att = sins.att; pXP1->vn = -sins.vnL; pXP1->pos = sins.posL;
@@ -3928,8 +4311,8 @@ CSINSGNSSOD::CSINSGNSSOD(void)
 CSINSGNSSOD::CSINSGNSSOD(int nq0, int nr0, double ts, int yawHkRow0):CSINSGNSS(nq0, nr0, ts, yawHkRow0)
 {
 	odmeast = 0.0;  odmeasT = 1.0;  dS0 = 0.0;  Hkv2y = 1.0;  SetDistance(0.0);
-	lvOD = vnOD = O31;  ODKappa(CVect3(0,1,0));
-	odmeasOK = badODCnt = 0;  
+	lvOD = vnOD = O31;  Kod2 = AOS = 0.0;  ODKappa(CVect3(0,1,0));
+	odmeasOK = badODCnt = IVniFirst = 0;  afaIVni = 1.0;
 }
 
 void CSINSGNSSOD::Init(const CSINS &sins0, int grade)
@@ -3966,6 +4349,7 @@ int CSINSGNSSOD::ODVelUpdate(double dS)
 	if(odmeast<EPS || badODCnt>5) {   // re-initialize
 		IVno = IVni = Ifn = O31;
 		IMv = odMlever = O33;
+		if(badODCnt>5) IVniFirst=0;
 	}
 	dS *= Kod;
 	distance += dS;
@@ -3980,9 +4364,12 @@ int CSINSGNSSOD::ODVelUpdate(double dS)
 						  IMv.e12,-IMv.e11,-IMv.e10,
 						  IMv.e22,-IMv.e21,-IMv.e20 );
 		//odMlever = sins.Cnb*askew(-odmeast*sins.web);
+		if(Kod2>EPS) { double k2=Kod2/odmeast; IVno.i += k2*IVno.i*IVno.i;  IVno.j += k2*IVno.j*IVno.j; } // 2nd nonlinear scale factor
+		if(AOS>EPS) { IVno = rotz(IVno, -AOS*sins.web.k); } // Angle Of Slide correct
 		odZk = IVni - IVno; 
 		odmeast = 0.0;
-		return odmeasOK=1;
+//		return odmeasOK=1;
+		return odmeasOK = badODCnt<5 ? 1 : 0;
 	}
 	else {
 		IVno += dSn;  IVni += sins.vn*sins.nts; Ifn += sins.fn*sins.nts;
@@ -4116,8 +4503,11 @@ int CAutoDrive::Update(const CVect3 *pwm, const CVect3 *pvm, double dS, int nn, 
 	int res = CSINSGNSSOD::Update(pwm, pvm, dS, nn, ts, nSteps);
 	if(odmeasOK) {
 		Hk.SetMat3(6, 0, odMphi, odMvn); Hk.SetMat3(6, 15, odMkappa);
-		*(CVect3*)&Zk.dd[6] = odZk;  // SINS/OD-dvn
-		SetMeasFlag(0700);
+//		*(CVect3*)&Zk.dd[6] = odZk;  // SINS/OD-dvn
+//		SetMeasFlag(0700);
+		*(CVect3*)&Zk.dd[6] = IVni_1*(1.0-afaIVni)+IVni*afaIVni-IVno;  // SINS/OD-dvn
+		IVni_1 = IVni;
+		if(IVniFirst++) SetMeasFlag(0700);
 	}
 	gnssLostdist += dS;  gnssLostnofixdist += dS;
 	if(*gnssLost>10 && *odLost>10.0) ZUPTtest();
@@ -4312,23 +4702,148 @@ void CCALLH::OutLLH(void)
 	pos = CVect3(lat.Xk.i, lon.Xk.i, hgt.Xk.i);	Ppos = CVect3(lat.Pk.e00, lon.Pk.e00, hgt.Pk.e00);
 }
 
+//***************************  class CGKP  *********************************/
+CGKP::CGKP(double a0, double f0)
+{
+	Init(a0, f0);
+}
+
+void CGKP::Init(double a0, double f0)
+{
+    int k;
+    double n, nk[6], e, ep;
+
+    a = a0;
+    b = (1-f0)*a;
+    e = sqrt(a*a-b*b)/a;    e2 = e*e;
+    ep = sqrt(a*a-b*b)/b;    ep2 = ep*ep;
+
+    for(k=1,nk[0]=1,n=(a-b)/(a+b); k<6; k++)
+        nk[k] = nk[k-1]*n;
+
+    cp[1] = (a+b)/2*(1+1./4*nk[2]+1./64*nk[4]);
+    cp[2] = -3./2*nk[1]+9./16*nk[3]-3./32*nk[5];
+    cp[3] = 15./16*nk[2]-15./32*nk[4];
+    cp[4] = -35./48*nk[3]+105./256*nk[5];
+    cp[5] = 315./512*nk[4];
+    cn[1] = (a+b)/2*(1+1./4*nk[2]+1./64*nk[4]);
+    cn[2] = 3./2*nk[1]-27./32*nk[3]+269./512*nk[5];
+    cn[3] = 21./16*nk[2]-55./32*nk[4];
+    cn[4] = 151./96*nk[3]-417./128*nk[5];
+    cn[5] = 1097./512*nk[4];
+}
+
+CVect3 CGKP::GKPCore(const CVect3 &BL)
+{
+    int k;
+    double B, l, x, y;
+    double lB, t, tk[7], lk[9], sB, cB, cBk[9], eta2, eta4, N;
+
+    B = BL.i, l = BL.j;
+    lB = B;
+    for(k=1; k<5; k++)
+        lB += cp[k+1]*sin(2*k*B);
+    lB *= cp[1];
+    
+    cB = cos(B);
+    cBk[0] = 1;
+    for(k=1; k<9; k++)
+        cBk[k] = cBk[k-1]*cB;
+    t = tan(B);
+    tk[0] = 1;
+    for(k=1; k<7; k++)
+        tk[k] = tk[k-1]*t;
+    lk[0] = 1;
+    for(k=1; k<9; k++)
+        lk[k] = lk[k-1]*l;
+    eta2 = ep2*cBk[2], eta4 = eta2*eta2;
+    sB = sin(B);
+    N = a/sqrt(1-e2*sB*sB);
+    
+    x = lB + t/2*N*cBk[2]*lk[2] + t/24*N*cBk[4]*(5-tk[2]+9*eta2+4*eta4)*lk[4] \
+        + t/720*N*cBk[6]*(61+58*tk[2]+tk[4]+270*eta2-330*tk[2]*eta2)*lk[6] \
+        + t/40320*N*cBk[8]*(1385-3111*tk[2]+543*tk[4]-tk[6])*lk[8];
+    y = N*cB*l + 1./6*N*cBk[3]*(1-tk[2]+eta2)*lk[3] \
+        + 1./120*N*cBk[5]*(5+18*tk[2]+tk[4]+14*eta2-58*tk[2]*eta2)*lk[5] \
+        + 1./5040*N*cBk[7]*(61-479*tk[2]+179*tk[4]-tk[6])*lk[7];
+    return CVect3(x, y, BL.k);
+}
+
+CVect3 CGKP::IGKPCore(const CVect3 &xy)
+{
+    int k;
+    double B, l, x, y;
+    double xbar, Bf, Nf, Nfk[9], tf, tfk[7], yk[9], sBf, cBf, etaf2, etaf4;
+
+    x = xy.i, y = xy.j;
+    xbar = x/cp[1];
+    Bf = xbar;
+    for(k=1; k<5; k++)
+        Bf += cn[k+1]*sin(2*k*xbar);
+    
+    sBf = sin(Bf);
+    Nf = a/sqrt(1-e2*sBf*sBf);
+    Nfk[0] = 1;
+    for(k=1; k<9; k++)
+        Nfk[k] = Nfk[k-1]*Nf;
+    tf = tan(Bf);
+    tfk[0] = 1;
+    for(k=1; k<7; k++)
+        tfk[k] = tfk[k-1]*tf;
+    cBf = cos(Bf);
+    etaf2 = ep2*cBf*cBf, etaf4 = etaf2*etaf2;
+    yk[0] = 1;
+    for(k=1; k<9; k++)
+        yk[k] = yk[k-1]*y;
+    
+    B = Bf + tf/(2*Nfk[2])*(-1-etaf2)*yk[2] \
+        + tf/(24*Nfk[4])*(5-3*tfk[2]+6*etaf2-6*tfk[2]*etaf2-3*etaf4-9*tfk[2]*etaf4)*yk[4] \
+        + tf/(720*Nfk[6])*(-61-90*tfk[2]-45*tfk[4]-107*etaf2+162*tfk[2]*etaf2+45*tfk[4]*etaf2)*yk[6] \
+        + tf/(40320*Nfk[8])*(1385+3633*tfk[2]+4095*tfk[4]+1575*tfk[6])*yk[8];
+    l = 1./(Nf*cBf)*y + 1./(6*Nfk[3]*cBf)*(-1-2*tfk[2]-etaf2)*yk[3] \
+        + 1./(120*Nfk[5]*cBf)*(5-28*tfk[2]+24*tfk[4]*6*etaf2+8*tfk[2]*etaf2)*yk[5] \
+        + 1./(5040*Nfk[7]*cBf)*(-61-662*tfk[2]-1320*tfk[4]-720*tfk[6])*yk[7];
+    return CVect3(B, l, xy.k);
+}
+
+CVect3 CGKP::GKP(const CVect3 &BL)
+{
+    int stripNo = (int)((BL.j/DEG)/6+1);
+    CVect3 BLH(BL.i, BL.j-(stripNo*6-3)*DEG, BL.k), xy=GKPCore(BLH);
+    xy.j += stripNo*1000000+500000;  // x/i to North; y/j to East
+    return xy;
+}
+
+CVect3 CGKP::IGKP(const CVect3 &xy)
+{
+    int stripNo = (int)(xy.j/1000000);
+    CVect3 xyz(xy.i, xy.j-stripNo*1000000-500000, xy.k), BL=IGKPCore(xyz);
+    BL.j += (stripNo*6-3)*DEG;
+    return BL;
+}
+
 //***************************  class CEarth  *********************************/
 CEarth::CEarth(double a0, double f0, double g0)
 {
 	a = a0;	f = f0; wie = glv.wie; 
 	b = (1-f)*a;
 	e = sqrt(a*a-b*b)/a;	e2 = e*e;
-	gn = O31;  pgn = 0;
+	gn = O31;  pgn = 0;  pos0=One31;
 	Update(O31);
 }
 
 void CEarth::Update(const CVect3 &pos, const CVect3 &vn, int isMemsgrade)
 {
 	this->pos = pos;  this->vn = vn;
-	sl = sin(pos.i), cl = cos(pos.i), tl = sl/cl;
-	double sq = 1-e2*sl*sl, sq2 = sqrt(sq);
-	RMh = a*(1-e2)/sq/sq2+pos.k;	f_RMh = 1.0/RMh;
-	RNh = a/sq2+pos.k;    clRNh = cl*RNh;  f_RNh = 1.0/RNh; f_clRNh = 1.0/clRNh;
+	CVect3 dpos; VSUB(dpos, pos, pos0);
+//	if(dpos.i>10.0/RE||dpos.i<-10.0/RE || dpos.k>1.0||dpos.k<-1.0)  // fast
+	{
+		sl = sin(pos.i), cl = cos(pos.i), tl = sl/cl;
+		double sq = 1-e2*sl*sl, sq2 = sqrt(sq);
+		RMh = a*(1-e2)/sq/sq2+pos.k;	f_RMh = 1.0/RMh;
+		RNh = a/sq2+pos.k;    clRNh = cl*RNh;  f_RNh = 1.0/RNh; f_clRNh = 1.0/clRNh;
+		VEQU(pos0, pos);
+	}
 	if(isMemsgrade) {
 //		wnie.i = 0.0,			wnie.j = wie*cl,		wnie.k = wie*sl;
 //		wnen.i = -vn.j*f_RMh,	wnen.j = vn.i*f_RNh,	wnen.k = wnen.j*tl;
@@ -4340,17 +4855,26 @@ void CEarth::Update(const CVect3 &pos, const CVect3 &vn, int isMemsgrade)
 	else {
 		wnie.i = 0.0,			wnie.j = wie*cl,		wnie.k = wie*sl;
 		wnen.i = -vn.j*f_RMh,	wnen.j = vn.i*f_RNh,	wnen.k = wnen.j*tl;
-		wnin = wnie + wnen;
+//		wnin = wnie + wnen;
+		wnin.i=/*wnie.i+*/wnen.i, wnin.j=wnie.j+wnen.j, wnin.k=wnie.k+wnen.k;
 		sl2 = sl*sl, sl4 = sl2*sl2;
 		gn.k = -( glv.g0*(1+5.27094e-3*sl2+2.32718e-5*sl4)-3.086e-6*pos.k );
 		gcc = pgn ? *pgn : gn;
-		gcc -= (wnie+wnin)*vn;
+//		gcc -= (wnie+wnin)*vn;
+		wnnin.i=wnin.i, wnnin.j=wnie.j+wnin.j, wnnin.k=wnie.k+wnin.k;
+		gcc.i -= crosI(wnnin,vn), gcc.j -= crosJ(wnnin,vn), gcc.k -= crosK(wnnin,vn);
 	}
 }
+
 
 CVect3 CEarth::vn2dpos(const CVect3 &vn, double ts) const
 {
 	return CVect3(vn.j*f_RMh, vn.i*f_clRNh, vn.k)*ts;
+}
+
+void CEarth::vn2dpos(CVect3 &dpos, const CVect3 &vn, double ts) const
+{
+	dpos.i=vn.j*f_RMh*ts, dpos.j=vn.i*f_clRNh*ts, dpos.k=vn.k*ts;
 }
 
 //***************************  class CIMU  *********************************/
@@ -4359,15 +4883,16 @@ CIMU::CIMU(void)
 	nSamples = 1;
 	Reset();
 	phim = dvbm = wmm = vmm = swmm = svmm = wm_1 = vm_1 = O31;
-	pSf = NULL; pTempArray = NULL; pKga = pgSens = pgSens2 = pgSensX = NULL; pKa2 = NULL; prfu = NULL;
+	pSf = NULL; pTempArray = NULL; pKga = pgSens = pgSens2 = pgSensX = NULL; pKapn = pKa2 = pTau = NULL; prfu = NULL;
 	plv = NULL; pCba = NULL;   tk = tGA = 0.0;
 	Sfg = Sfa = One31;  Kg = Ka = Cba = iTCba = I33;
-	eb = db = lvx = lvy = lvz = Ka2 = Q11 = Q12 = Q13 = Q21 = Q22 = Q23 = Q31 = Q32 = Q33 = O31;  SSx = SSy = SSz = O33;
+	eb = db = lvx = lvy = lvz = Kapn = Ka2 = Q11 = Q12 = Q13 = Q21 = Q22 = Q23 = Q31 = Q32 = Q33 = O31;  SSx = SSy = SSz = O33;
 }
 
 void CIMU::Reset(void)
 {
 	preFirst = onePlusPre = preWb = true;  swmm = svmm = wm_1 = vm_1 = O31;  smmT = 0.0;
+	compensated = false;
 }
 
 void CIMU::SetRFU(const char *rfu0)
@@ -4408,10 +4933,20 @@ void CIMU::SetKa2(const CVect3 &Ka20)
 	Ka2 = Ka20;	pKa2 = &Ka2;
 }
 
+void CIMU::SetKapn(const CVect3 &Kapn0)
+{
+	Kapn = Kapn0;	pKapn = &Kapn;
+}
+
 void CIMU::SetLvtGA(const CVect3 &lvx0, const CVect3 &lvy0, const CVect3 &lvz0, double tGA0)
 {
 	lvx = lvx0; lvy = lvy0; lvz = lvz0; tGA = tGA0;
 	plv = &lvx;
+}
+
+void CIMU::SetTau(const CVect3 &taux0, const CVect3 &tauy0, const CVect3 &tauz0)
+{
+	Taux = taux0;	Tauy = tauy0;	Tauz = tauz0;	pTau = &Taux;
 }
 
 void CIMU::SetCba(const CMat3 &Cba0)
@@ -4450,7 +4985,7 @@ double CIMU::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double t
 	{
 		for(i=0; i<nSamples; i++) { wm[i] = dotdiv(wm[i], Sfg);  vm[i] = dotdiv(vm[i], Sfa); }
 	}
-	if(pKa2)
+	if(pKa2||pKapn)
 	{
 		for(i=0; i<nSamples; i++) { vmma+=vm[i]; }
 	}
@@ -4477,37 +5012,52 @@ double CIMU::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double t
 	vmm += vm[i];
 	phim = wmm + cm*wm[i];
 	dvbm = vmm + 1.0/2*wmm*vmm + (cm*vm[i]+sm*wm[i]);
+	if(nSamples==1 && compensated) 
+	{
+		phim = wmm;
+		dvbm = vmm;
+	}
+	CVect3 _phim(0.0), _dvbm(0.0);
 	if(pTempArray)
 	{
 		double *p=&pTempArray[iTemp*5];
 		*(&Kg.e00+iTemp) = p[0] + polyval(&p[1], 3, Temp);
-		if(++iTemp==37) iTemp=0;  // (&tGA-&Kg.e00)==37
+		if(++iTemp==40) iTemp=0;  // (&tGA-&Kg.e00)==37
 	}
 	if(pgSens) {
-		phim.i -= gSens.e00*dvbm.i+gSens.e01*dvbm.j+gSens.e02*dvbm.k;   // gSens.eij in (rad/s)/(m/ss)
-		phim.j -= gSens.e10*dvbm.i+gSens.e11*dvbm.j+gSens.e12*dvbm.k;
-		phim.k -= gSens.e20*dvbm.i+gSens.e21*dvbm.j+gSens.e22*dvbm.k;
+		_phim.i += gSens.e00*dvbm.i+gSens.e01*dvbm.j+gSens.e02*dvbm.k;   // gSens.eij in (rad/s)/(m/ss)
+		_phim.j += gSens.e10*dvbm.i+gSens.e11*dvbm.j+gSens.e12*dvbm.k;
+		_phim.k += gSens.e20*dvbm.i+gSens.e21*dvbm.j+gSens.e22*dvbm.k;
 	}
 	if(pgSens2) {
 		double fx2_Ts = dvbm.i*dvbm.i*_nts,  fy2_Ts = dvbm.j*dvbm.j*_nts,  fz2_Ts = dvbm.k*dvbm.k*_nts;
-		phim.i -= gSens2.e00*fx2_Ts+gSens2.e01*fy2_Ts+gSens2.e02*fz2_Ts;   // gSens2.eij in (rad/s)/(m/ss)^2
-		phim.j -= gSens2.e10*fx2_Ts+gSens2.e11*fy2_Ts+gSens2.e12*fz2_Ts;
-		phim.k -= gSens2.e20*fx2_Ts+gSens2.e21*fy2_Ts+gSens2.e22*fz2_Ts;
+		_phim.i += gSens2.e00*fx2_Ts+gSens2.e01*fy2_Ts+gSens2.e02*fz2_Ts;   // gSens2.eij in (rad/s)/(m/ss)^2
+		_phim.j += gSens2.e10*fx2_Ts+gSens2.e11*fy2_Ts+gSens2.e12*fz2_Ts;
+		_phim.k += gSens2.e20*fx2_Ts+gSens2.e21*fy2_Ts+gSens2.e22*fz2_Ts;
 	}
 	if(pgSensX) {
 		double fxy_Ts = dvbm.i*dvbm.j*_nts,  fyz_Ts = dvbm.j*dvbm.k*_nts,  fzx_Ts = dvbm.k*dvbm.i*_nts;
-		phim.i -= gSensX.e00*fxy_Ts+gSensX.e01*fyz_Ts+gSensX.e02*fzx_Ts;   // gSensX.eij in (rad/s)/(m/ss)^2
-		phim.j -= gSensX.e10*fxy_Ts+gSensX.e11*fyz_Ts+gSensX.e12*fzx_Ts;
-		phim.k -= gSensX.e20*fxy_Ts+gSensX.e21*fyz_Ts+gSensX.e22*fzx_Ts;
+		_phim.i += gSensX.e00*fxy_Ts+gSensX.e01*fyz_Ts+gSensX.e02*fzx_Ts;   // gSensX.eij in (rad/s)/(m/ss)^2
+		_phim.j += gSensX.e10*fxy_Ts+gSensX.e11*fyz_Ts+gSensX.e12*fzx_Ts;
+		_phim.k += gSensX.e20*fxy_Ts+gSensX.e21*fyz_Ts+gSensX.e22*fzx_Ts;
+	}
+	if(pTau) {
+//		_phim.i += (dvbm.i*Taux.i+dvbm.j*Taux.j+dvbm.k*Taux.k)*phim.i*_nts;
+//		_phim.j += (dvbm.i*Tauy.i+dvbm.j*Tauy.j+dvbm.k*Tauy.k)*phim.j*_nts;
+//		_phim.k += (dvbm.i*Tauz.i+dvbm.j*Tauz.j+dvbm.k*Tauz.k)*phim.k*_nts;
+		CVect3 wXf=wmm*vmm;
+		_phim.i += dot(Taux, wXf)*_nts;
+		_phim.j += dot(Tauy, wXf)*_nts;
+		_phim.k += dot(Tauz, wXf)*_nts;
+	}
+	if(pKapn) {
+		_dvbm += iTCba*dotmul(Kapn,abs(vmma));  // Kapn in (m/ss)/(m/ss)=(m/s)/(m/s)=no unit
 	}
 	if(pKa2) {
-//		dvbm.i -= Ka2.i*dvbm.i*dvbm.i*_nts;   // Ka2.i in (m/ss)/(m/ss)^2
-//		dvbm.j -= Ka2.j*dvbm.j*dvbm.j*_nts;
-//		dvbm.k -= Ka2.k*dvbm.k*dvbm.k*_nts;
 		vmma.i = Ka2.i*vmma.i*vmma.i*_nts;   // Ka2.i in (m/ss)/(m/ss)^2
 		vmma.j = Ka2.j*vmma.j*vmma.j*_nts;
 		vmma.k = Ka2.k*vmma.k*vmma.k*_nts;
-		dvbm -= iTCba*vmma;
+		_dvbm += iTCba*vmma;
 	}
 	if(plv) {
 		if(preWb) { wb_1=phim*_nts, preWb=false; }
@@ -4518,12 +5068,15 @@ double CIMU::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double t
 			SSx = CMat3(Q11*W, Q21*W, Q31*W);  SSy = CMat3(Q12*W, Q22*W, Q32*W);  SSz = CMat3(Q13*W, Q23*W, Q33*W);
 			fL = SSx*lvx + SSy*lvy + SSz*lvz;
 		}
-		else
+		else {
 			fL = CVect3(dot(*(CVect3*)&W.e00,lvx), dot(*(CVect3*)&W.e10,lvy), dot(*(CVect3*)&W.e20,lvz));
-		dvbm -= fL*nts + tGA*(wb*dvbm);
+		}
+		_dvbm += fL*nts + tGA*(wb*dvbm);
 	}
-	swmm += phim;     svmm += dvbm;  smmT += nts;
-	if(prfu) IMURFU(&phim, &dvbm, 1, prfu);
+	wmm -= _phim;	  vmm -= _dvbm;
+	phim -= _phim;	  dvbm -= _dvbm;
+	swmm += wmm;     svmm += vmm;  smmT += nts;
+	if(prfu) { IMURFU(&wmm, &vmm, 1, prfu);  IMURFU(&phim, &dvbm, 1, prfu); IMURFU(&swmm, &svmm, 1, prfu); }
 	return tk;
 }
 
@@ -4582,6 +5135,66 @@ CMat lsclbt(CMat &wfb, CMat &wfn)
 	return Kga_edb;
 }
 
+//**************************  class CIMUInc  ********************************/
+CIMUInc::CIMUInc(double gScale, double aScale)
+{
+	Init();
+}
+
+void CIMUInc::Init(double gScale, double aScale)
+{
+	diGx=diGy=diGz=diAx=diAy=diAz=0;
+	iTotalGx0=iTotlaGy0=iTotalGz0=iTotalAx0=iTotalAy0=iTotalAz0=0;
+	iTotalGx=iTotalGy=iTotalGz=iTotalAx=iTotalAy=iTotalAz=0;
+	fTotalGx=fTotalGy=fTotalGz=fTotalAx=fTotalAy=fTotalAz=0.0;
+	this->gScale = gScale,  this->aScale = aScale;
+}
+
+void CIMUInc::Update(const CVect3 &wm, const CVect3 &vm)
+{
+#define MAX_NN  2147483648.0  // 2^31
+#define MAX_PP  (MAX_NN-1.0)
+	fTotalGx += wm.i/gScale, fTotalGy += wm.j/gScale, fTotalGz += wm.k/gScale;
+	fTotalAx += vm.i/aScale, fTotalAy += vm.j/aScale, fTotalAz += vm.k/aScale;
+	double *pfTotal=&fTotalGx;  int *pdi = &diGx, *piTotal0 = &iTotalGx0, *piTotal = &iTotalGx;
+	for(int i=0; i<6; i++,pfTotal++,pdi++,piTotal0++,piTotal++) {
+		if(*pfTotal>=MAX_PP)		*pfTotal -= 2.0*MAX_NN;
+		else if(*pfTotal<=-MAX_NN) 	*pfTotal += 2.0*MAX_NN;
+		*piTotal = (int)(*pfTotal);
+		*pdi = *piTotal - *piTotal0;
+		if(*pdi>100000000)			*pdi -= 2147483648;
+		else if(*pdi<-100000000)	*pdi += 2147483648;
+		*piTotal0 = *piTotal;
+	}
+}
+
+//**************************  class CIMUInv  ********************************/
+CIMUInv::CIMUInv(const CVect3 &att00, const CVect3 &vn00, const CVect3 &pos00, double ts0, double tk0)
+{
+	vn0 = vn00;  pos0 = pos00;  att = att00;  vn = vn0;  pos = pos0;
+	Cbn0 = ~a2mat(att00);
+	eth.Update(pos, vn);
+	ts = ts0;  tk = tk0;
+	isFirst = TRUE;
+}
+
+void CIMUInv::Update(const CVect3 &att1, const CVect3 &pos1)
+{
+	CVect3 vn1 = pp2vn(pos1, pos0, ts, &eth);  vn1 = vn0+(vn1-vn0)*2;
+	eth.Update((pos0+pos1)/2, (vn0+vn)/2);
+	CMat3 Cnb1 = a2mat(att1);
+	CVect3 phim = m2rv(Cbn0*rv2m(eth.wnin*ts)*Cnb1);
+	if(isFirst) wm0=phim;
+    wm = inv(I33+askew(wm0/12.0))*phim;
+    CVect3 dvbm = Cbn0 * (rv2q(eth.wnin*ts*2) * (vn1-vn0-eth.gcc*ts));
+	if(isFirst) { vm0=dvbm; isFirst=FALSE; }
+    vm = inv(I33+askew(wm/2.0+wm0/12.0))*(dvbm-vm0*wm/12.0);
+	wm0 = wm;  vm0 = vm;
+	Cbn0 = ~Cnb1;  vn0 = vn1;  pos0 = pos1;
+	att = att1;  vn = vn1;  pos = pos1;
+	tk += ts;
+}
+
 //***************************  class CSINS  *********************************/
 CSINS::CSINS(double yaw0, const CVect3 &pos0, double tk0)
 {
@@ -4616,7 +5229,7 @@ void CSINS::Init(const CQuat &qnb0, const CVect3 &vn0, const CVect3 &pos0, doubl
 	isOpenloop = isMemsgrade = isNocompasseffect = isOutlever = 0;
 	Cbn = I33;
 	Update(&wib, &fb, 1, 1.0); imu.preFirst = 1;
-	tk = tk0;  ts = nts = 1.0; qnb = qnb0;	vn = vn0, pos = pos0;
+	tk = tk0;  ts = nts = 1.0; qnb = qnb0;	att=q2att(qnb), vn = vn0, pos = pos0;
 	mmwb = mmfb = CMaxMin(100);
 	mvn = mvnmax = mvnmin = vn; mvni = O31; mvnt = mvnT = lvlT = 0.0; mvnk = 0;
 	etm(); lever(); Extrap();
@@ -4640,14 +5253,13 @@ void CSINS::SetTauGA(const CVect3 &tauG, const CVect3 &tauA)
 
 void CSINS::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts)
 {
+	this->ts = ts;  nts = nSamples*ts;	tk += nts;
+	double nts2 = nts/2, _nts=1.0/nts;
 	if(isMemsgrade) {
-		this->ts = ts;  nts = nSamples*ts;	tk += nts;
-		double nts2 = nts/2;
 		imu.Update(pwm, pvm, nSamples, ts);
 		imu.phim = Kg*imu.phim - eb*nts; imu.dvbm = Ka*imu.dvbm - db*nts;  // IMU calibration
-//		CVect3 vn01 = vn+an*nts2, pos01 = pos+eth.vn2dpos(vn01,nts2);
 		if(!isOpenloop) eth.Update(pos,O31,1);
-		wib = imu.phim/nts; fb = imu.dvbm/nts;
+		wib = imu.phim*_nts; fb = imu.dvbm*_nts;
 		web = wib;  webbar = (1-afabar)*webbar + afabar*web;
 		wnb = wib;
 		fn = qnb*fb;
@@ -4658,15 +5270,13 @@ void CSINS::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts
 		Cnb = q2mat(qnb); att = m2att(Cnb); Cbn = ~Cnb; vb = Cbn*vn;
 	}
 	else {
-		this->ts = ts;  nts = nSamples*ts;	tk += nts;
-		double nts2 = nts/2;
+#ifndef PSINS_FAST_CALCULATION
 		imu.Update(pwm, pvm, nSamples, ts);
 		imu.phim = Kg*imu.phim - eb*nts; imu.dvbm = Ka*imu.dvbm - db*nts;  // IMU calibration
 		CVect3 vn01 = vn+an*nts2, pos01 = pos+eth.vn2dpos(vn01,nts2);
 		if(!isOpenloop) eth.Update(pos01, vn01);
 		wib = imu.phim/nts; fb = imu.dvbm/nts;
 		web = wib - Cbn*eth.wnie;  webbar = (1-afabar)*webbar + afabar*web;
-//		wnb = wib - (~(qnb*rv2q(imu.phim/2)))*eth.wnin;
 		wnb = wib - Cbn*eth.wnin;
 		fn = qnb*fb;
 		an = rv2q(-eth.wnin*nts2)*fn+eth.gcc;  anbar = (1-afabar)*anbar + afabar*an;
@@ -4674,6 +5284,34 @@ void CSINS::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts
 		pos = pos + eth.vn2dpos(vn+vn1, nts2);	vn = vn1;
 		qnb = rv2q(-eth.wnin*nts)*qnb*rv2q(imu.phim);
 		Cnb = q2mat(qnb); att = m2att(Cnb); Cbn = ~Cnb; vb = Cbn*vn;
+#else  // fast
+		imu.Update(pwm, pvm, nSamples, ts);
+//		imu.phim = Kg*imu.phim - eb*nts; imu.dvbm = Ka*imu.dvbm - db*nts;  // IMU calibration
+		AXbt(imu.phim, Kg, imu.phim, eb, -nts);  AXbt(imu.dvbm, Ka, imu.dvbm, db, -nts);
+//		CVect3 vn01 = vn+an*nts2, pos01 = pos+eth.vn2dpos(vn01,nts2);
+		CVect3 vn01,pos01,dpos; VADDf(vn01,vn,an,nts2); eth.vn2dpos(dpos,vn01,nts2); VADD(pos01,pos,dpos);
+		if(!isOpenloop) eth.Update(pos01, vn01);
+//		wib = imu.phim*_nts; fb = imu.dvbm*_nts;
+		VMULf(wib, imu.phim, _nts);  VMULf(fb, imu.dvbm, _nts);
+//		web = wib - Cbn*eth.wnie;  webbar = (1-afabar)*webbar + afabar*web;
+		CVect3 vtmp; mul(vtmp, Cbn, eth.wnie); VSUB(web, wib, vtmp); double b=1-afabar; VADDff(webbar, webbar, b, web, afabar);
+//		wnb = wib - Cbn*eth.wnin;
+		mul(vtmp, Cbn, eth.wnin); VSUB(wnb, wib, vtmp);
+//		fn = qnb*fb;
+		mul(fn, qnb, fb);
+//		an = rv2q(-eth.wnin*nts2)*fn+eth.gcc;  anbar = (1-afabar)*anbar + afabar*an;
+		CVect3 wnint, fnn; double tn=-nts2; VMULf(wnint,eth.wnin,tn);
+		CQuat q; rv2q(q, wnint); mul(fnn, q, fn);
+		VADD(an, fnn, eth.gcc);  VADDff(anbar, anbar, b, an, afabar);
+//		CVect3 vn1 = vn + an*nts;
+		CVect3 vn1; VADDf(vn1, vn, an, nts);
+//		pos = pos + eth.vn2dpos(vn+vn1, nts2);	vn = vn1;
+		VADD(vn01, vn, vn1);  eth.vn2dpos(dpos, vn01, nts2);  VADD(pos, pos, dpos);  VEQU(vn, vn1);
+//		qnb = rv2q(-eth.wnin*nts)*qnb*rv2q(imu.phim);
+		tn=-nts; VMULf(wnint,eth.wnin,tn);	rv2q(q, wnint);  mul(qnb, q, qnb);  rv2q(q, imu.phim);  mul(qnb, qnb, q); 
+//		Cnb = q2mat(qnb); att = m2att(Cnb); Cbn = ~Cnb; vb = Cbn*vn;
+		q2mat(Cnb, qnb);  m2att(att, Cnb);  _TT(Cbn, Cnb);  mul(vb, Cbn, vn);
+#endif		
 	}
 	psinsassert(pos.i<85.0*DEG && pos.i>-85.0*DEG);
 	if(vn.i>velMax) vn.i=velMax; else if(vn.i<-velMax) vn.i=-velMax;
@@ -4702,8 +5340,8 @@ void CSINS::Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts
 		dist += sqrt(vn.i*vn.i + vn.j*vn.j + vn.k*vn.k)*nts;  // travel distance ^2
 	if(lvlT>=0)
 		lvlT += nts;
-	mmwb.Update((float)norm(imu.wmm/nts));
-	mmfb.Update((float)(norm(imu.vmm/nts)+eth.gn.k));
+	mmwb.Update((float)(norm(imu.wmm)*_nts));
+	mmfb.Update((float)(norm(imu.vmm)*_nts+eth.gn.k));
 }
 
 void CSINS::Extrap(const CVect3 &wm, const CVect3 &vm, double ts)
@@ -4742,6 +5380,23 @@ void CSINS::lever(const CVect3 &dL, CVect3 *ppos, CVect3 *pvn)
 		*ppos = pos + MpvCnb*lvr;
 		if(pvn!=NULL)  *pvn = vn + CW*lvr;
 	}
+}
+
+void CSINS::lever2(const CVect3 &dL, CVect3 *ppos, CVect3 *pvn, const CVect3 *ppos0, const CVect3 *pvn0)
+{
+	if(&dL!=&O31) lvr = dL;
+	if(ppos0==NULL) ppos0=ppos;
+	if(pvn0==NULL) pvn0=pvn;
+	Mpv.e01=eth.f_RMh, Mpv.e10=eth.f_clRNh, Mpv.e22=1.0;
+	CW = Cnb*askew(web), MpvCnb = Mpv*Cnb;
+	if(ppos!=NULL)  *ppos = *ppos0 + MpvCnb*lvr;
+	if(pvn!=NULL)  *pvn = *pvn0 + CW*lvr;
+}
+
+void CSINS::atss(double *attack, double *sideslip)
+{
+	CVect3 as=::atss(att, vn);
+	*attack = as.i,  *sideslip = as.k;
 }
 
 void CSINS::etm(void)
@@ -4784,7 +5439,7 @@ void CSINS::AddErr(double phiU, const CVect3 &dvn, const CVect3 &dpos)
 	AddErr(CVect3(0,0,phiU), dvn, dpos);
 }
 
-void CSINS::leveling(int flag)
+void CSINS::Leveling(int flag)
 {
 	if(flag==0) {
 		lvlVn0 = vn;  lvlT = EPS;  // record
@@ -4829,13 +5484,14 @@ void CDR::Init(const CVect3 &att0, const CVect3 &pos0, const CVect3 &kappa, doub
 	Cbo = a2mat(CVect3(kappa.i,0.0,kappa.k));
 	qnb = a2qua(att0);  Cnb = q2mat(qnb); att = m2att(Cnb);
 	vn = O31;	pos = pos0;  eth.Update(pos, vn);
-	velPre = 0.0;  velMax=50.0; velMin=-3.0;  afa = 1.0;
-	tk = tk0;
+	velPre = 0.0;  velMax=50.0; velMin=-3.0;  afa = 0.1;
+	tk = tk0;  dist = 0.0;
+	SetGCK(10.0);
 }
 
-void CDR::Update(const CVect3 &wm, double dS, double ts)
+void CDR::Update(const CVect3 &wm, double dS, double ts, const CVect3 &vm)
 {
-	tk += ts;
+	tk += ts;  dist += dS;
 	double vel = dS*Kod/ts;
 	if(vel>velMax||vel<velMin) vel=velPre;  // if abnormal, keep last velocity
 	CVect3 vnk = Cnb*(Cbo*CVect3(0,vel,0));  velPre=vel;
@@ -4844,6 +5500,46 @@ void CDR::Update(const CVect3 &wm, double dS, double ts)
 	pos = pos + eth.vn2dpos(vnk, ts); 
 	qnb = rv2q(-eth.wnin*ts)*qnb*rv2q(wm);
 	Cnb = q2mat(qnb); att = m2att(Cnb);
+	if(&vm!=&O31) {
+		Leveling(vm, ts);
+	}
+}
+
+void CDR::SetGCK(double Td)
+{
+	double xi=0.707, xi2=xi*xi, ws2=G0/RE, sigma=_2PI*xi/(Td*sqrt(1.0-xi2)), sigma2=sigma*sigma;
+    gck1 = 3.0*sigma; 
+    gck2 = sigma2*(2.0+1.0/xi2)/ws2-1.0; 
+    gck3 = sigma2*sigma/(G0*xi2);
+	wnc = vni = dpos = O31;
+}
+
+void CDR::Leveling(const CVect3 &vm, double ts)
+{
+	CVect3 fn=qnb*vm/ts;
+	double dVE = vni.i - vn.i;     // vni: inertial vel;  vn: ref vel
+	vni.i = vni.i + (fn.i-gck1*dVE)*ts;
+	dpos.i = dpos.i + dVE*gck3*ts;
+	wnc.j = dVE*(1+gck2)/RE + dpos.i;
+	double dVN = vni.j - vn.j;
+	vni.j = vni.j + (fn.j-gck1*dVN)*ts;
+	dpos.j = dpos.j + dVN*gck3*ts;
+	wnc.i = -dVN*(1+gck2)/RE - dpos.j;
+	qnb = rv2q(-wnc*ts)*qnb;
+}
+
+CVect3 CDR::Calibrate(const CVect3 &pos0, const CVect3 &pos1, const CVect3 &pos1DR, double dist0)
+{
+	CVect3 dpos=pos1-pos0, xyz, xyzDR;
+	xyz = CVect3(dpos.j*eth.clRNh, dpos.i*eth.RMh, dpos.k);
+	dpos=pos1DR-pos0;
+	xyzDR = CVect3(dpos.j*eth.clRNh, dpos.i*eth.RMh, dpos.k);
+	if(dist0<-EPS) dist0=-norm(xyz);
+	else if(dist0<1.0) dist0=norm(xyz);
+	double kod = norm(xyz)/norm(xyzDR);
+	double dpitch = (xyzDR.k-xyz.k)/dist0;
+	double dyaw=crossXY(xyz,xyzDR)/normXY(xyz)/normXY(xyzDR);
+	return CVect3(dpitch, kod, dyaw);
 }
 
 //***************************  class CCNS  *********************************/
@@ -5277,7 +5973,6 @@ void CFileRdWt::Init(const char *fname0, int columns0)
 	{
 		rwf = fopen(fname, "rt");
 		if(!rwf) return;
-//		fpos_t pos;
 		long pos;
 		while(1)  // skip txt-file comments
 		{
@@ -5285,7 +5980,7 @@ void CFileRdWt::Init(const char *fname0, int columns0)
 			fgets(line, sizeof(line), rwf);
 			if(feof(rwf)) break;
 			int allSpace=1, allDigital=1;
-			for(register int i=0; i<sizeof(line); i++)
+			for(int i=0; i<sizeof(line); i++)
 			{
 				char c = line[i];
 				if(c=='\n') break;
@@ -5296,9 +5991,8 @@ void CFileRdWt::Init(const char *fname0, int columns0)
 			}
 			if(!allSpace && allDigital) break;
 		}
-//		fsetpos(rwf, &pos);
 		fseek(rwf, pos, SEEK_SET);
-		this->columns = columns;
+//		this->columns = columns;
 		for(int i=0; i<columns; i++)
 		{ sstr[4*i+0]='%', sstr[4*i+1]='l', sstr[4*i+2]='f', sstr[4*i+3]=' ', sstr[4*i+4]='\0'; } 
 	}
@@ -5326,20 +6020,20 @@ int CFileRdWt::load(int lines, BOOL txtDelComma)
 		{
 			for(char *pc=line, *pend=line+sizeof(line); pc<pend; pc++)
 			{
-				if(*pc==','||*pc==';'||*pc==':'||*pc=='\t:') *pc=' ';
+				if(*pc==','||*pc==';'||*pc==':'||*pc=='\t') *pc=' ';
 				else if(*pc=='\0') break;
 			}
 		}
-		if(columns<10)
+		if(columns<=10)
 			sscanf(line, sstr,
 				&buff[ 0], &buff[ 1], &buff[ 2], &buff[ 3], &buff[ 4], &buff[ 5], &buff[ 6], &buff[ 7], &buff[ 8], &buff[ 9]
 				); 
-		else if(columns<20)
+		else if(columns<=20)
 			sscanf(line, sstr,
 				&buff[ 0], &buff[ 1], &buff[ 2], &buff[ 3], &buff[ 4], &buff[ 5], &buff[ 6], &buff[ 7], &buff[ 8], &buff[ 9],
 				&buff[10], &buff[11], &buff[12], &buff[13], &buff[14], &buff[15], &buff[16], &buff[17], &buff[18], &buff[19]
 				); 
-		else if(columns<40)
+		else if(columns<=40)
 			sscanf(line, sstr,
 				&buff[ 0], &buff[ 1], &buff[ 2], &buff[ 3], &buff[ 4], &buff[ 5], &buff[ 6], &buff[ 7], &buff[ 8], &buff[ 9],
 				&buff[10], &buff[11], &buff[12], &buff[13], &buff[14], &buff[15], &buff[16], &buff[17], &buff[18], &buff[19],
@@ -5357,7 +6051,7 @@ int CFileRdWt::loadf32(int lines)	// float32 bin file read
 	if(lines>1)
 		fseek(rwf, (lines-1)*(-columns)*sizeof(float), SEEK_CUR);
 	fread(buff32, -columns, sizeof(float), rwf);
-	for(register int i=0; i<-columns; i++) buff[i]=buff32[i];
+	for(int i=0; i<-columns; i++) buff[i]=buff32[i];
 	linek += lines;
 	if(feof(rwf))  return 0;
 	else return 1;
@@ -5646,7 +6340,7 @@ char* CFileList::NextFile(void)
 	return fname;
 }
 
-CFileList::~CFileList(void)
+CFileList::~CFileList()
 {
 	if(handle>0) { _findclose(handle); handle=0; }
 	if(flistout) { fclose(flistout); flistout=0; }
@@ -5703,7 +6397,7 @@ CFileLog& CFileLog::LogDate(BOOL hmsOnly)
 CFileLog& CFileLog::LogRunTime(BOOL abst)
 {
 	clock_t tms1 = clock();
-	if(f) { fprintf(f, "Elasped time (ms): %d.\n", tms1-tms0); Flush(1); }
+	if(f) { fprintf(f, "Elasped time (ms): %ld.\n", tms1-tms0); Flush(1); }
 	if(abst==0) tms0 = tms1;
 	return *this;
 }
@@ -5984,19 +6678,26 @@ CRMemory::CRMemory(void)
 	pMemStart0 = NULL;
 }
 
-CRMemory::CRMemory(long recordNum, int recordLen0)
+CRMemory::CRMemory(long recordNum0, int recordLen0)
 {
-	BYTE *pb = (BYTE*)malloc(recordNum*recordLen0);
-	*this = CRMemory(pb, recordNum*recordLen0, recordLen0);
+	pMemStart0 = NULL;
+	recordNum = recordNum0;
+	BYTE *pb = (BYTE*)malloc(recordNum0*recordLen0);
+	Init(pb, recordNum0*recordLen0, recordLen0);
 	pMemStart0 = pMemStart;
 }
 
 CRMemory::CRMemory(BYTE *pMem, long memLen0, int recordLen0)
 {
+	Init(pMem, memLen0, recordLen0);
+}
+
+void CRMemory::Init(BYTE *pMem, long memLen0, int recordLen0)
+{
 	psinsassert(recordLen0<=MAX_RECORD_BYTES);
-	pMemStart0 = NULL;
-	pMemStart = pMemPush = pMemPop = pMem;
+	pMemStart0 = pMemStart = pMemPush = pMemPop = pMem;
 	pMemEnd = pMemStart + memLen0;
+	recordNum = memLen0/recordLen0;
 	pushLen = popLen = recordLen = recordLen0;
 	memLen = memLen0;
 	dataLen = 0;
@@ -6007,12 +6708,30 @@ CRMemory::~CRMemory()
 	if(pMemStart0) { free(pMemStart0); pMemStart0 = NULL; } 
 }
 
+void CRMemory::operator=(const CRMemory &m)
+{
+	BYTE *pb=this->pMemStart0;
+	int len=recordNum*recordLen, len0=m.recordNum*m.recordLen;
+	memcpy(this, &m, sizeof(m));
+	this->pMemStart0 = pb;
+	if(len!=len0) {
+		Deletep(this->pMemStart0);
+		BYTE *pMem = (BYTE*)malloc(len0);
+		Init(pMem, len0, m.recordLen);
+	}
+	this->pMemStart=this->pMemStart0+(m.pMemStart-m.pMemStart0);
+	this->pMemEnd=this->pMemStart0+(m.pMemEnd-m.pMemStart0);
+	this->pMemPush=this->pMemStart0+(m.pMemPush-m.pMemStart0);
+	this->pMemPop=this->pMemStart0+(m.pMemPop-m.pMemStart0);
+	memcpy(this->pMemStart0, m.pMemStart0, len0);
+}
+
 BYTE CRMemory::pop(BYTE *p)
 {
 	if(dataLen==0) return 0;
 	popLen = recordLen==0 ? *pMemPop : recordLen;
 	if(p==(BYTE*)NULL) p = popBuf;
-	BYTE i;
+	int i;
 	for(i=0; i<popLen; i++,dataLen--)
 	{
 		*p++ = *pMemPop++;
@@ -6023,14 +6742,15 @@ BYTE CRMemory::pop(BYTE *p)
 
 BYTE* CRMemory::get(int iframe)
 {
+	iframe = iframe % recordNum;
+	if(iframe<0) iframe += recordNum;
 	return &pMemStart[popLen*iframe];
 }
 
 BYTE* CRMemory::set(int iframe, const BYTE *p)
 {
 	BYTE *p0 = &pMemStart[pushLen*iframe];
-	BYTE i;
-	for(i=0; i<pushLen; i++)
+	for(int i=0; i<pushLen; i++)
 	{
 		*p0++ = *p++;
 		if(p0>=pMemEnd)  p0 = pMemStart;
@@ -6044,10 +6764,10 @@ BOOL CRMemory::push(const BYTE *p)
 	if(p==(BYTE*)NULL) p = pushBuf;
 	pushLen = recordLen==0 ? *p : recordLen;
 	psinsassert(pushLen<=MAX_RECORD_BYTES);
-	for(BYTE i=0; i<pushLen; i++,dataLen++)
+	for(int i=0; i<pushLen; i++,dataLen++)
 	{
 		*pMemPush++ = *p++;
-		if(pMemPush>=pMemEnd)  pMemPush = pMemStart;
+		if(pMemPush>=pMemEnd) pMemPush = pMemStart;
 		if(pMemPush==pMemPop) { res=0; pop(); }
 	}
 	return res;
@@ -6158,6 +6878,22 @@ double CInterp::Interp(double t, double *data)
 
 #endif // PSINS_RMEMORY
 
+BYTE* flipud(BYTE *p, int rows, int clmBytes)
+{
+	BYTE *ptmp=(BYTE*)malloc(clmBytes), *p0=p, *p1=p0+(rows-1)*clmBytes, *p11=p1;
+	memcpy(ptmp, p0, clmBytes);
+	while(1) {
+		memcpy(p0, p1, clmBytes);  p0+=clmBytes;
+		if(p0>=p1) break;
+		memcpy(p1, p0, clmBytes);  p1-=clmBytes;
+		if(p0>=p1) break;
+	}
+	memcpy(p0, p0+clmBytes, p11-p0);
+	memcpy(p11, ptmp, clmBytes);
+	Deletep(ptmp);
+	return p;
+}
+
 //******************************  CContinuousCnt *******************************/
 CContinuousCnt::CContinuousCnt(int cntLargest)
 {
@@ -6196,6 +6932,7 @@ char *CVCFileFind::FindNextFile(void)
 //***************************  function AlignCoarse  *********************************/
 CVect3 Alignsb(const CVect3 &wmm, const CVect3 &vmm, double latitude)
 {
+//	if(latitude>PI/2)  latitude = asin(dot(wmm,vmm)/norm(wmm)/norm(vmm))/DEG;
 	double T11, T12, T13, T21, T22, T23, T31, T32, T33;
 	double cl = cos(latitude), tl = tan(latitude), nn;
 	CVect3 wbib = wmm / norm(wmm),  fb = vmm / norm(vmm);
@@ -6291,7 +7028,7 @@ void CAligni0fit::Init(const CVect3 &pos0)
 {
 	eth.Update(pos0);
 	this->pos0 = pos0;
-	tk = 0;
+	tk = imu.tk = 0;
 	vib0 = pib0 = vn0 = vnt = xyzt = O31;
 	qib0b = qnb = qnbsb = CQuat(1.0);  qn0i0 = ~m2qua(pos2Cen(CVect3(eth.pos.i,0.0,0.0)));
 	double G=glv.g0*eth.cl/glv.wie/glv.wie;
@@ -6557,7 +7294,7 @@ void CAligntf::SetHk(int nnq)
 void CAligntf::Feedback(int nnq, double fbts)
 {
 	CKalman::Feedback(nq, fbts);
-	sins.qnb -= *(CVect3*)&FBXk.dd[0];  sins.vn -= *(CVect3*)&FBXk.dd[ 3];  mu -= *(CVect3*)&FBXk.dd[6];
+	sins.qnb -= *(CVect3*)&FBXk.dd[0];  sins.vn -= *(CVect3*)&FBXk.dd[ 3];  mu += *(CVect3*)&FBXk.dd[6];
 	sins.eb  += *(CVect3*)&FBXk.dd[9];	sins.db += *(CVect3*)&FBXk.dd[12];  // 0-14 phi,dvn,mu,eb,db
 	lvMINS += *(CVect3*)&FBXk.dd[15];	// 15-17 lever
 	dtMINSdelay += FBXk.dd[18];			// 18 dt
@@ -6583,7 +7320,7 @@ void CAligntf::SetMeasVnAtt(const CVect3 &vnMINS, const CVect3 &attMINS)
 	if(!IsZero(attMINS))
 	{
 		if(avpi.Interp(dtMINSdelay)) {
-			*(CVect3*)&Zk.dd[3] = qq2phi(a2qua(avpi.att)*rv2q(mu), a2qua(attMINS));
+			*(CVect3*)&Zk.dd[3] = qq2phi(a2qua(avpi.att)*rv2q(-mu), a2qua(attMINS));
 			SetMeasFlag(00070);
 		}
 	}
@@ -6592,8 +7329,8 @@ void CAligntf::SetMeasVnAtt(const CVect3 &vnMINS, const CVect3 &attMINS)
 #ifdef PSINS_IO_FILE
 void CAligntf::operator<<(CFileRdWt &f)
 {
-	f<<sins.att<<sins.vn<<mu<<sins.eb<<sins.db  // 1-12
-		<<lvMINS<<dtMINSdelay <<kftk; // 13-20
+	f<<sins.att<<sins.vn<<mu<<sins.eb<<sins.db  // 1-15
+		<<lvMINS<<dtMINSdelay <<kftk; // 16-20
 }
 #endif
 
@@ -7027,6 +7764,14 @@ double unixt2gpst(double ut, int leap)
 	return fmod(ut+leap-315964800.0, 86400.0);
 }
 
+BOOL chkhdr(const char *str, const char *hdr)
+{
+	while(1) {
+		if(*hdr=='\0') return 1;
+		if(*hdr++!=*str++) return 0;
+	}
+}
+
 double randn(double mu, double sigma)
 {
 #define NSUM 25
@@ -7059,7 +7804,7 @@ CMat3 randn(const CMat3 &mu, const double &sigma)
 {
 	CMat3 mtmp;
 	const double *pmu=&mu.e00, *pEnd=&mu.e22;
-	for(double *p=&mtmp.e00; pmu<pEnd; p++,pmu++) *p=randn(*pmu,sigma);
+	for(double *p=&mtmp.e00; pmu<=pEnd; p++,pmu++) *p=randn(*pmu,sigma);
 	return mtmp;
 }
 
@@ -7087,6 +7832,230 @@ int* deci(int i, int *pi)
 		for(int j=0; j<=k; j++) pi[j]=di[j];
 	}
 	return di;
+}
+
+void add(CVect3 &res, const CVect3 &v1, const CVect3 &v2)
+{
+	res.i=v1.i+v2.i, res.j=v1.j+v2.j, res.k=v1.k+v2.k;
+}
+
+void add(CMat3 &res, const CMat3 &m1, const CMat3 &m2)
+{
+	res.e00=m1.e00+m2.e00, res.e01=m1.e01+m2.e01, res.e02=m1.e02+m2.e02; 
+	res.e10=m1.e10+m2.e10, res.e11=m1.e11+m2.e11, res.e12=m1.e12+m2.e12; 
+	res.e20=m1.e20+m2.e20, res.e21=m1.e21+m2.e21, res.e22=m1.e22+m2.e22; 
+}
+
+void add(CVect &res, const CVect &v1, const CVect &v2)
+{
+	const double *p1=v1.dd, *p2=v2.dd, *pEnd=&v1.dd[v1.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++,p2++) *p=*p1+*p2;
+}
+
+void add(CMat &res, const CMat &m1, const CMat &m2)
+{
+	const double *p1=m1.dd, *p2=m2.dd, *pEnd=&m1.dd[m1.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++,p2++) *p=*p1+*p2;
+}
+
+void sub(CVect3 &res, const CVect3 &v1, const CVect3 &v2)
+{
+	res.i=v1.i-v2.i, res.j=v1.j-v2.j, res.k=v1.k-v2.k;
+}
+
+void sub(CMat3 &res, const CMat3 &m1, const CMat3 &m2)
+{
+	res.e00=m1.e00-m2.e00, res.e01=m1.e01-m2.e01, res.e02=m1.e02-m2.e02; 
+	res.e10=m1.e10-m2.e10, res.e11=m1.e11-m2.e11, res.e12=m1.e12-m2.e12; 
+	res.e20=m1.e20-m2.e20, res.e21=m1.e21-m2.e21, res.e22=m1.e22-m2.e22; 
+}
+
+void sub(CVect &res, const CVect &v1, const CVect &v2)
+{
+	const double *p1=v1.dd, *p2=v2.dd, *pEnd=&v1.dd[v1.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++,p2++) *p=*p1-*p2;
+}
+
+void sub(CMat &res, const CMat &m1, const CMat &m2)
+{
+	const double *p1=m1.dd, *p2=m2.dd, *pEnd=&m1.dd[m1.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++,p2++) *p=*p1-*p2;
+}
+
+void cros(CVect3 &res, const CVect3 &v1, const CVect3 &v2)
+{
+	double
+		i=v1.j*v2.k-v1.k*v2.j,
+		j=v1.k*v2.i-v1.i*v2.k;
+	res.k=v1.i*v2.j-v1.j*v2.i;
+	res.i=i, res.j=j;
+}
+
+void dotmul(CVect3 &res, const CVect3 &v1, const CVect3 &v2)
+{
+	res.i=v1.i*v2.i, res.j=v1.j*v2.j, res.k=v1.k*v2.k;
+}
+
+void dotdiv(CVect3 &res, const CVect3 &v1, const CVect3 &v2)
+{
+	res.i=v1.i/v2.i, res.j=v1.j/v2.j, res.k=v1.k/v2.k;
+}
+
+void mul(CVect3 &res, const CVect3 &v, const double &f)
+{
+	res.i=v.i*f, res.j=v.j*f, res.k=v.k*f;
+}
+
+void mul(CMat3 &res, const CMat3 &m, const double &f)
+{
+	res.e00=m.e00*f, res.e01=m.e01*f, res.e02=m.e02*f;
+	res.e10=m.e10*f, res.e11=m.e11*f, res.e12=m.e12*f;
+	res.e20=m.e20*f, res.e21=m.e21*f, res.e22=m.e22*f;
+}
+
+void mul(CVect &res, const CVect &v, const double &f)
+{
+	res.row=v.row, res.clm=v.clm, res.rc=v.rc;
+	const double *p1=v.dd, *pEnd=&v.dd[v.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++) *p=*p1*f;
+}
+
+void mul(CVect &res, const CMat &m, const CVect &v)
+{
+	res.row=res.rc=m.row, res.clm=1;
+	double *p=res.dd, *pEnd=&res.dd[res.row]; const double *p1ij=m.dd, *p2End=&v.dd[v.rc];
+	for(; p<pEnd; p++)
+	{
+		double f=0.0; const double *p2j=v.dd;
+		for(; p2j<p2End; p1ij++,p2j++)	f += (*p1ij) * (*p2j);
+		*p = f;
+	}
+}
+
+void mul(CMat &res, const CMat &m, const double &f)
+{
+	res.row=m.row, res.clm=m.clm, res.rc=m.rc;
+	const double *p1=m.dd, *pEnd=&m.dd[m.rc];
+	for(double *p=res.dd; p1<pEnd; p++,p1++) *p=*p1*f;
+}
+
+void mul(CVect3 &res, const CMat3 &m, const CVect3 &v)
+{
+	res.i=m.e00*v.i+m.e01*v.j+m.e02*v.k, res.j=m.e10*v.i+m.e11*v.j+m.e12*v.k, res.k=m.e20*v.i+m.e21*v.j+m.e22*v.k;
+}
+
+void mul(CVect3 &res, const CVect3 &v, const CMat3 &m)
+{
+	res.i=m.e00*v.i+m.e10*v.j+m.e20*v.k, res.j=m.e01*v.i+m.e11*v.j+m.e21*v.k, res.k=m.e02*v.i+m.e12*v.j+m.e22*v.k;
+}
+
+void mul(CMat3 &res, const CMat3 &m1, const CMat3 &m2)
+{
+	if(&res==&m1||&res==&m2) {
+		res=m1*m2;
+	}
+	else {
+		res.e00 = m1.e00*m2.e00 + m1.e01*m2.e10 + m1.e02*m2.e20;
+		res.e01 = m1.e00*m2.e01 + m1.e01*m2.e11 + m1.e02*m2.e21;
+		res.e02 = m1.e00*m2.e02 + m1.e01*m2.e12 + m1.e02*m2.e22;
+		res.e10 = m1.e10*m2.e00 + m1.e11*m2.e10 + m1.e12*m2.e20;
+		res.e11 = m1.e10*m2.e01 + m1.e11*m2.e11 + m1.e12*m2.e21;
+		res.e12 = m1.e10*m2.e02 + m1.e11*m2.e12 + m1.e12*m2.e22;
+		res.e20 = m1.e20*m2.e00 + m1.e21*m2.e10 + m1.e22*m2.e20;
+		res.e21 = m1.e20*m2.e01 + m1.e21*m2.e11 + m1.e22*m2.e21;
+		res.e22 = m1.e20*m2.e02 + m1.e21*m2.e12 + m1.e22*m2.e22;
+	}
+}
+
+void mul(CQuat &res, const CQuat &q1, const CQuat &q2)
+{
+	double 
+		qq0 = q1.q0*q2.q0 - q1.q1*q2.q1 - q1.q2*q2.q2 - q1.q3*q2.q3,
+		qq1 = q1.q0*q2.q1 + q1.q1*q2.q0 + q1.q2*q2.q3 - q1.q3*q2.q2,
+		qq2 = q1.q0*q2.q2 + q1.q2*q2.q0 + q1.q3*q2.q1 - q1.q1*q2.q3;
+	 res.q3 = q1.q0*q2.q3 + q1.q3*q2.q0 + q1.q1*q2.q2 - q1.q2*q2.q1;
+	res.q0=qq0, res.q1=qq1, res.q2=qq2;
+}
+
+void mul(CVect3 &res, const CQuat &q, const CVect3 &v)
+{
+	double
+		qq0 =         - q.q1*v.i - q.q2*v.j - q.q3*v.k,
+		qq1 = q.q0*v.i           + q.q2*v.k - q.q3*v.j,
+		qq2 = q.q0*v.j           + q.q3*v.i - q.q1*v.k,
+		qq3 = q.q0*v.k           + q.q1*v.j - q.q2*v.i;
+	res.i = -qq0*q.q1 + qq1*q.q0 - qq2*q.q3 + qq3*q.q2;
+	res.j = -qq0*q.q2 + qq2*q.q0 - qq3*q.q1 + qq1*q.q3;
+	res.k = -qq0*q.q3 + qq3*q.q0 - qq1*q.q2 + qq2*q.q1;
+}
+
+void _TT(CMat3 &mT, const CMat3 &m)
+{
+	mT.e00=m.e00, mT.e10=m.e01, mT.e20=m.e02;
+	mT.e01=m.e10, mT.e11=m.e11, mT.e21=m.e12;
+	mT.e02=m.e20, mT.e12=m.e21, mT.e22=m.e22;
+}
+
+void rv2q(CQuat &q, const CVect3 &rv)
+{
+	double n2 = rv.i*rv.i+rv.j*rv.j+rv.k*rv.k, f;
+	if(n2<(PI/180.0*PI/180.0))	// 0.017^2 
+	{
+		double n4=n2*n2;
+		q.q0 = 1.0 - n2*(1.0/rvF2) + n4*(1.0/rvF4);
+		f = 0.5 - n2*(1.0/rvF3) + n4*(1.0/rvF5);
+	}
+	else
+	{
+		double n_2 = sqrt(n2)/2.0;
+		q.q0 = cos(n_2);
+		f = sin(n_2)/n_2*0.5;
+	}
+	q.q1=f*rv.i, q.q2=f*rv.j, q.q3=f*rv.k;
+}
+
+void qdelphi(CQuat &q, const CVect3 &phi)
+{
+	CQuat qtmp;
+	rv2q(qtmp, phi);
+	double
+		  q0 = qtmp.q0*q.q0 - qtmp.q1*q.q1 - qtmp.q2*q.q2 - qtmp.q3*q.q3,
+		  q1 = qtmp.q0*q.q1 + qtmp.q1*q.q0 + qtmp.q2*q.q3 - qtmp.q3*q.q2,
+		  q2 = qtmp.q0*q.q2 + qtmp.q2*q.q0 + qtmp.q3*q.q1 - qtmp.q1*q.q3;
+		q.q3 = qtmp.q0*q.q3 + qtmp.q3*q.q0 + qtmp.q1*q.q2 - qtmp.q2*q.q1;
+	q.q0=q0; q.q1=q1; q.q2=q2;
+}
+
+void q2mat(CMat3 &Cnb, const CQuat &qnb)
+{
+	double	q11 = qnb.q0*qnb.q0, q12 = qnb.q0*qnb.q1, q13 = qnb.q0*qnb.q2, q14 = qnb.q0*qnb.q3, 
+			q22 = qnb.q1*qnb.q1, q23 = qnb.q1*qnb.q2, q24 = qnb.q1*qnb.q3,     
+			q33 = qnb.q2*qnb.q2, q34 = qnb.q2*qnb.q3,  
+			q44 = qnb.q3*qnb.q3;
+    Cnb.e00 = q11+q22-q33-q44,  Cnb.e01 = 2*(q23-q14),     Cnb.e02 = 2*(q24+q13),
+	Cnb.e10 = 2*(q23+q14),      Cnb.e11 = q11-q22+q33-q44, Cnb.e12 = 2*(q34-q12),
+	Cnb.e20 = 2*(q24-q13),      Cnb.e21 = 2*(q34+q12),     Cnb.e22 = q11-q22-q33+q44;
+}
+
+void m2att(CVect3 &att, const CMat3 &Cnb)
+{
+//	att.i = asinEx(Cnb.e21);
+	float e21=(float)Cnb.e21;
+	if(e21<-1.0) e21=1.0; else if(e21>1.0) e21=1.0;  att.i = asinf(e21);
+//	att.j = atan2Ex(-Cnb.e20, Cnb.e22);
+	float e20=(float)Cnb.e20, e22=(float)Cnb.e22;
+	att.j = (e20>1.0e-10||e20<-1.0e-10 || e22>1.0e-10||e22<-1.0e-10) ? atan2f(-e20, e22) : 0.0;
+//	att.k = atan2Ex(-Cnb.e01, Cnb.e11);
+	float e01=(float)Cnb.e01, e11=(float)Cnb.e11;
+	att.k = (e01>1.0e-10||e01<-1.0e-10 || e11>1.0e-10||e11<-1.0e-10) ? atan2f(-e01, e11) : 0.0;
+}
+
+void AXbt(CVect3 &res, const CMat3 &A, const CVect3 &X, const CVect3 &b, const double &t)
+{
+	double  i = A.e00*X.i+A.e01*X.j+A.e02*X.k + b.i*t,
+		    j = A.e10*X.i+A.e11*X.j+A.e12*X.k + b.j*t;
+		res.k = A.e20*X.i+A.e21*X.j+A.e22*X.k + b.k*t;
+	res.i=i, res.j=j;
 }
 
 void sizedisp(int i)

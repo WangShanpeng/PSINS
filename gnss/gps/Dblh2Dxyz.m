@@ -6,7 +6,7 @@ function [T, Dxyz] = Dblh2Dxyz(blh, Dblh)
 % Inputs: blh - geographic position [lat;lon;hgt]
 %         Dblh - position perturbation [dlat;dlon;dhgt]
 %                where dlat,dlon in radians, dhgt in meter
-% Outputs: T - transformation matrix from nav-frame to Earth-frame
+% Outputs: T - transformation matrix from nav-frame to Earth-frame, T=C^e_n*M_pv
 %          Dxyz - position perturbation in Earth-frame in meters
 %
 % See also  blh2xyz, pos2cen.

@@ -11,7 +11,7 @@ global glv
     if nargin<2, t0=dd(1,2); end
     if t0==-inf, t0=dd(1,2); end
     dd(:,2) = dd(:,2)-t0;  % ttest(dd(:,2))
-    if tobin==1, binfile(fnameext(fname,'bin'),dd); end
+    if tobin==1, binfile(fnameext(fname,'bin'),dd); end  % sw28(fname, t0, 1);
     if size(dd,2)==15 
         %seq, time, exp_time, enu_x, enu_y, enu_z, enu_rx, enu_ry, enu_rz, enu_vx, enu_vy, enu_vz, lon, lat, alt
         imu = 1;

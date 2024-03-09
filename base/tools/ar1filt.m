@@ -12,5 +12,5 @@ function x = ar1filt(x, N)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 26/01/2021
 	[b, a] = ar1coefs(1, N);
-% 	x = filtfilt(b, a, x);
-    x = filter(b, a, x);
+	x = filtfilt(b, a, x);
+%     x = filter(b, a, x);

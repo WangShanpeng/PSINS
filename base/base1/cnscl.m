@@ -48,7 +48,7 @@ global glv
             dphim = conehighorder(wm);
         end
 	end
-    phim = (wmm+dphim)';  dvbm = [0; 0; 0];
+    phim = (wmm+dphim*glv.csCompensate)';  dvbm = [0; 0; 0];
     %% sculling compensation
     if m>=6
         vm = imu(:,4:6); 
@@ -69,7 +69,7 @@ global glv
             end
         end
         rotm = 1.0/2*cros(wmm,vmm);
-        dvbm = (vmm+rotm+scullm)';
+        dvbm = (vmm+(rotm+scullm)*glv.csCompensate)';
     end
 
 function [imu, n] = imureshape(imu0, n0, m0)

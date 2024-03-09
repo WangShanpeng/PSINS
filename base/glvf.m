@@ -32,6 +32,7 @@ global glv
     glv.mGal = 1.0e-3*0.01;         % milli Gal = 1cm/s^2 ~= 1.0E-6*g0
     glv.uGal = glv.mGal/1000;       % micro Gal
     glv.ugpg2 = glv.ug/glv.g0^2;    % ug/g^2
+    glv.ugpg3 = glv.ug/glv.g0^3;    % ug/g^3
     glv.ws = 1/sqrt(glv.Re/glv.g0); % Schuler frequency
     glv.ppm = 1.0e-6;               % parts per million
     glv.deg = pi/180;               % arcdeg
@@ -46,6 +47,9 @@ global glv
     glv.dpsh = glv.deg/sqrt(glv.hur);  % arcdeg / sqrt(hour)
     glv.dphpsh = glv.dph/sqrt(glv.hur); % (arcdeg/hour) / sqrt(hour)
     glv.dph2 = glv.dph/glv.hur;    % (arcdeg/hour) / hour
+    glv.secpg = glv.sec/glv.g0;    % arcsec / g
+    glv.secpdps2 = glv.sec/(glv.deg/1^2);    % arcsec / (deg/s^2)
+    glv.secprps2 = glv.sec/(1/1^2);    % arcsec / (rad/s^2)
     glv.Hz = 1/1;                   % Hertz
     glv.dphpsHz = glv.dph/glv.Hz;   % (arcdeg/hour) / sqrt(Hz)
     glv.dphpg = glv.dph/glv.g0;     % (arcdeg/hour) / g
@@ -68,10 +72,12 @@ global glv
         [250,  525,  650,  1375, 0    ]/504 
         [2315, 4558, 7296, 7834, 15797]/4620 ];
     glv.csmax = size(glv.cs,1)+1;  % max subsample number
+    glv.csCompensate = 1; % csCompensate=0 or 1, default 1
     glv.v0 = [0;0;0];    % 3x1 zero-vector
     glv.qI = [1;0;0;0];  % identity quaternion
     glv.I33 = eye(3); glv.o33 = zeros(3);  % identity & zero 3x3 matrices
-    glv.pos0 = [34.246048*glv.deg; 108.909664*glv.deg; 380]; % position of INS Lab@NWPU
+%   glv.pos0 = [34.246048*glv.deg; 108.909664*glv.deg; 380]; % position of INS Lab@NWPU old
+    glv.pos0 = [34.034310*glv.deg; 108.775427*glv.deg; 450];
     glv.eth = []; glv.eth = earth(glv.pos0);
     glv.t0 = 0;
     glv.tscale = 1;  % =1 for second, =60 for minute, =3600 for hour, =24*3600 for day

@@ -1,5 +1,5 @@
 function att = qis2att(qis, utc0, pos, isfig)
-% Translate q = [q1 q2 q3] to q = [q0 q1 q2 q3], for |q|=1 and q0>=0.
+% Translate CNS i-frame quaternion to n-frame attitude.
 %
 % Prototype: att = qis2att(qis, utc0, pos)
 % Inputs: qis - CNS quaternion output

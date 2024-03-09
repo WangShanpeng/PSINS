@@ -13,7 +13,7 @@ trj = trjfile('trj10ms.mat');  % insplot(trj.avp)
 %% init
 imuerr = imuerrset(0.03, 100, 0.001, 10);
 imu = imuadderr(trj.imu, imuerr);
-davp0 = avperrset([1.0*60;-1.0*60;60.0*60], [0.1;0.1;0.1], [1;1;3]);
+davp0 = avperrset([1.0*60;-1.0*60;160.0*60], [0.1;0.1;0.1], [1;1;3]);
 gps = gpssimu(trj.avp, davp0(4:6), davp0(7:9), 1);
 imugpssyn(imu(:,7), gps(:,7));
 ins = insinit(trj.avp0(1:9), ts, davp0);

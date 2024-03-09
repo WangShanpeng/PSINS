@@ -25,6 +25,7 @@ function [kf, ins, xfb] = kffeedback(kf, ins, T_fb, fbstr)
 %         kf.coef_fb(kf.xtau>kf.T_fb) = 1;
         idx = kf.T_fb>kf.xtau;  % scale<vector
         kf.coef_fb(idx) = 1;  kf.coef_fb(~idx) = kf.T_fb./kf.xtau(~idx);   %2022-6-25
+        kf.coef_fb(kf.xtau<0.001 & kf.T_fb~=inf) = 1;
     end
     xfb_tmp = kf.coef_fb.*kf.xk;  xfb = xfb_tmp*0;
     for k=1:length(fbstr)

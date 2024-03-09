@@ -4,7 +4,7 @@ function distplot(dist)
 % Prototype: distplot(dist)
 % Inputs: dist - distance data
 %
-% See also  odplot.
+% See also  odplot, distance.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

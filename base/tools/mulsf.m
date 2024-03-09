@@ -2,10 +2,10 @@ function x = mulsf(x, sf, clm)
 % Multiply scale factors.
 %
 % Prototype:  x = mulsf(x, sf, clm)
-% Inputs: x_in - input date with bias
+% Inputs: x_in - input data with bias
 %         sf - scale factor to multiply
 %         clm - data column to delete bias
-% Outputs: x - output date with no bias
+% Outputs: x - output data with no bias
 %
 % See also  delbias, imudeldrift.
 

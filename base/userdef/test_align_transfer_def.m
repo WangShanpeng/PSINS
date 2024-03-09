@@ -25,8 +25,8 @@ switch tag
         subplot(423),plot(t, xkpk(:,7:9)/glv.dph), xygo('eb'),  plot(t,repmat(imuerr.eb,1,len)/glv.dph,'-.'),
         subplot(424),plot(t, xkpk(:,10:12)/glv.ug), xygo('db'), plot(t,repmat(imuerr.db,1,len)/glv.ug,'-.'),
         subplot(425),plot(t, xkpk(:,13:15)/glv.min), xygo('mu'), plot(t,repmat(mub,1,len)/glv.min,'-.'),
-        subplot(426),plot(t, xkpk(:,16:18)/glv.min), xygo('theta'), plot(t,thetak/glv.min,'-.'),
-        subplot(427),plot(t, xkpk(:,19:21)/glv.dps), xygo('w'),  plot(t,omegak/glv.dps,'-.'),
+        subplot(426),plot(t, xkpk(:,16:18)/glv.min), xygo('theta'), plot(t,thetak(:,1:3)/glv.min,'-.'),
+        subplot(427),plot(t, xkpk(:,19:21)/glv.dps), xygo('w'),  plot(t,omegak(:,1:3)/glv.dps,'-.'),
         myfigure,
         xkpk(:,21+[1:21]) = sqrt(xkpk(:,21+[1:21]));
         subplot(421),plot(t, xkpk(:,21+[1:3])/glv.min), xygo('phi');

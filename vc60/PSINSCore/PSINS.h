@@ -1,9 +1,9 @@
 
 /* PSINS(Precise Strapdown Inertial Navigation System) C++ algorithm hearder file PSINS.h
 
-Copyright(c) 2015-2022, by YanGongmin, All rights reserved.
+Copyright(c) 2015-2023, by YanGongmin, All rights reserved.
 Northwestern Polytechnical University, Xi'an, P.R.China.
-Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022
+Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022, 23/09/2023
 */
 
 #ifndef _PSINS_H
@@ -20,20 +20,22 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17
 #pragma pack(4)
 
 /************** compiling control !!! ***************/
-#define PSINS_MATRIX_MAX_DIM	40
+#define PSINS_MATRIX_MAX_DIM	46
 #define PSINS_IO_FILE
 #define PSINS_IO_FILE_FIND
 #define PSINS_RMEMORY
 //#define PSINS_AHRS_MEMS
 //#define PSINS_psinsassert
-//#define MAT_COUNT_STATISTIC
+//#define PSINS_MAT_COUNT
 //#define PSINS_STACK
 //#define PSINS_CONSOLE_UART
 //#define PSINS_VC_AFX_HEADER
+//#define PSINS_COMPLEX
+#define PSINS_FAST_CALCULATION
 //#define PSINS_FOR_LINUX
 
-// for Linux
-#ifdef PSINS_FOR_LINUX
+#ifdef PSINS_IO_FILE
+#ifdef PSINS_FOR_LINUX  // for Linux
 	#undef PSINS_IO_FILE_FIND
 	#undef PSINS_CONSOLE_UART
 	#undef PSINS_VC_AFX_HEADER
@@ -43,6 +45,7 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17
 #else
 	#include <conio.h>
 	#include <io.h>
+#endif
 #endif
 
 // type re-define
@@ -91,7 +94,9 @@ typedef unsigned char BYTE;
 #define UG		(G0/1.0e6)		// ug
 #define UGPSHZ	(UG/1)			// ug/sqrt(Hz)
 #define UGPG2	(UG/G0/G0)		// ug/g^2
+#define SECPG	(SEC/G0)		// sec/g
 #define RE		6378137.0
+#define FF		(1.0/298.257)
 #define PPM		1.0e-6
 
 #ifndef EPS
@@ -149,6 +154,7 @@ typedef unsigned char BYTE;
 #define fINF9			fXX9(INF)
 #define fPHI(EN,U)		fXXZU(EN,U,MIN)
 #define fMU(X,Y,Z)		fXYZU(X,Y,Z,MIN)
+#define fdVEL(X)		fXXX(X)
 #define fdLLH(LL,H)		fXXZ((LL)/RE,(H))
 #define fdPOS(LLH)		fdLLH(LLH,LLH)
 #define fDEG3(X)		fXXX(X*DEG)
@@ -182,8 +188,11 @@ typedef unsigned char BYTE;
 #define fdKGA(dkgii,dkgij,dkaii,dkaij)	fdKGA15(dkgii,dkgij,dkaii,dkaij)
 #define fdKGA(dkgii,dkgij,dkaii,dkaij)	fdKGA15(dkgii,dkgij,dkaii,dkaij)
 #define fdKa23(dka2)	fXXX(dka2*UGPG2)
+#define fdKapn3(dkapn)	fXXX(dkapn*PPM)
 #define fInLv3(lv)		fXXX(lv*0.01)	// in cm
 #define fInLv6(lv)		fInLv3(lv),fInLv3(lv)
+#define SECPG3(X)  fXXX(X*SECPG)
+#define SECPG9(X)  SECPG3(X),SECPG3(X),SECPG3(X)
 
 
 #define dbsize(datatype)	( (int)(sizeof(datatype)/sizeof(double)) )
@@ -206,7 +215,7 @@ typedef unsigned char BYTE;
 #define CC180C360(yaw)  ( (yaw)>0.0 ? (_2PI-(yaw)) : -(yaw) )   // counter-clockwise +-180deg -> clockwise 0~360deg for yaw
 #define C360CC180(yaw)  ( (yaw)>=PI ? (_2PI-(yaw)) : -(yaw) )   // clockwise 0~360deg -> counter-clockwise +-180deg for yaw
 #define LLH(latitude,longitude,height)	CVect3((latitude)*DEG,(longitude)*DEG,height)
-#define PRY(pitch,roll,yaw)				CVect3((pitch)*DEG,(roll)*DEG,C360CC180((yaw)*DEG))
+#define PRY(pitch,roll,yaw)		CVect3((pitch)*DEG,(roll)*DEG,C360CC180((yaw)*DEG))
 #define LLHcvt(pllh)	{ double *p=(double*)pllh,tmp=p[0]; p[0]=p[1]*DEG,p[1]=tmp*DEG; }  // lat/lon/hgt convert
 #define PRYcvt(ppry)	{ double *p=(double*)ppry,y=p[2]*DEG; p[0]=p[0]*DEG,p[1]=p[1]*DEG,p[2]=C360CC180(y); }  // pch/rll/yaw convert
 
@@ -220,7 +229,9 @@ extern int	psinsstack0, psinsstacksize;
 #define stacksize()		NULL
 #endif
 
-#define disp(i, FRQ, n)  { if((i)%((n)*(FRQ))==0) printf("%d\n", (i)/(FRQ));  if(kbhit()&&getch()=='x') exit(0); } 
+#define disp(i, FRQ, n)  { if((i)%((n)*(FRQ))==0) printf("%d\n", (i)/(FRQ)); } 
+#define dispx(i, FRQ, n)  { disp(i,FRQ,n);  if(kbhit()&&getch()=='x') exit(0); }   // kbhit & getch waste time
+
 void sizedisp(int i=0);
 
 // class define
@@ -233,7 +244,7 @@ class CRAvar;		class CVAR;			class CVARn;		class CIIR;			class CIIRV3;
 class CMaxMin;		class CMaxMinn;		class CRMemory;		class CSmooth;		class CFileRdWt;
 class CDR;			class CVAutoPOS;	class CPOS618;		class CAutoDrive;	class CSINSGNSSOD;
 class CSGOClbt;		class CWzhold;		class CUartPP;		class CInterp;		class CFileLog;
-class CVCFileFind;	class PSINSBoard;	class ConUart;		class CContLarge;	class CFileCfg;
+class CVCFileFind;	class ConUart;		class CContLarge;	class CFileCfg;
 
 // global variables
 extern const CVect3	O31, One31, I31Z, Ipos, posNWPU;
@@ -251,6 +262,7 @@ double	dm2r(double dm);
 BOOL	logtrigger(int n, double f0=1.0);
 inline  BOOL IsZero(double f, double eps=EPS);
 int		sign(double val, double eps=EPS);
+double  randn(double mu, double sigma=1.0);
 double	range(double val, double minVal, double maxVal);
 double  maxn(const double *pd, int n);
 double  minn(const double *pd, int n);
@@ -262,8 +274,27 @@ double  polyval(const double *p, int order, double x);
 double	atan2Ex(double y, double x);
 double  diffYaw(double yaw, double yaw0);
 double	MKQt(double sR, double tau);
+char*	timestr(int type=0, char *p=NULL);
+char*	time2fname(void);
 double	unixt2gpst(double ut, int leap=0);
 int*	deci(int i, int *pi=NULL);		// decode decimal to 0~9 array
+BOOL	chkhdr(const char *str, const char *hdr);
+BYTE*	flipud(BYTE *p, int rows, int clmBytes);
+#define crosI(v1,v2)		(v1.j*v2.k-v1.k*v2.j)
+#define crosJ(v1,v2)		(v1.k*v2.i-v1.i*v2.k)
+#define crosK(v1,v2)		(v1.i*v2.j-v1.j*v2.i)
+#define VEQU(vv,v1)			{vv.i=v1.i, vv.j=v1.j, vv.k=v1.k;}
+#define VCROS(vv,v1,v2)		{double i=crosI(v1,v2), j=crosJ(v1,v2); vv.k=crosK(v1,v2); vv.i=i, vv.j=j;}
+#define VDOT(f,v1,v2)		{f=v1.i*v2.i+v1.j*v2.j+v1.k*v2.k;}
+#define VDOTMUL(vv,v1,v2)	{vv.i=v1.i*v2.j, vv.j=v1.j*v2.j, vv.k=v1.k*v2.k;}
+#define VMULf(vv,v1,f)		{vv.i=v1.i*(f), vv.j=v1.j*(f), vv.k=v1.k*(f);}
+#define VADD(vv,v1,v2)		{vv.i=v1.i+v2.i, vv.j=v1.j+v2.j, vv.k=v1.k+v2.k;}
+#define VADDE(vv,v2)		{vv.i+=v2.i, vv.j+=v2.j, vv.k+=v2.k;}
+#define VSUB(vv,v1,v2)		{vv.i=v1.i-v2.i, vv.j=v1.j-v2.j, vv.k=v1.k-v2.k;}
+#define VSUBE(vv,v2)		{vv.i-=v2.i, vv.j-=v2.j, vv.k-=v2.k;}
+#define VADDf(vv,v1,v2,f2)	{vv.i=v1.i+v2.i*(f2), vv.j=v1.j+v2.j*(f2), vv.k=v1.k+v2.k*(f2);}
+#define VADDff(vv,v1,f1,v2,f2)	{vv.i=v1.i*(f1)+v2.i*(f2), vv.j=v1.j*(f1)+v2.j*(f2), vv.k=v1.k*(f1)+v2.k*(f2);}
+#define MMULf(m,m1,f)		{m.e00=m1.e00*(f),m.e01=m1.e01*(f),m.e02=m1.e02*(f),m.e10=m1.e10*(f),m.e11=m1.e11*(f),m.e12=m1.e12*(f),m.e20=m1.e20*(f),m.e21=m1.e21*(f),m.e22=m1.e22*(f);}
 #define swapt(a, b, tpe)  { tpe tmp=a; a=b; b=tmp; };
 #define pow2(x)			((x)*(x))
 #define asinEx(x)		asin(range(x, -1.0, 1.0))
@@ -273,48 +304,6 @@ int*	deci(int i, int *pi=NULL);		// decode decimal to 0~9 array
 #define hit2(t, t10, t11, t20, t21)   ( hit1(t,t10,t11) || hit1(t,t20,t21) )
 #define hit3(t, t10, t11, t20, t21, t30, t31)   ( hit2(t,t10,t11,t20,t21) || hit1(t,t30,t31) )
 #define hit4(t, t10, t11, t20, t21, t30, t31, t40, t41)   ( hit3(t, t10, t11, t20, t21, t30, t31) || hit1(t,t40,t41) )
-
-// friend declaration with default argument
-BOOL	IsZero(const CVect3 &v, double eps=EPS);
-BOOL	IsZeroXY(const CVect3 &v, double eps=EPS);
-CVect3	pow(const CVect3 &v, int k=2);
-CVect3	sv2att(const CVect3 &fb, double yaw0=0.0, const CVect3 &fn=I31Z);
-double	MagYaw(const CVect3 &mag, const CVect3 &att, double declination=0);
-CVect3	attract(const CVect3 &v, const CVect3 &th=One31, const CVect3 &center=O31);
-CVect3	ff2muxy(const CVect3 &f0, const CVect3 &f1, const char *dir0=NULL, const char *dir1=NULL);
-CMat3	askew(const CMat3 &m, int I=0);
-CMat3	MMT(const CMat3 &m1, const CMat3 &m2=I33);
-double	trMMT(const CMat3 &m1, const CMat3 &m2=I33);
-CMat3	sfoam(const CMat3 &B, int iter=50);
-CVect	pow(const CVect &v, int k=2);
-double	randn(double mu, double sigma=1.0);
-CVect3	randn(const CVect3 &mu, const CVect3 &sigma=One31);
-CVect	randn(const CVect &mu, const CVect &sigma=Onen1);
-CMat3	randn(const CMat3 &mu, const double &sigma=1.0);
-CMat	randn(const CMat &mu, const double &sigma=1.0);
-void	DVMDVafa(const CVect &V, CMat &M, double afa=1.0);
-void	IMURFU(CVect3 *pwm, int nSamples, const char *str="X");
-void	IMURFU(CVect3 *pwm, CVect3 *pvm, int nSamples, const char *str="X");
-void	IMUStatic(CVect3 &wm, CVect3 &vm, CVect3 &att0, CVect3 &pos0, double ts=1.0);
-void	fusion(double *x1, double *p1, const double *x2, const double *p2, int n=9, double *xf=NULL, double *pf=NULL);
-void	MeasUD(double U[], double D[], const double H[], double R, double K[], int n);
-CMat3	Ka2Cba(const CMat3 &Ka, CVect3 &Sfa=Vrbs);
-CMat3	Cba2Ka(const CMat3 &Cba, const CVect3 &Sfa=One31);
-void	RowMul(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0);
-void	RowMulT(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0);
-CFileCfg WriteCfg(const char *fname, const char *ext=NULL);
-CFileCfg ReadCfg(const char *fname, const char *ext=NULL);
-unsigned char* swap24(unsigned char* puc3, unsigned char* pres=NULL);
-// function re-define ?
-CVect3	q2att(const CQuat &qnb);
-CVect3	q2attr(const CQuat &qnb);
-CMat3	q2mat(const CQuat &qnb);
-CVect3	m2att(const CMat3 &m);
-CQuat	m2qua(const CMat3 &Cnb);
-CMat3	diag(const CVect3 &v);
-CMat	lsclbt(CMat &wfb, CMat &wfn);
-char*	timestr(int type=0, char *p=NULL);
-char*	time2fname(void);
 
 // Matrix Max Dimension define
 #define MMD		PSINS_MATRIX_MAX_DIM
@@ -329,8 +318,14 @@ public:
 	double dps, dph, dpsh, dphpsh, dph2, dphpg, ugpsh, ugpsHz, ugpg2, mpsh, mpspsh, secpsh;
 
 	CGLV(double Re=6378137.0, double f=(1.0/298.257), double g0=9.7803267714, double wie0=7.2921151467e-5);
+#ifdef PSINS_IO_FILE
+	clock_t	t0;
+	int toc(BOOL disp=0);
+	~CGLV(void);
+#endif
 };
 
+#ifdef PSINS_COMPLEX
 class CComplex
 {
 public:
@@ -339,29 +334,30 @@ public:
 	CComplex(double a0, double b0=0.0);
 	CComplex operator+(const CComplex &z) const;		// complex addition
 	CComplex operator+(double a0) const;
-	friend CComplex operator+(double a0, const CComplex &z);
 	CComplex operator-(const CComplex &z) const;		// complex subtraction
 	CComplex operator-(double a0) const;
-	friend CComplex operator-(double a0, const CComplex &z);
 	CComplex operator*(const CComplex &z) const;		// complex multiplication
 	CComplex operator*(double a0) const;
-	friend CComplex operator*(double a0, const CComplex &z);
 	CComplex operator/(const CComplex &z) const;		// complex divide
 	CComplex operator/(double a0) const;
-	friend CComplex operator/(double a0, const CComplex &z);
 	CComplex& operator=(double a0);						// equal to a real
-	friend CComplex operator-(const CComplex &z);		// minus
-	friend CComplex operator~(const CComplex &z);		// complex conjugate
-	friend double real(const CComplex &z);				// real
-	friend double img(const CComplex &z);				// image
-	friend double norm(const CComplex &z);				// norm
-	friend double arg(const CComplex &z);				// argument
-	friend CComplex pow(const CComplex &z, double k);	// z^k
-	friend CComplex sqrt(const CComplex &z);
-	friend CVect3 m33abc(const CMat3 &m);
-	friend CVect3 realrt3(double a, double b, double c);	// real roots for x^3+ax^2+bx+c=0;
-	friend CVect3 ShengJin(double a, double b, double c);	// real roots for x^3+ax^2+bx+c=0;
 };
+CComplex operator+(double a0, const CComplex &z);
+CComplex operator-(double a0, const CComplex &z);
+CComplex operator*(double a0, const CComplex &z);
+CComplex operator/(double a0, const CComplex &z);
+CComplex operator-(const CComplex &z);		// minus
+CComplex operator~(const CComplex &z);		// complex conjugate
+double real(const CComplex &z);				// real
+double img(const CComplex &z);				// image
+double norm(const CComplex &z);				// norm
+double arg(const CComplex &z);				// argument
+CComplex pow(const CComplex &z, double k);	// z^k
+CComplex sqrt(const CComplex &z);
+CVect3 m33abc(const CMat3 &m);
+CVect3 realrt3(double a, double b, double c);	// real roots for x^3+ax^2+bx+c=0;
+CVect3 ShengJin(double a, double b, double c);	// real roots for x^3+ax^2+bx+c=0;
+#endif  // PSINS_COMPLEX
 
 class CVect3 
 {
@@ -376,9 +372,6 @@ public:
 
 	CVect3& operator=(double f);							// every element equal to a same double
 	CVect3& operator=(const double *pf);					// vector equal to a array
-	friend BOOL IsZero(const CVect3 &v, double eps);		// psinsassert if all elements are zeros
-	friend BOOL IsZeroXY(const CVect3 &v, double eps);		// psinsassert if x&&y-elements are zeros
-	friend BOOL IsNaN(const CVect3 &v);						// psinsassert if any element is NaN
 	CVect3 operator+(const CVect3 &v) const;				// vector addition
 	CVect3 operator-(const CVect3 &v) const;				// vector subtraction
 	CVect3 operator*(const CVect3 &v) const;				// vector cross multiplication
@@ -392,56 +385,70 @@ public:
 	CVect3& operator/=(double f);							// vector divide scale
 	CVect3& operator/=(const CVect3 &v);					// vector divide vect3 element by element
 	double& operator()(int r);								// vector element
-	friend CVect3 operator*(double f, const CVect3 &v);		// scale multiply vector
-	friend CVect3 operator-(const CVect3 &v);				// minus
-	friend CMat3 vxv(const CVect3 &v1, const CVect3 &v2);	// column-vector multiply row-vector, v1*v2'
-	friend CVect3 abs(const CVect3 &v);						// abs for each element
-	friend CVect3 maxabs(const CVect3 &v1, const CVect3 &v2);	// max_abs for each element
-	friend double norm(const CVect3 &v);					// vector norm
-	friend double normlize(CVect3 *v);						// vector normlize
-	friend double normInf(const CVect3 &v);					// vector inf-norm
-	friend double normXY(const CVect3 &v);					// vector norm of X & Y components
-	friend double normXYInf(const CVect3 &v);				// vector inf-norm of X & Y components
-	friend CVect3 sqrt(const CVect3 &v);					// sqrt for each element
-	friend CVect3 pow(const CVect3 &v, int k);				// power for each element
-	friend double dot(const CVect3 &v1, const CVect3 &v2);	// vector dot multiplication
-	friend CVect3 dotmul(const CVect3 &v1, const CVect3 &v2);	// vector dot multiplication '.*'
-	friend CVect3 dotdiv(const CVect3 &v1, const CVect3 &v2);	// vector dot divide './'
-	friend CMat3 a2mat(const CVect3 &att);					// Euler angles to DCM 
-	friend CVect3 m2att(const CMat3 &Cnb);					// DCM to Euler angles 
-	friend CVect3 m2attr(const CMat3 &Cnb);					// DCM to reversed Euler angles (in 3-2-1 rotation sequence)
-	friend CVect3 q2attr(const CQuat &qnb);					// Qnb to reversed Euler angles (in 3-2-1 rotation sequence)
-	friend CQuat a2qua(double pitch, double roll, double yaw);	// Euler angles to quaternion
-	friend CQuat a2qua(const CVect3 &att);					// Euler angles to quaternion
-	friend CMat3 ar2mat(const CVect3 &attr);				// reversed Euler angles to DCM
-	friend CQuat ar2qua(const CVect3 &attr);				// reversed Euler angles to Qnb
-	friend CVect3 q2att(const CQuat &qnb);					// quaternion to Euler angles 
-	friend CQuat rv2q(const CVect3 &rv);					// rotation vector to quaternion
-	friend CMat3 rv2m(const CVect3 &rv);					// rotation vector to DCM
-	friend CVect3 q2rv(const CQuat &q);						// quaternion to rotation vector
-	friend CMat3 askew(const CVect3 &v);					// askew matrix;
-	friend double sinAng(const CVect3 &v1, const CVect3 &v2); // |sin(angle(v1,v2))|
-	friend CMat3 pos2Cen(const CVect3 &pos);				// to geographical position matrix
-	friend CVect3 pp2vn(const CVect3 &pos1, const CVect3 &pos0, double ts, CEarth *pEth);  // position difference to velocity
-	friend CVect3 MKQt(const CVect3 &sR, const CVect3 &tau);// first order Markov white-noise variance calculation
-	friend CVect3 sv2att(const CVect3 &fb, double yaw0, const CVect3 &fn);  // level attitude determination using single-vector
-	friend CVect3 dv2att(const CVect3 &va1, const CVect3 &va2, const CVect3 &vb1, const CVect3 &vb2);  // attitude determination using double-vector
-	friend CVect3 mv2att(int n, const CVect3 *vai, const CVect3 *vbi, ...);  // attitude determination using multiple-vector
-	friend CVect3 vn2att(const CVect3 &vn);  // trans ENU velocity to attitude (pitch & yaw)
-	friend CVect3 Alignsb(const CVect3 &wmm, const CVect3 &vmm, double latitude);  // align in static-base
-	friend CVect3 Alignsb(const CVect3 &wmm, const CVect3 &vmm, const CVect3 &pos);
-	friend double MagYaw(const CVect3 &mag, const CVect3 &att, double declination);
-	friend CVect3 xyz2blh(const CVect3 &xyz);				// ECEF X/Y/Z to latitude/longitude/height
-	friend CVect3 blh2xyz(const CVect3 &blh);				// latitude/longitude/height to ECEF X/Y/Z 
-	friend CVect3 Vxyz2enu(const CVect3 &Vxyz, const CVect3 &pos);  // ECEF Vx/Vy/Vz to Ve/Vn/Vu
-	friend CVect3 randn(const CVect3 &mu, const CVect3 &sigma);
-	friend CVect3 v2double(double f);
-	friend CVect3 v3double(double f);
-	friend void v5double(double f, CVect3 &v1, CVect3 &v2);
-	friend CVect3 sort(const CVect3 &v);
-	friend CVect3 attract(const CVect3 &v, const CVect3 &th, const CVect3 &center);
-	friend CVect3 ff2muxy(const CVect3 &f0, const CVect3 &f1, const char *dir0, const char *dir1);
 };
+BOOL IsZero(const CVect3 &v, double eps=EPS);		// psinsassert if all elements are zeros
+BOOL IsZeroXY(const CVect3 &v, double eps=EPS);		// psinsassert if x&&y-elements are zeros
+BOOL IsNaN(const CVect3 &v);						// psinsassert if any element is NaN
+CVect3 operator*(double f, const CVect3 &v);		// scale multiply vector
+double crossXY(const CVect3 &v1, const CVect3 &v2);
+CVect3 operator-(const CVect3 &v);				// minus
+CMat3 vxv(const CVect3 &v1, const CVect3 &v2);	// column-vector multiply row-vector, v1*v2'
+CVect3 abs(const CVect3 &v);						// abs for each element
+CVect3 maxabs(const CVect3 &v1, const CVect3 &v2);	// max_abs for each element
+double norm(const CVect3 &v);					// vector norm
+double normlize(CVect3 *v);						// vector normlize
+double normInf(const CVect3 &v);					// vector inf-norm
+double normXY(const CVect3 &v);					// vector norm of X & Y components
+double normXYInf(const CVect3 &v);				// vector inf-norm of X & Y components
+CVect3 sqrt(const CVect3 &v);					// sqrt for each element
+CVect3 pow(const CVect3 &v, int k=2);				// power for each element
+double dot(const CVect3 &v1, const CVect3 &v2);	// vector dot multiplication
+CVect3 dotmul(const CVect3 &v1, const CVect3 &v2);	// vector dot multiplication '.*'
+CVect3 dotdiv(const CVect3 &v1, const CVect3 &v2);	// vector dot divide './'
+CMat3 a2mat(const CVect3 &att);					// Euler angles to DCM 
+CVect3 m2att(const CMat3 &Cnb);					// DCM to Euler angles 
+CVect3 m2attr(const CMat3 &Cnb);					// DCM to reversed Euler angles (in 3-2-1 rotation sequence)
+CVect3 q2attr(const CQuat &qnb);					// Qnb to reversed Euler angles (in 3-2-1 rotation sequence)
+CQuat a2qua(double pitch, double roll, double yaw);	// Euler angles to quaternion
+CQuat a2qua(const CVect3 &att);					// Euler angles to quaternion
+CMat3 ar2mat(const CVect3 &attr);				// reversed Euler angles to DCM
+CQuat ar2qua(const CVect3 &attr);				// reversed Euler angles to Qnb
+CVect3 q2att(const CQuat &qnb);					// quaternion to Euler angles 
+CQuat rv2q(const CVect3 &rv);					// rotation vector to quaternion
+CMat3 rv2m(const CVect3 &rv);					// rotation vector to DCM
+CVect3 q2rv(const CQuat &q);						// quaternion to rotation vector
+CMat3 askew(const CVect3 &v);					// askew matrix;
+double sinAng(const CVect3 &v1, const CVect3 &v2, const CVect3 &v0=O31); // |sin(angle(v1,v2))|
+CVect3 rotz(const CVect3 &v, double angle);
+CMat3 pos2Cen(const CVect3 &pos);				// to geographical position matrix
+CVect3 pp2vn(const CVect3 &pos1, const CVect3 &pos0, double ts=1.0, CEarth *pEth=NULL);  // position difference to velocity
+CVect3 pp2att(const CVect3 &pos1, const CVect3 &pos0);  // position difference to attitude
+CVect3 MKQt(const CVect3 &sR, const CVect3 &tau);// first order Markov white-noise variance calculation
+CVect3 sv2att(const CVect3 &fb, double yaw0=0.0, const CVect3 &fn=I31Z);  // level attitude determination using single-vector
+CVect3 dv2att(const CVect3 &va1, const CVect3 &va2, const CVect3 &vb1, const CVect3 &vb2);  // attitude determination using double-vector
+CVect3 mv2att(int n, const CVect3 *vai, const CVect3 *vbi, ...);  // attitude determination using multiple-vector
+CVect3 vn2att(const CVect3 &vn);  // trans ENU velocity to attitude (pitch & yaw)
+CVect3 atss(CVect3 &att, CVect3 &vn);  // angles of attack & sideslip
+CVect3 Alignsb(const CVect3 &wmm, const CVect3 &vmm, double latitude);  // align in static-base
+CVect3 Alignsb(const CVect3 &wmm, const CVect3 &vmm, const CVect3 &pos);
+double MagYaw(const CVect3 &mag, const CVect3 &att, double declination=0.0);
+CVect3 xyz2blh(const CVect3 &xyz);				// ECEF X/Y/Z to latitude/longitude/height
+CVect3 blh2xyz(const CVect3 &blh);				// latitude/longitude/height to ECEF X/Y/Z 
+CVect3 Vxyz2enu(const CVect3 &Vxyz, const CVect3 &pos);  // ECEF Vx/Vy/Vz to Ve/Vn/Vu
+CVect3 randn(const CVect3 &mu, const CVect3 &sigma=One31);
+CVect3 v2double(double f);
+CVect3 v3double(double f);
+void v5double(double f, CVect3 &v1, CVect3 &v2);
+CVect3 sort(const CVect3 &v);
+double median(const CVect3 &v);
+double median(const double &f1, const double &f2, const double &f3);
+CVect3 dm2r(const CVect3 &v, int typ=2);
+CVect3 v3mmm(const CVect3 &p1, const CVect3 &p2, const CVect3 &p3, CVect3 *pmm=NULL, BOOL isMean=0, const CVect3 &th=One31);  //3-vect max-median-min
+CVect3 fopp(const CVect3 &a, const CVect3 &b, const CVect3 &c); // foot of a perpendicular
+CVect3 fopp(const CVect3 &a, const CVect3 &b, const CVect3 &c, const CVect3 &d); // foot of a perpendicular
+CVect3 tp2att(const CVect3 &a, const CVect3 &b, const CVect3 &c); // triad point to attitude
+CVect3 attract(const CVect3 &v, const CVect3 &th=One31, const CVect3 &center=O31);
+CVect3 ff2muxy(const CVect3 &f0, const CVect3 &f1, const char *dir0=NULL, const char *dir1=NULL);
 
 class CQuat
 {
@@ -461,12 +468,12 @@ public:
 	CQuat& operator*=(const CQuat &q);			// quaternion multiplication
 	CQuat& operator-=(const CVect3 &phi);		// calculated quaternion delete misalign angles
 	void SetYaw(double yaw=0.0);				// set Euler angles to designated yaw
-	friend double normlize(CQuat *q);				// quaternion norm
-	friend CQuat operator~(const CQuat &q);		// quaternion conjugate
-	friend CVect3 qq2phi(const CQuat &qcalcu, const CQuat &qreal); // phi = qcalcu - qreal
-	friend CQuat addmu(const CQuat &q, const CVect3 &mu); // qreal = qcalcu + mu
-	friend CQuat UpDown(const CQuat &q);		// Up-Down the quaternion represented attitide
 };
+double normlize(CQuat *q);				// quaternion norm
+CQuat operator~(const CQuat &q);		// quaternion conjugate
+CVect3 qq2phi(const CQuat &qcalcu, const CQuat &qreal); // phi = qcalcu - qreal
+CQuat addmu(const CQuat &q, const CVect3 &mu); // qreal = qcalcu + mu
+CQuat UpDown(const CQuat &q);		// Up-Down the quaternion represented attitide
 
 class CMat3 
 {
@@ -496,34 +503,39 @@ public:
 	void SetClm(int i, const CVect3 &v);					// set i-column from vector
 	CVect3 GetRow(int i) const;								// get i-row from matrix
 	CVect3 GetClm(int i) const;								// get i-column from matrix
-	friend CMat3 Rot(double angle, char axis);				// rotation by x/y/z axis with angle
-	friend CMat3 rcijk(const CMat3 &m, int ijk);			// re-arrange row/clm indexed by ijk
-	friend CMat3 operator-(const CMat3 &m);					// minus
-	friend CMat3 operator~(const CMat3 &m);					// matrix transposition
-	friend CMat3 operator*(double f, const CMat3 &m);		// scale multiply matrix
-	friend void symmetry(CMat3 &m);							// matrix symmetrization
-	friend CMat3 pow(const CMat3 &m, int k);				// k^th power
-	friend double trace(const CMat3 &m);					// matrix trace
-	friend double det(const CMat3 &m);						// matrix determinat
-	friend CMat3 adj(const CMat3 &m);						// 3x3 adjoint matrix
-	friend CMat3 inv(const CMat3 &m);						// 3x3 matrix inverse
-	friend CVect3 diag(const CMat3 &m);						// the diagonal of a matrix
-	friend CMat3 diag(const CVect3 &v);						// diagonal matrix
-	friend CMat3 askew(const CMat3 &m, int I);				// askew matrix;
-	friend CMat3 dotmul(const CMat3 &m1, const CMat3 &m2);	// m = m1.*m2;
-	friend CMat3 MMT(const CMat3 &m1, const CMat3 &m2);		// m=m1*m2^T
-	friend double trMMT(const CMat3 &m1, const CMat3 &m2);	// trace(m1*m2^T)
-	friend double norm(const CMat3 &m);						// matrix norm
-	friend CVect3 m2rv(const CMat3 &Cnb);					// DCM to rotation vector
-	friend CQuat m2qua(const CMat3 &Cnb);					// DCM to quaternion
-	friend CMat3 q2mat(const CQuat &qnb);					// attitude quaternion to DCM
-//	friend CMat3 Ka2Cba(const CMat3 &Ka, CVect3 *pSfa=NULL);
-//	friend CMat3 Cba2Ka(const CMat3 &Cba, const CVect3 Sfa=One31);
-	friend CMat3 sfoam(const CMat3 &B, int iter);			// Supper Fast Optimal Attitude Matrix(SFOAM)
-	friend CMat3 randn(const CMat3 &mu, const double &sigma);// random 3x3 matrix
-	friend void Ka22Kpn(const CVect3 &Ka1, const CVect3 &Ka2, CVect3 &Kap, CVect3 &Kan);
-	friend void Kpn2Ka2(const CVect3 &Kap, const CVect3 &Kan, CVect3 &Ka1, CVect3 &Ka2);
 };
+CMat3 Rot(double angle, char axis);				// rotation by x/y/z axis with angle
+CMat3 rcijk(const CMat3 &m, int ijk);			// re-arrange row/clm indexed by ijk
+CMat3 operator-(const CMat3 &m);					// minus
+CMat3 operator~(const CMat3 &m);					// matrix transposition
+CMat3 operator*(double f, const CMat3 &m);		// scale multiply matrix
+void symmetry(CMat3 &m);							// matrix symmetrization
+CMat3 pow(const CMat3 &m, int k);				// k^th power
+double trace(const CMat3 &m);					// matrix trace
+double det(const CMat3 &m);						// matrix determinat
+CMat3 adj(const CMat3 &m);						// 3x3 adjoint matrix
+CMat3 inv(const CMat3 &m);						// 3x3 matrix inverse
+CVect3 diag(const CMat3 &m);						// the diagonal of a matrix
+CMat3 diag(const CVect3 &v);						// diagonal matrix
+CMat3 diag(double ii, double jj, double kk);		// diagonal matrix
+CMat3 askew(const CMat3 &m, int I=0);				// askew matrix;
+CMat3 dotmul(const CMat3 &m1, const CMat3 &m2);	// m = m1.*m2;
+CMat3 MMT(const CMat3 &m1, const CMat3 &m2=I33);		// m=m1*m2^T
+double trMMT(const CMat3 &m1, const CMat3 &m2=I33);	// trace(m1*m2^T)
+double norm(const CMat3 &m);						// matrix norm
+CVect3 m2rv(const CMat3 &Cnb);					// DCM to rotation vector
+CQuat m2qua(const CMat3 &Cnb);					// DCM to quaternion
+CMat3 q2mat(const CQuat &qnb);					// attitude quaternion to DCM
+CMat3 Ka2Cba(const CMat3 &Ka, CVect3 &Sfa=Vrbs);
+CMat3	Cba2Ka(const CMat3 &Cba, const CVect3 &Sfa=One31);
+//	 CMat3 Ka2Cba(const CMat3 &Ka, CVect3 *pSfa=NULL);
+//	 CMat3 Cba2Ka(const CMat3 &Cba, const CVect3 Sfa=One31);
+CMat3 sfoam(const CMat3 &B, int iter=50);			// Supper Fast Optimal Attitude Matrix(SFOAM)
+CMat3 randn(const CMat3 &mu, const double &sigma=1.0);// random 3x3 matrix
+void Ka22Kpn(const CVect3 &Ka1, const CVect3 &Ka2, CVect3 &Kap, CVect3 &Kan);
+void Kpn2Ka2(const CVect3 &Kap, const CVect3 &Kan, CVect3 &Ka1, CVect3 &Ka2);
+void KgMdf(CMat3 &Kg, const double *dKg, int typ=0);
+void KaMdf(CMat3 &Ka, const double *dKa, int typ=0);
 
 class CVect
 {
@@ -548,6 +560,7 @@ public:
 	void Set2Vect3(int i, const CVect3 &v);		// pow2
 	void SetBit(unsigned int bit, double f);	// set element to f by bit mask
 	void SetBit(unsigned int bit, const CVect3 &v);
+	void Seti2j(int i, int j=MMD-1, double val=0.0);  // dd[i]~dd[j] = val
 	CVect3 GetVect3(int i) const;
 	CVect operator+(const CVect &v) const;		// vector addition
 	CVect operator-(const CVect &v) const;		// vector subtraction
@@ -561,18 +574,18 @@ public:
 	CVect operator*(const CMat &m) const;		// row-vector multiply matrix
 	CMat operator*(const CVect &v) const;		// 1xn vector multiply nx1 vector, or nx1 vector multiply 1xn vector
 	double& operator()(int r);					// vector element
-	friend double dot(const CVect &v1, const CVect &v2);	// vector dot multiplication
-	friend CVect dotmul(const CVect &v1, const CVect &v2);	// vector dot multiplication '.*'
-	friend CVect operator-(const CVect &v);		// minus
-	friend CVect operator~(const CVect &v);		// vector transposition
-	friend CVect abs(const CVect &v);			// vector abs for each element
-	friend double norm(const CVect &v);			// vector norm
-	friend double normInf(const CVect &v);		// inf-norm
-	friend CVect pow(const CVect &v, int k);	// vector element power
-	friend CVect randn(const CVect &mu, const CVect &sigma); // random nx1 vector
-	friend double mean(const CVect &v);
-	friend CVect sort(const CVect &v);
 };
+double dot(const CVect &v1, const CVect &v2);	// vector dot multiplication
+CVect dotmul(const CVect &v1, const CVect &v2);	// vector dot multiplication '.*'
+CVect operator-(const CVect &v);		// minus
+CVect operator~(const CVect &v);		// vector transposition
+CVect abs(const CVect &v);			// vector abs for each element
+double norm(const CVect &v);			// vector norm
+double normInf(const CVect &v);		// inf-norm
+CVect pow(const CVect &v, int k=2);	// vector element power
+CVect randn(const CVect &mu, const CVect &sigma=Onen1); // random nx1 vector
+double mean(const CVect &v);
+CVect sort(const CVect &v);
 
 class CMat
 {
@@ -585,6 +598,7 @@ public:
 	CMat(int row0, int clm0, double f);
 	CMat(int row0, int clm0, double f, double f1, ...);
 	CMat(int row0, int clm0, const double *pf);
+	CMat(int clm0, const CVect *pv, ...);
 
 	void Clear(void);
 	void Reset(int row0, int clm0);
@@ -611,7 +625,10 @@ public:
 	void SetClm(int j, double f, ...);					// set j-column from n-double
 	void SetClm(int j, const CVect &v);					// set j-column from vector
 	CVect GetRow(int i) const;							// get i-row from matrix
+	void GetRow(CVect &v, int i);
 	CVect GetClm(int j) const;							// get j-column from matrix
+	CMat GetClm(int c1, int c2, ...) const;				// get c1,c2...-column from matrix
+	void GetClm(CVect &v, int j);
 	void SetRowVect3(int i, int j, const CVect3 &v);	// set i-row&j...(j+2)-column from CVect3
 	void SetRowVect3(int i, int j, const CVect3 &v, const CVect3 &v1);
 	void SetRowVect3(int i, int j, const CVect3 &v, const CVect3 &v1, const CVect3 &v2);
@@ -628,27 +645,27 @@ public:
 	void SetMat3(int i, int j, const CMat3 &m, const CMat3 &m1, const CMat3 &m2);
 	CMat3 GetMat3(int i, int j=-1) const;				// get CMat3 from i...(i+2)-row&j...(j+2)-comumn
 	void SubAddMat3(int i, int j, const CMat3 &m);		// add i...(i+2)-row&j...(j+2)-comumn with CMat3 m
-	friend CMat operator~(const CMat &m);				// matrix transposition
-	friend void symmetry(CMat &m);						// matrix symmetrization
-	friend double trace(const CMat &m);					// matrix trace
-	friend double norm1(const CMat &m);					// 1-norm
-	friend double normInf(const CMat &m);				// inf-norm
-	friend CMat dotmul(const CMat &m1, const CMat &m2);	// matrix dot multiplication '.*'
-	friend CVect diag(const CMat &m);					// diagonal of a matrix
-	friend CMat diag(const CVect &v);					// diagonal matrix
-	friend CMat eye(int n);
-	friend CMat inv4(const CMat &m);					// 4x4 matrix inverse
-	friend CMat inv6(const CMat &m);					// 6x6 matrix inverse
-	friend CVect lss(const CMat &A, const CVect &y);		// least square solusion
-//	friend void RowMul(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0); // m(r,:)=m0(r,:)*m1
-//	friend void RowMulT(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0); // m(r,:)=m0(r,:)*m1'
-	friend void DVMDVafa(const CVect &V, CMat &M, double afa);	// M = diag(V)*M*diag(V)*afa
-	friend CMat randn(const CMat &mu, const double &sigma);
-#ifdef MAT_COUNT_STATISTIC
+#ifdef PSINS_MAT_COUNT
 	static int iCount, iMax;
 	~CMat(void);
 #endif
 };
+CMat operator~(const CMat &m);				// matrix transposition
+void symmetry(CMat &m);						// matrix symmetrization
+double trace(const CMat &m);					// matrix trace
+double norm1(const CMat &m);					// 1-norm
+double normInf(const CMat &m);				// inf-norm
+CMat dotmul(const CMat &m1, const CMat &m2);	// matrix dot multiplication '.*'
+CVect diag(const CMat &m);					// diagonal of a matrix
+CMat diag(const CVect &v);					// diagonal matrix
+CMat eye(int n);
+CMat inv4(const CMat &m);					// 4x4 matrix inverse
+CMat inv6(const CMat &m);					// 6x6 matrix inverse
+CVect lss(const CMat &A, const CVect &y);		// least square solusion
+void RowMul(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0); // m(r,:)=m0(r,:)*m1
+void RowMulT(CMat &m, const CMat &m0, const CMat &m1, int r, int fast=0); // m(r,:)=m0(r,:)*m1'
+void DVMDVafa(const CVect &V, CMat &M, double afa=1.0);	// M = diag(V)*M*diag(V)*afa
+CMat randn(const CMat &mu, const double &sigma=1.0);
 
 class CPolyfit
 {
@@ -785,11 +802,12 @@ public:
 	double wie;
 
 	double sl, sl2, sl4, cl, tl, RMh, RNh, clRNh, f_RMh, f_RNh, f_clRNh;
-	CVect3 pos, vn, wnie, wnen, wnin, gn, gcc, *pgn;
+	CVect3 pos0, pos, vn, wnie, wnen, wnin, wnnin, gn, gcc, *pgn;
 
 	CEarth(double a0=glv.Re, double f0=glv.f, double g0=glv.g0);
 	void Update(const CVect3 &pos, const CVect3 &vn=O31, int isMemsgrade=0);
 	CVect3 vn2dpos(const CVect3 &vn, double ts=1.0) const;
+	void vn2dpos(CVect3 &dpos, const CVect3 &vn, double ts) const;
 };
 
 class CEGM  // Earth Gravitational Model 
@@ -805,34 +823,62 @@ public:
 class CIMU
 {
 public:
-	CMat3 Kg; CVect3 eb; CMat3 Ka; CVect3 db, Ka2, lvx, lvy, lvz; double tGA;  // Do not modify this line!!!
+	CMat3 Kg; CVect3 eb; CMat3 Ka; CVect3 db, Kapn, Ka2, lvx, lvy, lvz, Taux, Tauy, Tauz; double tGA;  // Do not modify this line!!!
 	CMat3 *pKga, *pgSens, gSens, *pgSens2, gSens2, *pgSensX, gSensX;  // gyro g-sensitivity
-	CVect3 Sfg, Sfa, *pSf, *pKa2;  // acc quadratic nonlinearity
+	CVect3 Sfg, Sfa, *pSf, *pKapn, *pKa2, *pTau;  // acc quadratic nonlinearity
 	CVect3 *plv, wb_1;  // inner lever-arm
 	CMat3 Cba, iTCba, SSx, SSy, SSz, *pCba;
 	CVect3 Q11, Q12, Q13, Q21, Q22, Q23, Q31, Q32, Q33;
 	char *prfu, rfu[3];
 	int nSamples, iTemp;
 	double tk, nts, _nts, smmT, Temp, *pTempArray;
-	bool preFirst, onePlusPre, preWb;
+	bool preFirst, onePlusPre, preWb, compensated;
 	CVect3 phim, dvbm, wmm, vmm, swmm, svmm, wm_1, vm_1;
 
 	CIMU(void);
 	void Reset(void);
-	void SetSf(const CVect3 &Sfg0, const CVect3 &Sfa0);
+	void SetSf(const CVect3 &Sfg0=One31, const CVect3 &Sfa0=One31);
 	void SetTemp(double *tempArray0, int type=1);
-	void SetKga(const CMat3 &Kg0, const CVect3 eb0, const CMat3 &Ka0, const CVect3 &db0);
+	void SetKga(const CMat3 &Kg0=I33, const CVect3 eb0=O31, const CMat3 &Ka0=I33, const CVect3 &db0=O31);
 	void SetgSens(const CMat3 &gSens0, const CMat3 &gSens20=O33, const CMat3 &gSensX0=O33);
-	void SetKa2(const CVect3 &Ka20);
-	void SetLvtGA(const CVect3 &lvx0, const CVect3 &lvy0, const CVect3 &lvz0=O31, double tGA0=0.0);
-	void SetCba(const CMat3 &Cba0);
+	void SetKapn(const CVect3 &Kapn0=O31);
+	void SetKa2(const CVect3 &Ka20=O31);
+	void SetLvtGA(const CVect3 &lvx0=O31, const CVect3 &lvy0=O31, const CVect3 &lvz0=O31, double tGA0=0.0);
+	void SetTau(const CVect3 &taux0=O31, const CVect3 &tauy0=O31, const CVect3 &tauz0=O31);
+	void SetCba(const CMat3 &Cba0=I33);
 	void SetRFU(const char *rfu0);
 	double GetMeanwf(CVect3 &wib, CVect3 &fsf, BOOL reset=1);
 	double Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts);
-	friend void IMURFU(CVect3 *pwm, int nSamples, const char *str);
-	friend void IMURFU(CVect3 *pwm, CVect3 *pvm, int nSamples, const char *str);
-	friend void IMUStatic(CVect3 &wm, CVect3 &vm, CVect3 &att0, CVect3 &pos0, double ts);
-	friend CMat lsclbt(CMat &wfb, CMat &wfn);
+};
+void IMURFU(CVect3 *pwm, int nSamples, const char *str="X");
+void IMURFU(CVect3 *pwm, CVect3 *pvm, int nSamples, const char *str="X");
+void IMUStatic(CVect3 &wm, CVect3 &vm, CVect3 &att0, CVect3 &pos0, double ts=1.0);
+CMat lsclbt(CMat &wfb, CMat &wfn);
+
+class CIMUInc
+{
+public:
+	int diGx, diGy, diGz, diAx, diAy, diAz;
+	int iTotalGx0, iTotlaGy0, iTotalGz0, iTotalAx0, iTotalAy0, iTotalAz0;
+	int iTotalGx, iTotalGy, iTotalGz, iTotalAx, iTotalAy, iTotalAz;
+	double fTotalGx, fTotalGy, fTotalGz, fTotalAx, fTotalAy, fTotalAz, gScale, aScale;
+
+	CIMUInc(double gScale=0.1*SEC, double aScale=0.001);
+	void Init(double gScale=0.1*SEC, double aScale=0.001);
+	void Update(const CVect3 &wm, const CVect3 &vm);
+};
+
+class CIMUInv
+{
+public:
+	CVect3 wm, vm, wm0, vm0, att, vn, pos, vn0, pos0;
+	CMat3 Cbn0;
+	CEarth eth;
+	double ts, tk;
+	BOOL isFirst;
+
+	CIMUInv(const CVect3 &att00, const CVect3 &vn00, const CVect3 &pos00, double ts0, double tk0=0.0);
+	void Update(const CVect3 &att, const CVect3 &pos);
 };
 
 class CSINS	// sizeof(CSINS)~=3k bytes
@@ -861,25 +907,30 @@ public:
 	void Extrap(const CVect3 &wm=O31, const CVect3 &vm=O31, double ts=0.0);			// SINS fast extrapolation using 1 Gyro&Acc sample
 	void Extrap(double extts);			// SINS fast extrapolation using previous Gyro&Acc sample
 	void lever(const CVect3 &dL=O31, CVect3 *ppos=NULL, CVect3* pvn=NULL);		// lever arm
+	void lever2(const CVect3 &dL, CVect3 *ppos, CVect3 *pvn=NULL, const CVect3 *ppos0=NULL, const CVect3 *pvn0=NULL);
+	void atss(double *attack, double *sideslip);  // angles of attack & sideslip
 	void etm(void);							// SINS error transform matrix coefficients
 	void AddErr(const CVect3 &phi, const CVect3 &dvn=O31, const CVect3 &dpos=O31);
 	void AddErr(double phiU, const CVect3 &dvn=O31, const CVect3 &dpos=O31);
-	void leveling(int flag);
+	void Leveling(int flag);
 	void DebugStop(double t1, int absT=0, int ext=0);
 };
 
 class CDR	// dead reckoning
 {
 public:
-	double tk, Kod, velPre, velMax, velMin, afa;
+	double tk, dist, Kod, velPre, velMax, velMin, afa, gck1, gck2, gck3;
 	CEarth eth;
 	CQuat qnb;
 	CMat3 Cnb, Cbo;
-	CVect3 att, vn, pos;
+	CVect3 att, vn, pos, wnc, vni, dpos;	
 	CDR(void);
 	void Init(const CSINS &sins, const CVect3 &kappa=CVect3(0,1,0));
 	void Init(const CVect3 &att0, const CVect3 &pos0, const CVect3 &kappa=CVect3(0,1,0), double tk0=0.0);
-	void Update(const CVect3 &wm, double dS, double ts);
+	void Update(const CVect3 &wm, double dS, double ts, const CVect3 &vm=O31);
+	void SetGCK(double Td);  // gyro-compass control coefficients K1,K2,K3
+	void Leveling(const CVect3 &vm, double ts);
+	CVect3 Calibrate(const CVect3 &pos0, const CVect3 &pos1, const CVect3 &pos1DR, double dist0=0.0);
 };
 
 class CCNS
@@ -1018,12 +1069,11 @@ public:
 	void SetRadptStop(unsigned int meas, double stop=10.0f);
 	void XPConstrain(void);						// Xk & Pk constrain: -Xmax<Xk<Xmax, Pmin<diag(Pk)<Pmax
 	void PmaxPminCheck(void);
-	friend void MeasUD(double U[], double D[], const double H[], double R, double K[], int n);
-	friend void fusion(double *x1, double *p1, const double *x2, const double *p2,
-		int n, double *xf, double *pf);
-	friend void fusion(CVect3 &x1, CVect3 &p1, const CVect3 x2, const CVect3 p2);
-	friend void fusion(CVect3 &x1, CVect3 &p1, const CVect3 x2, const CVect3 p2, CVect3 &xf, CVect3 &pf);
 };
+void MeasUD(double U[], double D[], const double H[], double R, double K[], int n);
+void fusion(double *x1, double *p1, const double *x2, const double *p2,	int n=9, double *xf=NULL, double *pf=NULL);
+void fusion(CVect3 &x1, CVect3 &p1, const CVect3 x2, const CVect3 p2);
+void fusion(CVect3 &x1, CVect3 &p1, const CVect3 x2, const CVect3 p2, CVect3 &xf, CVect3 &pf);
 
 class CSINSTDKF:public CKalman
 {
@@ -1078,26 +1128,28 @@ public:
 	int Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts, int nSteps=5); 
 #ifdef PSINS_IO_FILE
 	void operator<<(CFileRdWt &f);
+	void LogXk(void);
 #endif
 };
 
 class CSysClbt:public CSINSTDKF
 {
 public:
-	int iter;
+	int ka2ORpn, iter;
 	double wibStatic;
 	CVect3 att0, pos0, gn;
 
-	CSysClbt(const CVect3 &pos0, double g00=G0);
-	void Init(double g00=G0, const CMat3 &Cba0=I33, const CVect3 &Sfg0=One31, const CVect3 &Sfa0=One31);
+	CSysClbt(const CVect3 &pos0, double g00=0.0, int ka2pn=1);
+	void Init(double g00=G0);
 	void NextIter(void);
 	virtual void SetFt(int nnq);
 	virtual void SetHk(int nnq) {};
 	virtual void SetMeas(void) {};
 	virtual void Feedback(int nnq, double fbts);
-	int Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts); 
+	int Update(const CVect3 *pwm, const CVect3 *pvm, int nSamples, double ts, int isStatic=-1); 
 #ifdef PSINS_IO_FILE
 	void Log(void);
+	void LogXk(void);
 #endif
 };
 
@@ -1231,11 +1283,11 @@ class CSINSGNSSOD:public CSINSGNSS
 {
 #define distN 20
 public:
-	CVect3 IVno, IVni, Ifn, lvOD, vnOD, posOD, odZk;
+	CVect3 IVno, IVni, IVni_1, Ifn, lvOD, vnOD, posOD, odZk;
 	CMat3 Cbo, IMv, odMphi, odMvn, odMkappa, odMlever;		// Cbo: from body-frame to OD-frame
-	double Kod, odmeast, odmeasT, dS0, distance, distances[distN], distT01, odVel, Hkv2y;
+	double Kod, Kod2, AOS, odmeast, odmeasT, dS0, afaIVni, distance, distances[distN], distT01, odVel, Hkv2y;
 	BOOL odmeasOK;
-	int distK0, badODCnt;
+	int distK0, badODCnt, IVniFirst;
 
 	CSINSGNSSOD(void);
 	CSINSGNSSOD(int nq0, int nr0, double ts, int yawHkRow0=10);
@@ -1320,6 +1372,18 @@ public:
 	void Update(const CSINS &sins, const CVect3 &posGPS=O31, const CVect3 &vnGPS=O31);
 	void Update(const CVect3 &posGPS=O31, const CVect3 &vnGPS=O31);  // meas update only
 	void OutLLH(void);
+};
+
+class CGKP
+{
+    double a, b, e2, ep2, cp[6], cn[6];
+    CVect3 GKPCore(const CVect3 &BL);
+    CVect3 IGKPCore(const CVect3 &xy);
+public:
+    CGKP(double a0=RE, double f0=FF);
+    void Init(double a0=RE, double f0=FF);
+    CVect3 GKP(const CVect3 &BL);
+    CVect3 IGKP(const CVect3 &xy);
 };
 
 #ifdef PSINS_AHRS_MEMS
@@ -1504,9 +1568,9 @@ public:
 	CFileCfg& operator>>(CQuat &q);
 	CFileCfg& operator>>(CMat3 &m);
 	CFileCfg& operator=(CFileCfg &cfg);
-	friend CFileCfg WriteCfg(const char *fname, const char *ext);  // the only method to create WriteCfg file
-	friend CFileCfg ReadCfg(const char *fname, const char *ext);   // the only method to create ReadCfg file
 };
+CFileCfg WriteCfg(const char *fname, const char *ext=NULL);  // the only method to create WriteCfg file
+CFileCfg ReadCfg(const char *fname, const char *ext=NULL);   // the only method to create ReadCfg file
 
 #endif // PSINS_IO_FILE
 
@@ -1518,7 +1582,7 @@ class CRMemory
 {
 public:
 	BYTE *pMemStart0, *pMemStart, *pMemEnd;
-	int pushLen, popLen, recordLen;
+	int pushLen, popLen, recordNum, recordLen;
 	long memLen, dataLen;
 	BYTE *pMemPush, *pMemPop, pushBuf[MAX_RECORD_BYTES], popBuf[MAX_RECORD_BYTES];
 
@@ -1526,6 +1590,8 @@ public:
 	CRMemory(long recordNum, int recordLen0);
 	CRMemory(BYTE *pMem, long memLen0, int recordLen0=0);
 	~CRMemory();
+	void Init(BYTE *pMem, long memLen0, int recordLen0);
+	void operator=(const CRMemory &m);
 	BOOL push(const BYTE *p=(const BYTE*)NULL);
 	BYTE pop(BYTE *p=(BYTE*)NULL);
 	BYTE* get(int iframe);
@@ -1555,6 +1621,8 @@ public:
 	double Interp(double t, double *data=NULL);
 };
 
+#endif // PSINS_RMEMORY
+
 class CContinuousCnt  // continuous count
 {
 	int cnt0, cntLargest0, isFirst, lost;
@@ -1562,8 +1630,6 @@ public:
 	CContinuousCnt(int cntLargest=255);
 	int Update(int cnt);
 };
-
-#endif // PSINS_RMEMORY
 
 #ifdef PSINS_CONSOLE_UART
 
@@ -1617,13 +1683,13 @@ public:
 
 class CBytemani {
 public:
-	friend unsigned short swap16(unsigned short ui16);
-	friend unsigned int swap32(unsigned int ui32);
-	friend unsigned long swap64(unsigned long ui64);
-	friend unsigned char* int24(unsigned char *pchar3, int int32);
-	friend unsigned char* swap24(unsigned char* puc3, unsigned char* pres);
-	friend int diffint24(const unsigned char *pc1, const unsigned char *pc0);
 };
+unsigned short swap16(unsigned short ui16);
+unsigned int swap32(unsigned int ui32);
+unsigned long swap64(unsigned long ui64);
+unsigned char* int24(unsigned char *pchar3, int int32);
+unsigned char* swap24(unsigned char* puc3, unsigned char* pres=NULL);
+int diffint24(const unsigned char *pc1, const unsigned char *pc0);
 
 #ifdef PSINS_VC_AFX_HEADER
 
@@ -1638,6 +1704,32 @@ public:
 };
 
 #endif // PSINS_VC_AFX_HEADER
+
+void add(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
+void add(CMat3 &res, const CMat3 &m1, const CMat3 &m2);
+void add(CVect &res, const CVect &v1, const CVect &v2);
+void add(CMat &res, const CMat &m1, const CMat &m2);
+void sub(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
+void sub(CMat3 &res, const CMat3 &m1, const CMat3 &m2);
+void cros(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
+void dotmul(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
+void dotdiv(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
+void mul(CVect3 &res, const CVect3 &v, const double &f);
+void mul(CMat3 &res, const CMat3 &m, const double &f);
+void mul(CVect &res, const CVect &v, const double &f);
+void mul(CVect &res, const CMat &m, const CVect &v);
+void mul(CMat &res, const CMat &m, const double &f);
+void mul(CVect3 &res, const CMat3 &m, const CVect3 &v);
+void mul(CVect3 &res, const CVect3 &v, const CMat3 &m);
+void mul(CMat3 &res, const CMat3 &m1, const CMat3 &m2);
+void mul(CQuat &res, const CQuat &q1, const CQuat &q2);
+void mul(CVect3 &res, const CQuat &q, const CVect3 &v);
+void _TT(CMat3 &mT, const CMat3 &m); 
+void rv2q(CQuat &q, const CVect3 &rv);
+void qdelphi(CQuat &q, const CVect3 &phi);
+void q2mat(CMat3 &Cnb, const CQuat &qnb);
+void m2att(CVect3 &att, const CMat3 &Cnb);
+void AXbt(CVect3 &res, const CMat3 &A, const CVect3 &X, const CVect3 &b, const double &t=1.0);  // res=A*X1+X2*w
 
 #pragma pack()
 

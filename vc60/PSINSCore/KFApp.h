@@ -12,7 +12,7 @@
 
 #include "PSINS.h"
 
-#define FRQ	FRQ100
+#define FRQ	FRQ200
 #define TS	(1.0/FRQ)
 
 class CKFApp:public CSINSGNSS

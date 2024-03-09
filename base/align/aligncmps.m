@@ -8,7 +8,7 @@ function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, isfig)
 %         ctl0 - ctl0(1): level setting time in level align stage
 %                ctl0(2): the lasting time for level align stage
 %         ctl1 - ctl1(1): level setting time in yaw align stage
-%         ctl1 - ctl1(2): gyro-compass setting time in yaw align stage 
+%                ctl1(2): gyro-compass setting time in yaw align stage 
 %         isfig - figure flag
 % Outputs: att0 - attitude align result
 %          attk - result array

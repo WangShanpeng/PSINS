@@ -1,13 +1,14 @@
 function avp1 = drinstant(imuod, avp, t0, t1, inst, kod)
 % Process DR for short time within [t0,t1].
 %
-% Prototype: avp = insinstant(imu, avp, t0, t1)
+% Prototype: avp1 = drinstant(imuod, avp, t0, t1, inst, kod)
 % Inputs: imuod - SIMU/OD data array
 %         avp - AVP parameters, avp = [att,vn,pos,t]
 %         t0 - start time in second.
 %         t1 - end time in second.
-%         inst - ints=[dpitch;0;dyaw], where dpitch and dyaw are
+%         inst - ints=[dpitch;aos;dyaw], where dpitch and dyaw are
 %            installation error angles(in rad) from odometer to SIMU
+%            aos is Angle Of Slide coefficient
 %         kod - odometer scale factor in meter/pulse.
 % Output: avp1 - navigation results, avp1 = [att,vn,pos,t]
 %
@@ -19,13 +20,13 @@ function avp1 = drinstant(imuod, avp, t0, t1, inst, kod)
 global glv
     if size(avp,2)==4, avp=[avp(:,1:3), zeros(length(avp),6), avp(:,end)]; end
     if ~exist('kod', 'var'), kod = 1; end
-    if ~exist('inst', 'var'), inst = [0;1;0]; end
+    if ~exist('inst', 'var'), inst = [0;0;0]; end
     if ~exist('t0', 'var'), t0 = avp(1,end); end
-    if ~exist('t1', 'var'), t1 = imu(end,end); end
+    if ~exist('t1', 'var'), t1 = imuod(end,end); end
     idx0 = find(avp(:,end)>=t0,1);
     avp0 = avp(idx0,:)';
-    idx0 = find(imu(:,end)>avp(idx0,end),1);
-    idx1 = find(imu(:,end)>=t1,1); 
+    idx0 = find(imuod(:,end)>avp(idx0,end),1);
+    idx1 = find(imuod(:,end)>=t1,1); 
     if length(avp0)<9, avp0 = [avp0(1:3); zeros(6,1)]; end
     avp1 = drpure(imuod(idx0:idx1,:), avp0, inst, kod);
     idx0 = find(avp(:,end)>=t0,1);

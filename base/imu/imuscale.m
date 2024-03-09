@@ -10,7 +10,7 @@ function [imu, sf, Kga, Ka] = imuscale(imu, t, w, f)
 %          sf - scale factor array
 %          Kga - coarse installation matrix, or Kg & Ka
 %
-% See also  sysclbt, imuinc, imudot, imurot, imustaticcale.
+% See also  sysclbt, imuinc, imudot, imurot, imustaticscale.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

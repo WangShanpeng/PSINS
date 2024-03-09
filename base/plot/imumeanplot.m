@@ -24,3 +24,6 @@ global glv
         addtemplot(imu(:,7:end));
     end
     subplot(321); title(sprintf('mean time = %.3f (s)', n*ts));
+    if dph~=glv.dph, dph=glv.dps; end
+    subplot(325); plot(imu(:,end), normv(imu(:,1:3))/(n*ts)/dph, 'm');
+    subplot(326); plot(imu(:,end), normv(imu(:,4:6))/(n*ts)/glv.g0, 'm');

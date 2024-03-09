@@ -11,6 +11,7 @@ function res = meann(scr, n, dim)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 16/04/2009, 09/03/2014
+    if n==1, res=scr; return; end
     if nargin<3
         dim = 1;
     end

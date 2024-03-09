@@ -11,7 +11,7 @@ function ig = igplot(ig, flag)
 % Inputs: ig - SINS/GNSS data array.
 %         flag - plot flag
 %          
-% See also  igoplot, igkfplot, igload, odpplot, imuplot, gpsplot, dataplot.
+% See also  igoplot, igkfplot, tfplot, igload, odpplot, imuplot, gpsplot, dataplot.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -1,18 +1,20 @@
-function plotn(data, t)
+function plotn(data, t, isDelMean)
 % Plot multi-column data in each sub-figure.
 %
-% Prototype: plotn(data, t)
+% Prototype: plotn(data, t, isDelMean)
 % Inputs: data - data to plot, 
 %         t - time flag
 %
 % Example:
 %    plotn(randn(100,30));
 %
-% See also  dataplot, miniplot, plotpsdn.
+% See also  dataplot, miniplot, plotpsdn, plotline.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 09/10/2022
+    if nargin<3, isDelMean=0; end
+    if isDelMean, for k=1:size(data,2), data(:,k)=data(:,k)-mean(data(:,k)); end, end
     if nargin<2, t=(1:size(data,1))'; end
     if length(t)==1, t=(1:size(data,1))'*t; end  % plotn(data, ts)
     if size(data,2)>9,

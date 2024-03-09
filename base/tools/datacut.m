@@ -6,7 +6,7 @@ function [data, idx] = datacut(data0, t1, t2)
 %         t1, t2 - start & end time tags
 % Outputs: data, idxi - output data & index in data0
 %
-% See also  datahalf, datadel, getat, combinet.
+% See also  datahalf, datacuts, datadel, getat, combinet.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

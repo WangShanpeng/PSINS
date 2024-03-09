@@ -11,7 +11,7 @@
 glvs
 psinstypedef('test_align_transfer_def');
 load([glv.datapath,'trj_transfer.mat']);
-load([glv.datapath,'imu_transfer.mat']);
+load([glv.datapath,'imu_transfer.mat']);  % imuplot(imu,1);
 ts = trj.ts;
 qnbs = a2qua(trj.avp0(1:3)); vns = trj.avp0(4:6); % slave INS init
 kf = kfinit(ts, imuerr, beta, Q);
@@ -26,7 +26,7 @@ for k=1:len
     qnbs = qupdt(qnbs, phim-Cnbs'*eth.wnin*ts);  % slave INS attitude
     kf.Phikk_1(1:6,1:3) = [-askew(eth.wnin*ts)+glv.I33; askew(dvn)];
         kf.Phikk_1(1:3,7:9) = -Cnbs*ts; kf.Phikk_1(4:6,10:12) = Cnbs*ts;
-    kf.Hk(1:3,13:18) = [-Cnbs,-Cnbs];
+    kf.Hk(1:3,13:18) = [-Cnbs,-Cnbs];  kf.Hk(1:2,:) = 0; % kf.Hk(3,[13:14,16:17])=0;
     kf = kfupdate(kf, [qq2phi(qnbs,qnbm); vns-vnm]);
     res(k,:) = [qq2phi(qnbs,qnbsk(k,:)'); vns-vnm; t]'; 
     xkpk(k,:) = [kf.xk; diag(kf.Pxk); t]';

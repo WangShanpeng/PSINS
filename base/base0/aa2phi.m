@@ -18,6 +18,8 @@ function phi = aa2phi(att1, att0)
         phi = qq2phi(a2qua(att1), a2qua(att0));
         return;
     end
+    if nargin<2, att0=att1(1,1:3)'; end
+    if size(att0,2)==1, att0=repmat(att0(1:3)',m,1); end
     phi = att1;
     s1 = sin(att1); c1 = cos(att1);
     s0 = sin(att0); c0 = cos(att0);

@@ -13,13 +13,13 @@ function avp = inspure(imu, avp0, href, isfig)
 %                   'H' - height fix-damping, =pos0(3)
 %                   'f' - height free.
 %                   'O' - open loop, vn=0.  Ref: my PhD thesis P41
-%                If href is a 3or2-column vector length(href)==length(imu)
+%                If href is a 3or2-column vector and length(href)==length(imu)
 %                   'z' - fix vU & hgt, vU=href(:,1), hgt=href(:,2).
 %                   'Z' - fix hgt, hgt=href(:,1).
 %         isfig - figure on/off flag
 % Output: avp - navigation results, avp = [att,vn,pos,t]
 %
-% See also  insinstant, attpure, trjsimu, insupdate, drpure, nhcpure.
+% See also  insinstant, attpure, trjsimu, insupdate, drpure, nhcpure, insopenav.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -31,6 +31,7 @@ global glv
     if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
     if nargin<3,  href = avp0(9);  end
     vp_fix = 'n';
+%     vp_fix = 'b';  % unsing baro height
     if length(href)==1
         if ischar(href), vp_fix = href;
         else
@@ -42,9 +43,9 @@ global glv
             ins.openloop = 1;
         end
     else
-        if size(href,2)==3
+        if size(href,2)==3  && length(href)==length(imu)
             vp_fix = 'z';
-        elseif size(href,2)==2
+        elseif size(href,2)==2  && length(href)==length(imu)
             vp_fix = 'Z';
         end
     end
@@ -52,6 +53,11 @@ global glv
         alt = altfilt(1000, 1*glv.ugpsHz, 10.0, nts);  % altitude damping setting
         imugpssyn(imu(:,end), href(:,2));
         dbU = href; dbU(:,1) = 0;
+    end
+    if vp_fix=='b';
+        imugpssyn(imu(:,end), href(:,2));
+        ins_vz = ins.vn(3);  ins_h = ins.pos(3);   baro_h = ins_h;
+        wn = 0.1; xi = 0.707;  K2 = wn^2+2*glv.g0/glv.Re;  K1 = xi*2*sqrt(K2-2*glv.g0/glv.Re);  % Qin,'Inertial Navigation',Eq.(7.5.3)
     end
     len = length(imu);    avp = zeros(fix(len/nn), 10);
     ki = timebar(nn, len, 'Pure inertial navigation processing.');
@@ -74,6 +80,13 @@ global glv
                 ins.vn(3) = ins.vn(3) - alt.xk(2);    alt.xk(2:3) = 0;
                 dbU(khref,1) = alt.xk(1); % just for plot debug
             end
+        elseif vp_fix=='b',
+            [khref, dt] = imugpssyn(k, k1, 'F');
+            if khref>0, baro_h = href(khref,1); end
+            dh = ins_h - baro_h;
+            ins_vz = ins_vz + (ins.an(3)-K2*dh)*ins.nts;
+            ins_h = ins_h + (ins_vz-K1*dh)*ins.nts;
+            ins.vn(3) = ins_vz; ins.pos(3) = ins_h;
         elseif vp_fix=='f',
             ins.vn(3) = ins.vn(3);  % free, no need
         elseif vp_fix=='z',

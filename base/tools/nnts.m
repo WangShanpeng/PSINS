@@ -10,7 +10,7 @@ function [nn, ts, nts] = nnts(nn, ts)
 % Example:
 %        [nn, ts, nts] = nnts(2, 0.01);
 %
-% See also  setvals.
+% See also  lent, setvals.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

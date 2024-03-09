@@ -20,7 +20,7 @@ function [Kg, eb, Ka, db] = lsclbt(wbib, yw, fbsf, yf)
     end
     Kw = (Xw'*Xw)^-1*Xw'*Yw;
     Kg = reshape(Kw(1:9),3,3)';
-    eb = -Kw(10:12);
+    eb = Kw(10:12);
     if nargin>2  % for acc calibration
         [Ka, db] = lsclbt(fbsf, yf);
     end

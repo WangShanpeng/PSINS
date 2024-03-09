@@ -5,7 +5,7 @@ function insplot(avp, ptype, varargin)
 % Inputs: avp - may be [att], [att,vn] or [att,vn,pos]
 %         ptype - plot type define
 %          
-% See also  attplot, miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, addyawplot.
+% See also  attplot, miniplot, inserrplot, kfplot, gpsplot, imuplot, magplot, dvlplot, addyawplot, tscaleset.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -30,7 +30,7 @@ global glv
             myfigure;
             plot(t, avp(:,1)/glv.deg), xygo('y');
         case 'l',
-            myfigure;
+            myfig;
             dxyz = pos2dxyz([avp(:,1:2),avp(:,1)*0]);
             plot(0, 0, 'rp');
             hold on, plot(dxyz(:,1), dxyz(:,2)); xygo('est', 'nth');
@@ -38,12 +38,16 @@ global glv
             myfig;
             plot(t, avp(:,1:2)/glv.deg), xygo('pr');
         case 'a',
-            myfigure;
+            myfig;
             subplot(211), plot(t, avp(:,1:2)/glv.deg), xygo('pr');
             subplot(212), plot(t, avp(:,3)/glv.deg), xygo('y');
         case 'v',
-            myfigure;
+            myfig;
             plot(t, avp(:,1:3)), xygo('vn');
+        case 'p',
+            myfig;
+            dxyz = pos2dxyz(avp(:,1:3));
+            plot(t, dxyz(:,[2,1,3])); xygo('DP'); legend('\DeltaLat','\DeltaLon','\DeltaHgt');
         case 'av',
             myfigure;
             subplot(221), plot(t, avp(:,1:2)/glv.deg); xygo('pr');

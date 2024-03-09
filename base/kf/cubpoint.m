@@ -25,6 +25,7 @@ function [U, w] = cubpoint(n, odr)
             end
         end
         U = [ei, ein, [pip,-pip,pin,-pin]/sqrt(2), zeros(n,1)]*sqrt(n+2);
-        w = [repmat((4-n)/2/(n+2)^2,1,2*n), repmat(1/(n+2)^2,1,2*n*(n-1)), 2/(n+2)];
+        w = [repmat((4-n)/2/(n+2)^2,1,2*n), repmat(1/(n+2)^2,1,2*n*(n-1)), ...
+             2/(n+2)];
     end
     

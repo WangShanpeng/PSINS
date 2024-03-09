@@ -7,7 +7,7 @@ function lost = imuplot(imu, type, t0)
 %         t0 - plot time t0 as 0
 % Output: lost - lost index      
 %          
-% See also  imumeanplot, imutplot, insplot, inserrplot, kfplot, gpsplot, odplot, magplot, igsplot, ttest.
+% See also  imumeanplot, imutplot, cumangplot, insplot, inserrplot, kfplot, gpsplot, odplot, imuodplot, magplot, igsplot, ttest.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -23,7 +23,7 @@ global glv
     if size(imu,2)>10  % 5-axis redundancy IMU plot
         myfig;
         ts = diff(imu(1:2,end));  t = imu(:,end);
-        subplot(221), plot(t, imu(:,1:3)/ts/dps); xygo('w');
+        subplot(221), plot(t, imu(:,1:3)/ts/dps); xygo('w');  title('X_R Y_F Z_U');
         subplot(223), plot(t, imu(:,4:5)/ts/dps); xygo('wS/T');
         subplot(222), plot(t, imu(:,6:8)/ts/g0);  xygo('f');
         subplot(224), plot(t, imu(:,9:10)/ts/g0);  xygo('fS/T');
@@ -39,7 +39,7 @@ global glv
     if length(type)>=7  % err = imuplot(imu1, imu2);
         imuplot(imu);
         imu2 = type;   t = imu2(:,end);  ts = diff(imu2(1:2,end));
-        subplot(321), plot(t, imu2(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');
+        subplot(321), plot(t, imu2(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');  title('X_R Y_F Z_U');
         subplot(323), plot(t, imu2(:,2)/ts/dps, 'r');
         subplot(325), plot(t, imu2(:,3)/ts/dps, 'r');
         subplot(322), plot(t, imu2(:,4)/ts/g0, 'r');
@@ -62,21 +62,22 @@ global glv
     end
 % 	ts = mean(diff(t));
 	ts = mean(diff(t(1:2)));
+    t = t/tscaleget;
 %     if norm(mean(imu(:,4:6)))<9.8/2   % if it's velocity increment
         imu(:,1:end-1)=imu(:,1:end-1)/ts;
 %     end
     myfig;
     if type==1 || type==11
-        subplot(121), plot(t, [imu(:,1:3)]/dps); xygo('w');
+        subplot(121), plot(t, [imu(:,1:3)]/dps); xygo('w');  title('X_R Y_F Z_U');
         subplot(122), plot(t, [imu(:,4:6)]/g0);  xygo('f');
         if type==11
-            subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');
+            subplot(121), plot(t, [imu(:,1:3),normv(imu(:,1:3))]/dps); xygo('w'); legend('Wx','Wy','Wz','|W|');  title('X_R Y_F Z_U');
             subplot(122), plot(t, [imu(:,4:6),normv(imu(:,4:6))]/g0);  xygo('f'); legend('Ax','Ay','Az','|A|');
         end
     elseif type==2
         ax = plotyy(t, imu(:,1:3)/dps, t, imu(:,4:6)/g0); xyygo(ax, 'w', 'f');
     elseif type==3
-        subplot(311), ax = plotyy(t, imu(:,1)/dps, t, imu(:,4)/g0); xyygo(ax, 'wx', 'fx');
+        subplot(311), ax = plotyy(t, imu(:,1)/dps, t, imu(:,4)/g0); xyygo(ax, 'wx', 'fx');  title('X_R Y_F Z_U');
         subplot(312), ax = plotyy(t, imu(:,2)/dps, t, imu(:,5)/g0); xyygo(ax, 'wy', 'fy');
         subplot(313), ax = plotyy(t, imu(:,3)/dps, t, imu(:,6)/g0); xyygo(ax, 'wz', 'fz');
 %     elseif type==4
@@ -89,7 +90,7 @@ global glv
 %         subplot(326), plot(t, [imu(:,6),wfdot(:,6)]/g0);  xygo('fz');
     elseif type==4
         wfdot = diff([imu(1,:);imu]);
-        subplot(321), myplotyy([imu(:,1)/dps,wfdot(:,1)/dps/ts,t], 'wx', 'w_xdot/(dps/s)');
+        subplot(321), myplotyy([imu(:,1)/dps,wfdot(:,1)/dps/ts,t], 'wx', 'w_xdot/(dps/s)');  title('X_R Y_F Z_U');
         subplot(323), myplotyy([imu(:,2)/dps,wfdot(:,2)/dps/ts,t], 'wy', 'w_ydot/(dps/s)');
         subplot(325), myplotyy([imu(:,3)/dps,wfdot(:,3)/dps/ts,t], 'wy', 'w_zdot/(dps/s)');
         subplot(322), myplotyy([imu(:,4)/g0,wfdot(:,4)/g0/ts,t], 'fx', 'f_xdot/(g/s)');
@@ -97,7 +98,7 @@ global glv
         subplot(326), myplotyy([imu(:,6)/g0,wfdot(:,6)/g0/ts,t], 'fz', 'f_zdot/(g/s)');
     elseif type==5  % test if some data repeat
         wfdot = diff([imu(1,:)+111;imu]);
-        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');
+        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');  title('X->R/Y->F/Z->U');
         repidx = find(wfdot(:,1)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,1)/dps,'ro');  end
         subplot(323), plot(t, imu(:,2)/dps); xygo('wy');
         repidx = find(wfdot(:,2)==0);  if ~isempty(repidx),  plot(t(repidx),imu(repidx,2)/dps,'ro');  end
@@ -112,7 +113,7 @@ global glv
     elseif type==glv.dph
         dt = diff(t);
         lost = abs(dt)>mean(dt)*1.5; tlost = t(lost)+dt(1);
-        subplot(321), plot(t, imu(:,1)/glv.dph, tlost,imu(lost,1)/glv.dph,'ro'); xygo('wxdph');
+        subplot(321), plot(t, imu(:,1)/glv.dph, tlost,imu(lost,1)/glv.dph,'ro'); xygo('wxdph');  title('X_R Y_F Z_U');
         subplot(323), plot(t, imu(:,2)/glv.dph, tlost,imu(lost,2)/glv.dph,'ro'); xygo('wydph');
         subplot(325), plot(t, imu(:,3)/glv.dph, tlost,imu(lost,3)/glv.dph,'ro'); xygo('wzdph');
         subplot(322), plot(t, imu(:,4)/g0,  tlost,imu(lost,4)/g0,'ro');  xygo('fx');
@@ -120,7 +121,7 @@ global glv
         subplot(326), plot(t, imu(:,6)/g0,  tlost,imu(lost,6)/g0,'ro');  xygo('fz');
         lost = find(lost)+1;
     elseif type==-1
-        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');
+        subplot(321), plot(t, imu(:,1)/dps); xygo('wx');  title('X_R Y_F Z_U');
         subplot(323), plot(t, imu(:,2)/dps); xygo('wy');
         subplot(325), plot(t, imu(:,3)/dps); xygo('wz');
         subplot(322), plot(t, imu(:,4)/g0);  xygo('fx');
@@ -130,11 +131,11 @@ global glv
         dt = diff(t);
         lost = abs(dt)>mean(dt)*1.5; tlost = t(lost)+dt(1);
         if size(imu,2)==4  % plot gyro only
-            subplot(311), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');
+            subplot(311), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');  title('X_R Y_F Z_U');
             subplot(312), plot(t, imu(:,2)/dps, tlost,imu(lost,2)/dps,'ro'); xygo('wy');
             subplot(313), plot(t, imu(:,3)/dps, tlost,imu(lost,3)/dps,'ro'); xygo('wz');
         else
-            subplot(321), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');
+            subplot(321), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');  title('X_R Y_F Z_U');
             subplot(323), plot(t, imu(:,2)/dps, tlost,imu(lost,2)/dps,'ro'); xygo('wy');
             subplot(325), plot(t, imu(:,3)/dps, tlost,imu(lost,3)/dps,'ro'); xygo('wz');
             subplot(322), plot(t, imu(:,4)/g0,  tlost,imu(lost,4)/g0,'ro');  xygo('fx');

@@ -44,4 +44,4 @@ global glv
     else
         BL = [B; l+(stripNo*6-3)*glv.deg];
     end
-    if length(xy)==3, BL(3) = xy(3); end
+    if length(xy)>=3, BL(3:length(xy)) = xy(3:end); end

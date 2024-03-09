@@ -29,7 +29,7 @@ global glv
         ww = mean(imu(k-frq2:k+frq2,1:3),1); ww = norm(ww)/ts;
         if ww>20*glv.dph, break; end
     end
-    if k<10*frq2,  error('Not find static state in the first 5 second to make valid INS alignment.'); end
+    if k<10*frq2,  error('Not find static state in the first 10 second to make valid INS alignment.'); end
     kstatic = k-3*frq2;
     wnie = glv.wie*[0;cos(pos0(1));sin(pos0(1))]; gn = [0;0;-g0];
     clbt.Kg = eye(3); clbt.Ka = eye(3); clbt.Ka2 = zeros(3,1); clbt.eb = zeros(3,1); clbt.db = zeros(3,1);

@@ -68,6 +68,8 @@ global glv
             end
         end
         kfs.p = p; kfs.q = q; kfs.r = r;  % p,q,r in Percentage
-        kfs.err = sqrt(sum([p, q, r],2)) - 1;
+        s = sum([p, q, r],2);
+        for k=1:n, kfs.p(k,:)=kfs.p(k,:)/s(k); kfs.q(k,:)=kfs.q(k,:)/s(k); kfs.r(k,:)=kfs.r(k,:)/s(k); end  % normalize
+        kfs.err = sqrt(s) - 1;
     end
         

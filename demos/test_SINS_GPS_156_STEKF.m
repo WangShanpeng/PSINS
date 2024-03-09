@@ -23,6 +23,7 @@ kf = kfinit(ins, davp0, imuerr, r0);
 len = length(imu); [avp, xkpk] = prealloc(fix(len/nn), 10, 2*kf.n+1);
 timebar(nn, len, '15-state SINS/GPS EKF & STEKF comparision simulation.'); ki = 1;
 ins_st = ins; kf_st = kf; avp_st = avp; xkpk_st = xkpk;  % ST
+A = eye(kf_st.n); A(4:6,1:3)=-askew(ins_st.vn);  kf_st.Pxk=A*kf_st.Pxk*A';
 for k=1:nn:len-nn+1
     k1 = k+nn-1; 
     wvm = imu(k:k1,1:6); t = imu(k1,end);

@@ -11,5 +11,5 @@ function odpplot(odp)
 % 15/07/2021
 global glv
     myfig
-	subplot(211), plot(odp(:,end), odp(:,[1,3])/glv.deg); xygo('dPitch,dYaw / \circ'); 
+	subplot(211), plot(odp(:,end), odp(:,[1,3])/glv.deg); xygo('\it\delta\theta,\delta\psi\rm / \circ'); 
 	subplot(212), plot(odp(:,end), odp(:,2)); xygo('Kod');

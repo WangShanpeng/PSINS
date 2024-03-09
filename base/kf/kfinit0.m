@@ -12,7 +12,7 @@ function kf = kfinit0(kf, nts)
     kf.measlog = 0;              % measurement log flag
     if ~isfield(kf, 'xk'),  kf.xk = zeros(kf.n, 1);  end
     if ~isfield(kf, 'Qk'),  kf.Qk = kf.Qt*kf.nts;  end
-    if ~isfield(kf, 'Gammak'),  kf.Gammak = 1; kf.l = kf.n;  end
+    if ~isfield(kf, 'Gammak'),  kf.Gammak = 1; kf.l = kf.n;  else, kf.l=size(kf.Gammak,2);  end
     if ~isfield(kf, 'fading'),  kf.fading = 1;  end
     if ~isfield(kf, 'adaptive'),  kf.adaptive = 0;  end
 %     if kf.adaptive==1

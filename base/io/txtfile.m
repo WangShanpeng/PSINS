@@ -16,7 +16,7 @@ function data = txtfile(fname, formatstr, data, varargin)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 20/09/2014
-    fname = fnamechk(fname, 'txt');
+%     fname = fnamechk(fname, 'txt');
     if nargin>1
         fid = fopen(fname, 'wt');
         if nargin>3, 

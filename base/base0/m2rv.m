@@ -1,8 +1,9 @@
-function rv = m2rv(m)
+function rv = m2rv(m, rv0)
 % Convert transformation matrix to rotation vector.
 %
 % Prototype: rv = m2rv(m)
 % Input: m - transformation matrix
+%        rv0 - make sure the direction of output rv same as rv0 
 % Output: rv - corresponding rotation vector, such that
 %     m = I + sin(|rv|)/|rv|*(rvx) + [1-cos(|rv|)]/|rv|^2*(rvx)^2
 %     where rvx is the askew matrix or rv.
@@ -14,9 +15,16 @@ function rv = m2rv(m)
 % 05/02/2009, 18/03/2014
         rv = [m(3,2)-m(2,3); m(1,3)-m(3,1); m(2,1)-m(1,2)];  % 11/10/2022
         phi = acos((m(1,1)+m(2,2)+m(3,3)-1)/2);
-        if phi<1e-10, afa=1/2; else afa=phi/(2*sin(phi)); end
-%         afa = phi/sqrt(rv'*rv);
-        rv = afa*rv;
+        if phi>pi-1e-3,  % near pi
+            rv=q2rv(m2qua(m));
+        elseif phi<1e-10,  % very small
+            rv=1/2*rv; 
+        else
+            rv=rv*phi/(2*sin(phi));
+        end
+        if nargin>1
+            nrv = rv'*rv0; if nrv<0;  nrv=norm(rv); rv=-rv/nrv*(2*pi-nrv); end;
+        end
         return;
 %     rv = iaskew(m-glv.I33);  % coarse init is ok when rv is small, otherwise may fail
 %     rvx = askew(rv); % good! the following iteration due to the

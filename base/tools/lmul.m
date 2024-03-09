@@ -1,7 +1,7 @@
 function lmul(val)
-% Selected line set to negtive value.
+% Selected line set to multiply value.
 %
-% Prototype: lneg(val)
+% Prototype: lmul(val)
 % 
 % See also lneg, ladd, lmc, lsmooth, lmrs, tshift, scft0.
 

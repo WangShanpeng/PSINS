@@ -5,7 +5,7 @@ function [imu, sw, sf] = imustaticscale(imu, pos)
 % Inputs: 
 %    imu - high-accuracy raw SIMU data
 %    pos - sampling position
-% Output: imu - new SIMU date with adequate incremental sampling output
+% Output: imu - new SIMU data with adequate incremental sampling output
 %
 % See also  imuscale, imustatic.
 
