@@ -55,8 +55,8 @@ function trj = odsimu(trj, inst, kod, qe, dt, ifplot)
     end
     trj.od = [dS,t];
     avpd = drpure([trj.imu(:,1:6), trj.od], trj.avp0, inst, kod);  % re-calculate INS - IMU & AVP
-    avpd = [[trj.avp0',2*avpd(1,end)-avpd(2,end)]; avpd];
-    [trj.imu, trj.avp0, trj.avp] = ap2imu(avpd(:,[1:3,7:end]), trj.ts);
+    avpd = [[trj.avp0',0,2*avpd(1,end)-avpd(2,end)]; avpd];
+    [trj.imu, trj.avp0, trj.avp] = ap2imu(avpd(:,[1:3,7:9,end]), trj.ts);
     trj.avp(1,:) = [];
 
 function dS = pos2dS(pos, intk)

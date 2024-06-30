@@ -12,7 +12,7 @@ function mu = aa2mu(att1, att0)
 %    att1 = randn(3,1);  att2 = randn(3,1);
 %    aa2mu(att2,att1) - m2rv(a2mat(att1)'*a2mat(att2))  % =0
 %
-% See also  aa2phi, aa2phimu, aaddmu, aa2dkg, avprot, m2rv, q2rv.
+% See also  aa2phi, aa2phimu, ff2mu, aaddmu, aa2dkg, avprot, m2rv, q2rv.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

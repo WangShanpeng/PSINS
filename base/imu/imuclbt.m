@@ -31,6 +31,10 @@ global glv
         if ~exist('eb','var'), eb=zeros(3,1); end
         if ~exist('Ka','var'), Ka=eye(3); end
         if ~exist('db','var'), db=zeros(3,1); end
+        if isempty(Kg), Kg=eye(3); elseif length(Kg)==1, Kg=diag([Kg,Kg,Kg]); elseif size(Kg,2)==1, Kg=diag(Kg); end   % [], scale or 3x1 diag vector
+        if isempty(eb), eb=zeros(3,1); elseif length(eb)==1, eb=[eb;eb;eb]; end  % [] or scale
+        if isempty(Ka), Ka=eye(3); elseif length(Ka)==1, Ka=diag([Ka,Ka,Ka]); elseif size(Ka,2)==1, Ka=diag(Ka); end
+        if isempty(db), db=zeros(3,1); elseif length(db)==1, db=[db;db;db]; end
         imu(:,1:6) = [imu(:,1:3)*Kg',imu(:,4:6)*Ka'] - repmat([eb;db]'*ts,length(imu),1);
         return;
     end
@@ -40,23 +44,27 @@ global glv
     if ~isfield(clbt, 'eb'), clbt.eb = zeros(3,1); end
     if ~isfield(clbt, 'db'), clbt.db = zeros(3,1); end
     if ~isfield(clbt, 'Ka2'), clbt.Ka2 = zeros(3,1); end
+    if ~isfield(clbt, 'Kap'), clbt.Kap = zeros(3,1); end
     if ~isfield(clbt, 'rx'), clbt.rx = zeros(3,1); end
     if ~isfield(clbt, 'ry'), clbt.ry = zeros(3,1); end
     if ~isfield(clbt, 'rz'), clbt.rz = zeros(3,1); end
     if ~isfield(clbt, 'tGA'), clbt.tGA = 0; end
     for k=1:6, imu(:,k)=imu(:,k)*clbt.sf(k); end
-    if norm(clbt.rx)>0 || norm(clbt.ry)>0
+    imuerr.dKg = (clbt.Kg-eye(3)); imuerr.eb = -clbt.eb; imuerr.web = zeros(3,1); imuerr.sqg = zeros(3,1);
+    imuerr.dKa = (clbt.Ka-eye(3)); imuerr.db = -clbt.db; imuerr.wdb = zeros(3,1); imuerr.sqa = zeros(3,1);
+    if isfield(clbt, 'Ka2'), imuerr.Ka2 = -clbt.Ka2; end
+    if isfield(clbt, 'Kap'), imuerr.Kap = -clbt.Kap; end
+    if isfield(clbt, 'gSens'), imuerr.gSens = -clbt.gSens; end
+    imu = imuadderr(imu, imuerr);
+    if norm(clbt.rx)>0 || norm(clbt.ry)>0 || norm(clbt.rz)>0 || abs(clbt.tGA)>0
         timebar(1, length(imu), 'IMU calibration,');
         for k=2:length(imu)
             wb = imu(k,1:3)'/ts; fb = imu(k,4:6)'/ts;
             dwb = (imu(k,1:3)-imu(k-1,1:3))'/ts/ts;
             SS = imulvS(wb, dwb);  fL = SS*[clbt.rx;clbt.ry;clbt.rz];
-            fb = fb - fL + clbt.tGA*cross(wb,fb);
+            fb = fb - fL - clbt.tGA*cros(wb,fb);
             imu(k,4:6) = fb'*ts;
             timebar(1);
         end
     end
-    imuerr.dKg = (clbt.Kg-eye(3)); imuerr.eb = -clbt.eb; imuerr.web = zeros(3,1); imuerr.sqg = zeros(3,1);
-    imuerr.dKa = (clbt.Ka-eye(3)); imuerr.db = -clbt.db; imuerr.KA2 = -clbt.Ka2; imuerr.wdb = zeros(3,1);  imuerr.sqa = zeros(3,1);
-    imu = imuadderr(imu, imuerr);
     

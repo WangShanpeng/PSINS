@@ -25,7 +25,8 @@ function t = cnt2t(cnt, ts, t0)
         dcnt(dcnt==-65535) = 1;
     else
         idx = dcnt<0;
-        dcnt(idx) = dcnt(idx)+m;
+        dcnt(idx) = dcnt(1);
+%         dcnt(idx) = dcnt(idx)+m;
     end
     t = cumsum([cnt(1);dcnt])*ts;
 	t = t - t(1) + t0;

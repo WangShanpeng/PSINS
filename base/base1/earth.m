@@ -25,7 +25,9 @@ global glv
     eth.wnen = [-vn(2)/eth.RMh; vE_RNh; vE_RNh*eth.tl];
     eth.wnin = eth.wnie + eth.wnen;
     eth.wnien = eth.wnie + eth.wnin;
-    eth.g = glv.g0*(1+5.27094e-3*eth.sl2+2.32718e-5*sl4)-3.086e-6*pos(3); % grs80
+%     eth.g = glv.g0*(1+5.2790414e-3*eth.sl2+2.32718e-5*sl4)-3.086e-6*pos(3);  % GJB6304-2008,Eq.(B.5)
+    gL = glv.g0*(1+glv.beta*eth.sl2-glv.beta1*(2*eth.sl*eth.cl)^2);  hR = pos(3)/(glv.Re*(1-glv.f*eth.sl2));
+    eth.g = gL*(1-2*hR-5*hR^2);
     eth.gn = [0;0;-eth.g];
 %     eth.gcc = eth.gn - cros(eth.wnien,vn); % Gravitational/Coriolis/Centripetal acceleration
     eth.gcc =  [ eth.wnien(3)*vn(2)-eth.wnien(2)*vn(3);  % faster than previous line

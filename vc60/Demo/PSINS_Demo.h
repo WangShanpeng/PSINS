@@ -15,40 +15,44 @@
 #define FRQ	FRQ200
 #define TS	(1.0/FRQ)
 
-#define PSINSDemo 23
-
-#define psinsdemo()  \
-	switch(PSINSDemo)\
-	{\
-	case -1: /*main-CKFApp()*/break;\
-	case 0: Demo_User(); break;\
-	case 1: Demo_CIIRV3(); break;\
-	case 2: Demo_CMaxMin(); break;\
-	case 3: Demo_CVAR(); break;\
-	case 4: Demo_CVARn(); break;\
-	case 5: Demo_CRAvar(); break;\
-	case 6: Demo_CSINS_static(); break;\
-	case 7: Demo_CAlignsv(); break;\
-	case 8: Demo_CAligntf(); break;\
-	case 9: Demo_CAlign_CSINS(); break;\
-	case 10: Demo_CSINSGNSS(); break;\
-	case 11: Demo_CSINSGNSSDR(); break;\
-	case 12: Demo_SINSOD(); break;\
-	case 13: Demo_POS618(); break;\
-	case 14: Demo_CNS_PrecNut(); break;\
-	case 15: Demo_SINSCNS(); break;\
-	case 16: Demo_IMUTempCompensate(); \
-	case 17: Demo_CVCFileFind(); break;\
-	case 18: Demo_DSP_main(); break; \
-	case 19: Demo_CONSOLE_UART(); break; \
-	case 20: Demo_Cfg(); break; \
-	case 21: Demo_CPolyfit(); break; \
-	case 22: Demo_CAligni0(); break; \
-	case 23: Demo_SysClbt(); break; \
-	case 24: Demo_GKP(); break; \
-	case 25: Demo_CIMUInc(); break; \
-	case 26: Demo_Extract_Txt_File(); break; \
-	case 27: Demo_operator_pointer_run_time(); break; \
+#define psinsdemo(demoNO)  \
+	if(demoNO>=0) \
+	{ \
+		switch(demoNO)\
+		{\
+		case -1: /*main-CKFApp()*/break;\
+		case  0: Demo_User(); break;\
+		case  1: Demo_CIIRV3(); break;\
+		case  2: Demo_CMaxMin(); break;\
+		case  3: Demo_CVAR(); break;\
+		case  4: Demo_CVARn(); break;\
+		case  5: Demo_CRAvar(); break;\
+		case  6: Demo_CSINS_static(); break;\
+		case  7: Demo_CSINS_Error(); break;\
+		case  8: Demo_CAlignsv(); break;\
+		case  9: Demo_CAligntf(); break;\
+		case 10: Demo_CAlign_CSINS(); break;\
+		case 11: Demo_CSINSGNSS(); break;\
+		case 12: Demo_CSINSGNSSDR(); break;\
+		case 13: Demo_SINSOD(); break;\
+		case 14: Demo_POS618(); break;\
+		case 15: Demo_CNS_PrecNut(); break;\
+		case 16: Demo_SINSCNS(); break;\
+		case 17: Demo_IMUTempCompensate(); \
+		case 18: Demo_CVCFileFind(); break;\
+		case 19: Demo_DSP_main(); break; \
+		case 20: Demo_CONSOLE_UART(); break; \
+		case 21: Demo_Cfg(); break; \
+		case 22: Demo_CPolyfit(); break; \
+		case 23: Demo_CAligni0(); break; \
+		case 24: Demo_SysClbt(); break; \
+		case 25: Demo_GKP(); break; \
+		case 26: Demo_CIMUInc(); break; \
+		case 27: Demo_Extern_C_example(); break; \
+		case 28: Demo_Extract_Txt_File(); break; \
+		case 29: Demo_operator_pointer_run_time(); break; \
+		} \
+		exit(0); \
 	}
 void Demo_User(void);
 void Demo_CIIRV3(void);
@@ -57,6 +61,7 @@ void Demo_CVAR(void);
 void Demo_CVARn(void);
 void Demo_CRAvar(void);
 void Demo_CSINS_static(void);
+void Demo_CSINS_Error(void);
 void Demo_CAlignsv(void);
 void Demo_CAligntf(void);
 void Demo_CAlign_CSINS(void);
@@ -76,6 +81,7 @@ void Demo_CAligni0(void);
 void Demo_SysClbt(void);
 void Demo_GKP(void);
 void Demo_CIMUInc(void);
+void Demo_Extern_C_example(void);
 void Demo_Extract_Txt_File(void);
 void Demo_operator_pointer_run_time(void);
 

@@ -10,6 +10,7 @@ function avp = inspure(imu, avp0, href, isfig)
 %                   'v' - velocity fix-damping, =vn0
 %                   'V' - vertical velocity fix-damping, =vn0(3)
 %                   'p' - position fix-damping, =pos0
+%                   'P' - position fix-damping, =pos0 & vertical velocity fix-damping, =vn0(3)
 %                   'H' - height fix-damping, =pos0(3)
 %                   'f' - height free.
 %                   'O' - open loop, vn=0.  Ref: my PhD thesis P41
@@ -19,13 +20,18 @@ function avp = inspure(imu, avp0, href, isfig)
 %         isfig - figure on/off flag
 % Output: avp - navigation results, avp = [att,vn,pos,t]
 %
+% Example:
+%     t0=880; t1=940; t2=t1+1000;
+%     att0 = aligni0(datacut(imu,t0,t1), getat(gps(:,4:end),t0));
+%     avp = inspure(datacut(imu,t1,t2), [att0;getat(gps(:,4:end),t1)], 'f');
+%
 % See also  insinstant, attpure, trjsimu, insupdate, drpure, nhcpure, insopenav.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 12/01/2013, 04/09/2014
 global glv
-    [nn, ts, nts] = nnts(2, imu(2,end)-imu(1,end));
+    [nn, ts, nts] = nnts(4, imu(2,end)-imu(1,end));
     if length(avp0)<9, avp0=[avp0(1:3);zeros(3,1);avp0(4:end)]; end  % avp0=[att;pos]
     ins = insinit(avp0, ts);  vn0 = avp0(4:6); pos0 = avp0(7:9);
     if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
@@ -67,7 +73,8 @@ global glv
         ins = insupdate(ins, wvm);  ins.eth.dgnt=t; % ins.vn(3) = 0;
         if vp_fix=='v',      ins.vn = vn0;
         elseif vp_fix=='V',  ins.vn(3) = vn0(3);
-        elseif vp_fix=='p',  ins.pos = pos0; ins.vn(3) = vn0(3);
+        elseif vp_fix=='p',  ins.pos = pos0;
+        elseif vp_fix=='P',  ins.pos = pos0;  ins.vn(3) = vn0(3);
         elseif vp_fix=='H',  ins.pos(3) = pos0(3);
         elseif vp_fix=='N',  N=0; % no damping, same as =='f'
         elseif vp_fix=='n',

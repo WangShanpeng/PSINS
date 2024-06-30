@@ -11,7 +11,7 @@ function [qnb, att, Cnb] = sv2atti(vn, vb, yaw0)
 %    [qnb, att, Cnb] = sv2atti(gn, -fb);
 %       where gn is gravity vector and fb is acc specific force vector.
 %
-% See also  dv2atti, mv2atti, rv2q.
+% See also  dv2atti, mv2atti, fb2atti, rv2q.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

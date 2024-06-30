@@ -3,10 +3,10 @@ function qnb = qdelafa(qpb, afa)
 % angles. Please refer to 'qdelphi'.
 %
 % Prototype: qnb = qdelafa(qpb, afa)
-% Inputs: qpb - attitude quaternion from body-frame to computed nav-frame
+% Inputs: qpb - attitude quaternion from computed nav-frame to body-frame 
 %         afa - platform misalignment angles between ideal nav-frame and
 %               computed nav-frame
-% Output: qnb - attitude quaternion from body-frame to ideal nav-frame
+% Output: qnb - attitude quaternion from ideal nav-frame to body-frame 
 %
 % See also  qaddphi, qdelphi, qq2phi, qaddafa, qq2afa
 

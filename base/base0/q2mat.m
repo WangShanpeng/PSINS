@@ -3,7 +3,7 @@ function Cnb = q2mat(qnb)
 %
 % Prototype: Cnb = q2mat(qnb)
 % Input: qnb - attitude quaternion
-% Output: Cnb - DCM from body-frame to navigation-frame
+% Output: Cnb - DCM from navigation-frame to body-frame
 %
 % See also  a2mat, a2qua, m2att, m2qua, q2att, attsyn.
 

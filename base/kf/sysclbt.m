@@ -1,9 +1,9 @@
 function [clbt, av] = sysclbt(imu, pos0, g0, Cba, itertion)
 % SIMU systemtic calibration processing under specific rotating operation.
 %
-% Prototype: clbt = sysclbt(imu, pos, g0, Cba)
+% Prototype: [clbt, av] = sysclbt(imu, pos0, g0, Cba, itertion)
 % Inputs: imu - SIMU data after coarse calibration
-%         pos - geographical position = [latitude; longitude; height]
+%         pos0 - geographical position = [latitude; longitude; height]
 %         g0  - local gravity magnitude
 %         Cba - accelerometer installation direction matrix, always I3x3.
 %         itertion - calibration processing itertion times.
@@ -15,7 +15,7 @@ function [clbt, av] = sysclbt(imu, pos0, g0, Cba, itertion)
 %                where wb=wm/ts, fb=vm/ts, and fL is accelerometer inner
 %                lever arm effect (refer to the following code). 
 %
-% See also  imuscale, imudpdrift, lsclbt, clbtfile, clbtdiff, imuclbt, imuerrset, kfupdate.
+% See also  sysclbtKap, sysclbtMEMS, imuscale, imudpdrift, lsclbt, clbtfile, clbtdiff, imuclbt, imuerrset, kfupdate.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -6,7 +6,7 @@ function [qnb, att, Cnb] = attsyn(attForm)
 % Input: attForm - attitude in Euler angles, DCM or quaternion form
 % Outputs: qnb - attitude quaterinon
 %          att - Euler angles, att=[pitch; roll; yaw] in arcdeg
-%          Cnb - DCM from body-frame to navigation-frame
+%          Cnb - DCM from navigation-frame to body-frame
 %
 % See also  a2mat, a2qua, m2att, m2qua, q2att, q2mat.
 

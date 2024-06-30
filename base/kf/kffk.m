@@ -31,7 +31,7 @@ global psinsdef
         case {33}
             Ft = etm(ins);
             Ft(psinsdef.kffk,psinsdef.kffk) = 0;
-            % 15+dKg(9)+dKa(6)+KA2(3)
+            % 15+dKg(9)+dKa(6)+Ka2(3)
             Ft(1:3,16:24) = [-ins.wib(1)*ins.Cnb, -ins.wib(2)*ins.Cnb, -ins.wib(3)*ins.Cnb];
             Ft(4:6,25:33) = [ins.fb(1)*ins.Cnb, ins.fb(2)*ins.Cnb(:,2:3), ins.fb(3)*ins.Cnb(:,3), ins.Cnb*diag(ins.fb.^2)];
         case {34, 37}

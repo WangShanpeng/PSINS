@@ -3,8 +3,8 @@ function afa = qq2afa(qpb, qnb)
 % angles. Please refer to 'qq2phi'.
 % 
 % Prototype: afa = qq2afa(qpb, qnb)
-% Inputs: qpb - attitude quaternion from body-frame to computed nav-frame
-%         qnb - attitude quaternion from body-frame to ideal nav-frame
+% Inputs: qpb - attitude quaternion from computed nav-frame to body-frame
+%         qnb - attitude quaternion from ideal nav-frame to body-frame
 % Output: afa - platform misalignment angles between ideal nav-frame and
 %               computed nav-frame
 %

@@ -10,7 +10,7 @@ function v = vinsert(v, idx, ele)
 % Example
 %    v = vinsert(randn(10,1), [5,6,9], 10);  plotn(v);
 %
-% See also  getat, sortt, tshift, delbias, scalet, addclmt.
+% See also  minsert, getat, sortt, tshift, delbias, scalet, addclmt.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

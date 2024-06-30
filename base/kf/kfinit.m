@@ -78,7 +78,7 @@ switch(psinsdef.kfinit)
         [davp, imuerr, r0] = setvals(varargin);
         kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(9+15+3,1)])^2;
         kf.Rk = diag(r0)^2;
-        kf.Pxk = diag([davp; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.KA2])^2;
+        kf.Pxk = diag([davp; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.Ka2])^2;
         kf.Hk = kfhk(ins);
         kf.xtau(1:psinsdef.kffk,1) = 0;
     case psinsdef.kfinit346,

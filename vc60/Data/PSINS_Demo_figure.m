@@ -1,7 +1,7 @@
 % Figure for C++ processing results
 % Make sure Matlab/PSINS Toolbox have been initialized!
 glvs
-PSINSDemo = 6;
+PSINSDemo = 7;
 switch PSINSDemo
     case -1, %% Demo_SINS/GNSS
         ins = binfile('ins.bin', 16+3);
@@ -36,14 +36,23 @@ switch PSINSDemo
     case 6, %% Demo_CSINS_static
         avp = binfile('ins.bin', 16);
         insplot(avp(:,[1:9,end]));
-    case 7, %% Demo_CAlignsv
+    case 7, %% Demo_CSINS_Error
+        dd = binfile('ins.bin', 16+16+26);
+        ins1 = dd(:,1:16);  ins2 = dd(:,17:32);  xk = dd(:,[33:end,16]);
+        eth = earth(ins1(1,7:9)');
+        err = avpcmpplot(ins1, ins2);
+        subplot(322), plot(xk(:,end), xk(:,1:3)/glv.min,'m');
+        subplot(324), plot(xk(:,end), xk(:,4:6),'m');
+        subplot(326), plot(xk(:,end), [xk(:,7)*eth.RMh,xk(:,8)*eth.clRNh,xk(:,9)],'m');
+        avpcmpplot(err, xk(:,[1:9,end]));
+    case 8, %% Demo_CAlignsv
         att = binfile('aln.bin', 4);
         T1 = find(diff(att(:,end))<0,1);
         insplot(att(T1+1:end,:),'a');
         subplot(211), plot(att(1:T1,end), att(1:T1,1:2)/glv.deg, 'r');
         subplot(212), plot(att(1:T1,end), att(1:T1,3)/glv.deg, 'r');
         legend('Fine align', 'Coarse align');
-    case 8, %% Demo_CAligntf
+    case 9, %% Demo_CAligntf
         dd = binfile('aln.bin', 25);
         avp = dd(:,1:16); avpr = dd(:,[17:end,16]);
         insplot(avp);
@@ -55,12 +64,12 @@ switch PSINSDemo
         xpplot(zk,rk,1:3,1,'dvn');
         xpplot(zk,rk,4:6,glv.min,'datt');
         stateplot(sk);
-    case 9, %% Demo_CAlign_CSINS
+    case 10, %% Demo_CAlign_CSINS
         att = binfile('aln.bin', 4);
         insplot(att,'a');
         avp = binfile('ins.bin', 16);
         insplot(avp);
-    case 10, %% Demo_CSINSGNSS
+    case 11, %% Demo_CSINSGNSS
         res = binfile([glv.rootpath,'\vc60\Data\ins.bin'], 16+6);
         avp = res(:,1:16); gps = no0(res(:,[17:end,16]),1);
         insplot(avp);
@@ -71,17 +80,17 @@ switch PSINSDemo
         kfplot(xk,pk,1:19);
         rvpplot(zk,rk);
         stateplot(sk);
-    case 11, %% Demo_CVCFileFind
+    case 12, %% Demo_CVCFileFind
         NA = 0;
-    case 14,
+    case 15,
         [imu, mag, bar, avp, gps, gs, temp] = psinsboardbin(2);
         imuplot(imu);  magplot(mag);  baroplot(bar);
         if ~isempty(gps), gpsplot(gps); end
         templot(temp);
-    case 21, %% Demo_CPolyfit
+    case 22, %% Demo_CPolyfit
         res = binfile([glv.rootpath,'\vc60\Data\res.bin'], 2);
         polyfit(res(:,2),res(:,1),3)',
-    case 22, %% Demo_CPolyfit
+    case 23, %% Demo_CPolyfit
         att = binfile([glv.rootpath,'\vc60\Data\aln.bin'], 10+9);
         insplot(att(:,[1:3,end]),'a');
         subplot(211), plot(att(:,end), att(:,4:5)/glv.deg,'-.');
@@ -90,7 +99,7 @@ switch PSINSDemo
         subplot(311), plot(att(:,end), att(:,10:12)); xygo('V')
         subplot(312), plot(att(:,end), att(:,13:15)); xygo('dV')
         subplot(313), plot(att(:,end), att(:,16:18)); xygo('dP')
-    case 23,
+    case 24,
         [xk, pk, zk, rk, sk] = igkfplot('clbt.bin', 3703, 0);
         ins = binfile('ins.bin', 16); insplot(ins); addmark(ins(end,end)*[1;2]/3);
 end

@@ -2,11 +2,11 @@ function [U, D] = UDUT(P)
 % UDUT decomposition, so that P = U*diag(D)*U'.
 %
 % Prototype: [U, D] = UDUT(P)
-% Input: P - nonnegative define symmetic matrix
+% Input: P - non-negative define symmetic matrix
 % Outputs: U - unit upper-triangular matrix 
 %          D - vector representation of diagonal matrix
 %
-% See also  chol1, qrmgs.
+% See also  chol1, qrmgs, schur.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

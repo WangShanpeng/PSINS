@@ -20,6 +20,10 @@ global glv
         imuplot(lost);
         return;
     end
+    if iscell(imu)
+        for k=1:length(imu), imuplot(imu{k}); end
+        return;
+    end
     if size(imu,2)>10  % 5-axis redundancy IMU plot
         myfig;
         ts = diff(imu(1:2,end));  t = imu(:,end);
@@ -45,9 +49,11 @@ global glv
         subplot(322), plot(t, imu2(:,4)/ts/g0, 'r');
         subplot(324), plot(t, imu2(:,5)/ts/g0, 'r');
         subplot(326), plot(t, imu2(:,6)/ts/g0, 'r');
-        imu = interp1n(imu, imu2(:,end));
-        [t,i1,i2] = intersect(imu(:,end), imu2(:,end));
-        lost = [[imu(i1,1:6)-imu2(i2,1:6)], t];  % imuerr = imu1-imu2;
+        if imu(end,end)<imu2(1,end) && imu2(end,end)<imu(1,end)
+            imu = interp1n(imu, imu2(:,end));
+            [t,i1,i2] = intersect(imu(:,end), imu2(:,end));
+            lost = [[imu(i1,1:6)-imu2(i2,1:6)], t];  % imuerr = imu1-imu2;
+        end
         return;
     end
     if size(imu,2)==3, imu(:,4) = (1:length(imu))'; end
@@ -127,13 +133,24 @@ global glv
         subplot(322), plot(t, imu(:,4)/g0);  xygo('fx');
         subplot(324), plot(t, imu(:,5)/g0);  xygo('fy');
         subplot(326), plot(t, imu(:,6)/g0);  xygo('fz');
+        if size(imu,2)==8
+            hold off;
+            plotyy(t, imu(:,6)/g0, t, imu(:,7)*ts);  xygo('fz');
+        end
     else % type==0
         dt = diff(t);
         lost = abs(dt)>mean(dt)*1.5; tlost = t(lost)+dt(1);
-        if size(imu,2)==4  % plot gyro only
-            subplot(311), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');  title('X_R Y_F Z_U');
-            subplot(312), plot(t, imu(:,2)/dps, tlost,imu(lost,2)/dps,'ro'); xygo('wy');
-            subplot(313), plot(t, imu(:,3)/dps, tlost,imu(lost,3)/dps,'ro'); xygo('wz');
+        if size(imu,2)==4  % plot acc or gyro only
+            f = mean(normv(imu(:,1:3)));
+            if f>9.0 && f<10.6  % if acc static
+                subplot(311), plot(t, imu(:,1)/g0,  tlost,imu(lost,1)/g0,'ro');  xygo('fx');  title('X_R Y_F Z_U');
+                subplot(312), plot(t, imu(:,2)/g0,  tlost,imu(lost,2)/g0,'ro');  xygo('fy');
+                subplot(313), plot(t, imu(:,3)/g0,  tlost,imu(lost,3)/g0,'ro');  xygo('fz');
+            else
+                subplot(311), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');  title('X_R Y_F Z_U');
+                subplot(312), plot(t, imu(:,2)/dps, tlost,imu(lost,2)/dps,'ro'); xygo('wy');
+                subplot(313), plot(t, imu(:,3)/dps, tlost,imu(lost,3)/dps,'ro'); xygo('wz');
+            end
         else
             subplot(321), plot(t, imu(:,1)/dps, tlost,imu(lost,1)/dps,'ro'); xygo('wx');  title('X_R Y_F Z_U');
             subplot(323), plot(t, imu(:,2)/dps, tlost,imu(lost,2)/dps,'ro'); xygo('wy');

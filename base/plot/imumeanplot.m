@@ -7,7 +7,7 @@ function imu = imumeanplot(imu, n, dph)
 %         dph - deg/h unit for gyro
 % Output: imu - cumsum IMU oputput
 %          
-% See also  imuplot, imutplot, imutemplot, imuresample.
+% See also  imuplot, imutplot, imutemplot, imuresample, imumean.
 
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -27,3 +27,4 @@ global glv
     if dph~=glv.dph, dph=glv.dps; end
     subplot(325); plot(imu(:,end), normv(imu(:,1:3))/(n*ts)/dph, 'm');
     subplot(326); plot(imu(:,end), normv(imu(:,4:6))/(n*ts)/glv.g0, 'm');
+

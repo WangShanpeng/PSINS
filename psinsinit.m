@@ -24,6 +24,11 @@ end
 %% Add new PSINS directories to search path.
 rootpath = pwd;
 pp = genpath(rootpath);
+idx = strfind(pp,';');
+for k=length(idx):-1:2  % remove vc60 & doc
+    if ~isempty(strfind(pp(idx(k-1)+1:idx(k)),'vc60')), pp(idx(k-1)+1:idx(k))=[];
+    elseif ~isempty(strfind(pp(idx(k-1)+1:idx(k)),'doc')), pp(idx(k-1)+1:idx(k))=[]; end
+end
 mytestflag = 0;
 if exist('mytest\mytestinit.m', 'file')
     mytestflag = 1;

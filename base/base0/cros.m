@@ -11,6 +11,13 @@ function c = cros(a, b)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 04/05/2014
+    if length(a)>3
+        c = a;
+        c(:,1) = a(:,2).*b(:,3)-a(:,3).*b(:,2);
+        c(:,2) = a(:,3).*b(:,1)-a(:,1).*b(:,3);
+        c(:,3) = a(:,1).*b(:,2)-a(:,2).*b(:,1);
+        return;
+    end
     c = a;
     c(1) = a(2)*b(3)-a(3)*b(2);
     c(2) = a(3)*b(1)-a(1)*b(3);

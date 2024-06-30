@@ -3,12 +3,13 @@
 % Copyright(c) 2009-2015, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 01/10/2015
-function demo_sagnac_effect
+function demo_sagnac_effect(typ)
+    if nargin<1, typ=0; end
     hfig = figure;
     for k=0:11
         if ~ishandle(hfig),  break;  end
         hold off;
-        drawOneStep(k, 1);  % 0 for static, 1 for CW, -1 for CCW
+        drawOneStep(k, typ);  % 0 for static, 1 for CW, -1 for CCW
         pause(0.5);
     end
 

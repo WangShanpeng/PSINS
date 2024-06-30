@@ -1,6 +1,6 @@
 function A = chol1(P)
 % Cholesky factorization.
-% See also  chol, cholupdate1.
+% See also  chol, cholupdate1, schur.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -17,10 +17,11 @@ function  avp = ap2avp(ap, ts)
     t = (ap(1,7):ts:ap(end,7))';
     ap(:,1:3) = att2c(ap(:,1:3)); % make sure att is continuous
     avp = zeros(length(t), 10);
-    for k=1:3  % attitude spline interpolation
-        avp(:,k) = spline(ap(:,7), ap(:,k), t);
-    end
-    avp(:,1:3) = iatt2c(avp(:,1:3));
+%     for k=1:3  % attitude spline interpolation
+%         avp(:,k) = spline(ap(:,7), ap(:,k), t);
+%     end
+%     avp(:,1:3) = iatt2c(avp(:,1:3));
+    avp(:,1:3) = attinterp1(ap(:,[1:3,end]), t);  % 2024-05-18
     for k=1:3
         pp = spline(ap(:,7), ap(:,3+k));
         avp(:,6+k) = ppval(pp, t); % position interpolation

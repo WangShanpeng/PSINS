@@ -24,13 +24,16 @@ global glv
     glv.Rp = (1-glv.f)*glv.Re;      % semi-minor axis
     glv.e = sqrt(2*glv.f-glv.f^2); glv.e2 = glv.e^2; % 1st eccentricity
     glv.ep = sqrt(glv.Re^2-glv.Rp^2)/glv.Rp; glv.ep2 = glv.ep^2; % 2nd eccentricity
+    glv.GM = 3.986004418e14;        % Earth's universal
     glv.wie = wie;                  % the Earth's angular rate
     glv.meru = glv.wie/1000;        % milli earth rate unit
-    glv.g0 = 9.7803267714;          % gravitational force
+    glv.g0 = 9.7803267715;          % gravitational force
+    m = Re*glv.wie^2/glv.g0;  glv.beta = 5/2*m-f-17/14*m*f;  glv.beta1 = (5*m*f-f^2)/8;
     glv.mg = 1.0e-3*glv.g0;         % milli g
     glv.ug = 1.0e-6*glv.g0;         % micro g
     glv.mGal = 1.0e-3*0.01;         % milli Gal = 1cm/s^2 ~= 1.0E-6*g0
     glv.uGal = glv.mGal/1000;       % micro Gal
+    glv.ugpg = glv.ug/glv.g0;       % ug/g
     glv.ugpg2 = glv.ug/glv.g0^2;    % ug/g^2
     glv.ugpg3 = glv.ug/glv.g0^3;    % ug/g^3
     glv.ws = 1/sqrt(glv.Re/glv.g0); % Schuler frequency
@@ -41,6 +44,7 @@ global glv
     glv.mas = glv.sec/1000;         % milli arcsec
     glv.hur = 3600;                 % time hour (1hur=3600second)
     glv.dps = pi/180/1;             % arcdeg / second
+    glv.mdps = glv.dps/1000;        % milli dps
     glv.rps = 360*glv.dps;          % revolutions per second
     glv.dph = glv.deg/glv.hur;      % arcdeg / hour
     glv.dpss = glv.deg/sqrt(1);     % arcdeg / sqrt(second)
@@ -56,6 +60,8 @@ global glv
     glv.dphpg2 = glv.dphpg/glv.g0;  % (arcdeg/hour) / g^2
     glv.ugpsHz = glv.ug/sqrt(glv.Hz);  % ug / sqrt(Hz)
     glv.ugpsh = glv.ug/sqrt(glv.hur); % ug / sqrt(hour)
+    glv.ugph = glv.ug/glv.hur;      % ug / hour
+    glv.ugphpsh = glv.ugph/sqrt(glv.hur);  % ug / hour
     glv.mpsh = 1/sqrt(glv.hur);     % m / sqrt(hour)
     glv.mpspsh = 1/1/sqrt(glv.hur); % (m/s) / sqrt(hour), 1*mpspsh~=1700*ugpsHz
     glv.ppmpsh = glv.ppm/sqrt(glv.hur); % ppm / sqrt(hour)
@@ -82,7 +88,7 @@ global glv
     glv.t0 = 0;
     glv.tscale = 1;  % =1 for second, =60 for minute, =3600 for hour, =24*3600 for day
     glv.isfig = 1;
-    glv.dgn = [];
+    glv.gfix = []; glv.dgn = [];
     %%
     [glv.rootpath, glv.datapath, glv.mytestflag] = psinsenvi;
     glv1 = glv;

@@ -1,34 +1,14 @@
 #include "PSINS_Demo.h"
 
+#define PSINSDemo
 #ifdef  PSINSDemo
 
 void Demo_User(void)
 {
-	double aa[]={11,2,3,4,  1,22,3,4,   1,2,33,4,  1,2,3,44};
-	CMat m(4,4,aa), mm, I;
-	mm = inv4(m);
-	I = m*mm;
-	return;
-
-	clock_t t1, t2, t3;
-	double a[]={1,2,3,4,5,6,7,8}, b[]={1,1,1,1,1,1,1,1}, s1, s2;
-    t1 = clock();
-	for(int n1=0; n1<10*1000*1000; n1++)
-	{
-		double *pa=a; s1=1.0;
-		for(int i=8; i; i--)
-		{
-			s1 += s1**pa++;
-		}
-	}
-    t2 = clock();
-	for(int n2=0; n2<10*1000*1000; n2++)
-	{
-		double *pa=a; s2=1.0;
-		s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++; s2 += s2**pa++;
-	}
-    t3 = clock();
-	printf("%d   %d  %f  %f\n", t2-t1, t3-t2, s1, s2);
+	float ft[100];  double t=-1110.23;
+	CVect3 wm(1,2,3), vm(4,5,6);
+	int n = iga2flt(ft, (double*)&wm, (double*)&vm, NULL, NULL, &t);
+	double tt=flt22db(ft[6], ft[7]);
 }
 
 void Demo_CIIRV3(void)
@@ -119,6 +99,50 @@ void Demo_CSINS_static(void)
 			wm[1]=wm[0];
 		disp(i,1,3600);
 	}
+}
+
+void Demo_CSINS_Error(void)
+{
+	CFileRdWt::Dir(".\\Data\\");	CFileRdWt fins("ins.bin");
+	CVect3 att0=PRY(0,0,10), vn0=CVect3(1,10,2), pos0=LLH(34,116,340);
+	CSINS sins(att0, vn0, pos0, 0.0);
+	CSINSGNSS kf(26,6,TS);
+	*kf.pphi=CVect3(1,1,10)*MIN, *kf.pdvn=CVect3(0.1,0.2,0.3), *kf.pdpos=V3dpos(10,10,10);
+	*kf.peb=CVect3(1,2,3)*DPH, *kf.pdb=CVect3(100,200,300)*UG, *kf.plvr=CVect3(1,2,3)*0; *kf.pdT=0.0;
+	*kf.pdkgz=V3SSP(100,100,100), *kf.pdkaii=V3PPP(100,100,100);
+	*kf.pddbz=10000000*UGPHPSH;
+	if(kf.nq>26) {
+		*kf.pdkg1=V3PSS(100,100,100), *kf.pdkg2 =V3SPS(100,100,100), *kf.pdkg3=V3SSP(100,100,100);
+		*kf.pdka1=V3PSS(100,100,100), *kf.pdka23=V3SPP(100,100,100);
+	}
+	kf.Init(CSINS(a2qua(att0)+*kf.pphi, vn0+*kf.pdvn, pos0+*kf.pdpos, 0.0), 2);
+	kf.sins.Kg=I33+(~CMat3(O31,O31,*kf.pdkgz)); kf.sins.eb=-*kf.peb;
+	kf.sins.Ka=I33+diag(*kf.pdkaii);			kf.sins.db=-*kf.pdb;
+	for(int i=0; i<60*FRQ; i++)	{
+		CVect3 wm=CVect3(1, 2, 3)*DPS*TS, vm=CVect3(0.1, 0.1, G0+0.1)*TS;
+		kf.sins.db.k -= *kf.pddbz*TS;
+		sins.Update(&wm, &vm, 1, TS);
+		kf.Update(&wm, &vm, 1, TS);
+		if(i%10==0) fins<<sins<<kf.sins<<kf.Xk; 
+		disp(i, FRQ, 10);
+	}
+}
+
+void Demo_Extern_C_example(void)  // in main.c file
+{
+#ifdef PSINS_EXTERN_C_EXAMPLE
+	double att[]={0, 0, 0}, vn[]={0, 0, 0}, pos[]={34*DEG, 116*DEG, 340}, t=0.0;
+//	double gyro[]={0, 0, 0, 0, 0, 0}, acc[]={0, 0, 9.8*TS, 0, 0, 9.8*TS};
+	float gyro[]={0, 0, 0, 0, 0, 0}, acc[]={0, 0, 9.8*TS, 0, 0, 9.8*TS};
+	psinsInit0(att, vn, pos, t);
+	for(int i=0; i<60*FRQ/2; i++)
+	{
+//		psinsUpdate0(gyro, acc, 2, TS);
+		psinsUpdatef(gyro, acc, 2, TS);
+		psinsOut0(att, vn, pos, &t);
+		if(i%FRQ==0) printf("%.8f, %.8f, %.3f, %f\n", pos[0]/DEG, pos[1]/DEG, pos[2], t);
+	}
+#endif
 }
 
 void Demo_CAlignsv(void)

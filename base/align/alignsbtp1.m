@@ -1,12 +1,12 @@
-function [att2, eb, db, phi, dyaw] = alignsbtp1(imu, pos, T1T2, Y1Y2)
+function [att2, att1, eb, db, phi, dyaw] = alignsbtp1(imu, pos, T1T2, Y1Y2)
 % SINS align on static base using two-position method.
 %
-% Prototype: [att2, eb, db, phi] = alignsbtp1(imu, pos, T1T2, Y1Y2)
+% Prototype: [att2, att1, eb, db, phi, dyaw] = alignsbtp1(imu, pos, T1T2, Y1Y2)
 % Inputs: imu - SIMU data
 %         pos - initial position
 %         T1T2 - [-inf,T1T2(1)]/[T1T2(2),inf] for first/second angular position
 %         Y1Y2 - from first to second angular rotation
-% Outputs: att2, attitude align results Euler angles in second angular position
+% Outputs: att2, att1 - attitude align results Euler angles in second/first angular position
 %          eb, db - gyro drift, acc bias
 %
 % Example:
@@ -44,5 +44,7 @@ function [att2, eb, db, phi, dyaw] = alignsbtp1(imu, pos, T1T2, Y1Y2)
 %     att2 = q2att(qdelphi(a2qua(att2),-phi));  % lower accuracy
     wf = wf2 - [eb;db];
     [~, att2] = dv2atti(eth.wnie, -eth.gn, wf(1:3), wf(4:6));
+    wf = wf1 - [eb;db];
+    [~, att1] = dv2atti(eth.wnie, -eth.gn, wf(1:3), wf(4:6));
 
     

@@ -4,8 +4,8 @@ function phi = qq2phi(qpb, qnb)
 % quaternion and qnb is accurate quaternion.
 %
 % Prototype: phi = qq2phi(qpb, qnb)
-% Inputs: qpb - attitude quaternion from body-frame to computed nav-frame
-%         qnb - attitude quaternion from body-frame to ideal nav-frame
+% Inputs: qpb - attitude quaternion from computed nav-frame to body-frame
+%         qnb - attitude quaternion from ideal nav-frame to body-frame
 % Output: phi - platform misalignment angles from ideal nav-frame to
 %               computed nav-frame: Cnp(qnp) = I + (phiX)
 %

@@ -7,7 +7,7 @@ function yaw = magyaw(mag, att, declination)
 %         declination - geomagnetic declination
 % Output: yaw - geomagnetic yaw
 %          
-% See also  magplot.
+% See also  magplot, magellipfit.
 
 % Copyright(c) 2009-2018, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

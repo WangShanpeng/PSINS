@@ -1,4 +1,5 @@
 function [Kg, eb, Ka, db, data] = ldpara(fname, dis)
+global glv
     ext = fname(end-2:end);
     switch ext
         case 'bin'
@@ -13,5 +14,5 @@ function [Kg, eb, Ka, db, data] = ldpara(fname, dis)
     Ka = reshape(data(13:21),3,3)';  db = data(22:24)';
     if nargin<2, dis=1; end
     if dis % display
-        Kg, eb, Ka, db,
+        Kg, eb/glv.dps, Ka, db/glv.mg,
     end

@@ -25,7 +25,7 @@ global glv
     clear trj; trj.imu = imu; trj.avp = avp; trj.avp0 = avp0;
     if isempty(avperr), avperr = avperrset([0.1;0.1;1], 0.01, 0.1);  end
     if isempty(imuerr), imuerr = imuerrset(0.01,30,0.001,3,  0,1,0,1,  3,3, 3,3, 3);  end
-    aierr = [avperr; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.KA2; imuerr.web; imuerr.wdb];  % basic error 39x1
+    aierr = [avperr; imuerr.eb; imuerr.db; imuerr.dKga; imuerr.Ka2; imuerr.web; imuerr.wdb];  % basic error 39x1
     ts = diff(imu(1:2,end));
     ins = insinit(avp0, ts);  ins.nts=ts;
     kf = kfinit(ins, avperr, imuerr, 0);
@@ -52,7 +52,7 @@ global glv
         myfig,
         n = 40;
         subplot(311), plot(pqt(1:3,:)','-.o','linewidth',2); xlim([1,n]); grid on; ylabel('\phi / (\prime)'); legend('\phi_E', '\phi_N', '\phi_U', 'Location','Best');
-        xtl = {'phiE/N/U', 'dVE/N/U', 'dLat/Lon/Hgt', 'ebx/y/z', 'dbx/y/z', 'dkgx/y/zx', 'dkgx/y/zy', 'dkgx/y/zz', 'dkax/y/zx', 'dkay/zy,zz', 'KA2x/y/z', 'wgx/y/z', 'wax/y/z', 'Total'};
+        xtl = {'phiE/N/U', 'dVE/N/U', 'dLat/Lon/Hgt', 'ebx/y/z', 'dbx/y/z', 'dkgx/y/zx', 'dkgx/y/zy', 'dkgx/y/zz', 'dkax/y/zx', 'dkay/zy,zz', 'Ka2x/y/z', 'wgx/y/z', 'wax/y/z', 'Total'};
         set(gca, 'xtick', [2:3:n,n], 'XTicklabel', xtl);
         subplot(312), plot(pqt(4:6,:)','-.o','linewidth',2); xlim([1,n]); grid on; ylabel('\deltaV / m/s'); legend('\deltaV_E', '\deltaV_N', '\deltaV_U', 'Location','Best');
         set(gca, 'xtick', [2:3:n,n], 'XTicklabel', xtl);

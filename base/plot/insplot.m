@@ -19,6 +19,7 @@ global glv
         elseif n<5,	 ptype = 'a';
         elseif n<8,	 ptype = 'av';
         elseif n<11, ptype = 'avp';
+        elseif n==11, ptype = 'avpo';
         elseif n<17, ptype = 'avped';
         elseif n<20, ptype = 'avpedl';
         else         ptype = 'avpedlt';
@@ -67,7 +68,7 @@ global glv
             myfig;
             subplot(321), plot(t, avp(:,1:2)/glv.deg); xygo('pr'); legend('Pitch','Roll');
             subplot(322), plot(t, avp(:,3)/glv.deg); xygo('y'); legend('Yaw');
-            subplot(323), plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+avp(:,6).^2)]); xygo('V'); legend('V_E','V_N', 'V_U', '|V|');
+            subplot(323), plot(t, [avp(:,4:6),sqrt(avp(:,4).^2+avp(:,5).^2+0*avp(:,6).^2)]); xygo('V'); legend('V_E','V_N', 'V_U', '|V|');
 %             subplot(323), plot(t, avp(:,4:6)); xygo('V'); legend('V_E','V_N', 'V_U');
             dxyz = pos2dxyz(avp(:,7:9));
             subplot(325), plot(t, dxyz(:,[2,1,3])); xygo('DP'); legend('\DeltaLat','\DeltaLon','\DeltaHgt');
@@ -78,6 +79,10 @@ global glv
                 hold on, plot(dxyz(:,1), dxyz(:,2)); xygo('est', 'nth');
 %                 hold on, plot((avp(:,8)-avp(1,8))*glv.Re*cos(avp(1,7)), (avp(:,7)-avp(1,7))*glv.Re); xygo('est', 'nth');
             legend(sprintf('LON0:%.2f, LAT0:%.2f (DMS), H0:%.1f (m)', r2dms(avp(1,8)),r2dms(avp(1,7)),avp(1,9)));
+        case 'avpo',
+            insplot(avp(:,[1:9,end]));
+            if size(avp,2)~=11, dist = distance(avp(:,[7:9,end])); dist=dist(:,[1,end]); else, dist=avp(:,10:11); end
+            subplot(3,2,5), plot(dist(:,2), dist(:,1), 'm');  legend('\DeltaLat','\DeltaLon','\DeltaHgt', 'Dist');  % plot OD distance
         case {'t/m', 't/h', 't/d'},  % AVP-plot where t-axis in day
             tscalepush(ptype);
             insplot([avp(:,1:9),avp(:,end)/tscaleget()],'avp');

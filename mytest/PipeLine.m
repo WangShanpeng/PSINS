@@ -25,8 +25,8 @@ function [posdr,posdr0,posdr1] = PipeLine(imuod, t, pos, yaw0, inst, kod, Td)
     [inst1, kod] = drcalibrate(avp(1,7:9)', pos1, pos1DR(7:9));
     avp = drpure(datacut(imuod,t0,t2), [att-inst1;pos0], inst, kod, Td); % insplot(avp);
     %%
-    posdr0 = drfit(datacut(avp(:,7:10),1,t1), pos0, pos1, 1);  title('forward fit');
-    posdr1 = drfit(datacut(avp(:,7:10),t1,t2), pos1, pos0, 1);  title('backward fit');
+    posdr0 = drfit(datacut(avp(:,[7:9,end]),1,t1), pos0, pos1, 1);  title('forward fit');
+    posdr1 = drfit(datacut(avp(:,[7:9,end]),t1,t2), pos1, pos0, 1);  title('backward fit');
     posdr = drfusion(posdr0, posdr1, 1, 2); 
     glvwie(1);
 

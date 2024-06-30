@@ -14,6 +14,7 @@ function dr = drupdate(dr, imu, dS)
 % 17/12/2008, 8/04/2014
     nts = dr.ts*size(imu,1);
     dr.distance = dr.distance + dr.kod*norm(dS);
+    dr.distance1 = dr.distance1 + dr.kod*dS;
     [phim, dvbm] = cnscl(imu);  qnb12 = qupdt(dr.qnb, phim/2);
     if length(dS)>1,
         dSn = qmulv(qnb12, dr.Cbo*dS);

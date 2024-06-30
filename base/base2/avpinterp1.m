@@ -7,7 +7,7 @@ function avp = avpinterp1(avp, t, method)
 %         method - 'nearest'/'linear' etc, see interp1
 % Output: avp - interpolated avp
 %
-% See also  attinterp, interp1.
+% See also  attinterp, attinterp1.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

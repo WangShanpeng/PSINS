@@ -304,7 +304,7 @@ err1 = [s.phie*glv.min; s.phin*glv.min; s.phiu*glv.min; s.dve; s.dvn; s.dvu; s.d
     s.webx*glv.dpsh; s.weby*glv.dpsh; s.webz*glv.dpsh;    s.wdbx*glv.ugpsHz; s.wdby*glv.ugpsHz; s.wdbz*glv.ugpsHz ];
 for k=1:9,  pqt(k,1:39) = err1'./err0'.*pqt(k,1:39); pqt(k,end)=norm(pqt(k,1:39));   end  % scale error
 axes(handles.axes1); cla;
-xtl = {'phiE/N/U', 'dVE/N/U', 'dLat/Lon/Hgt', 'ebx/y/z', 'dbx/y/z', 'dkgx/y/zx', 'dkgx/y/zy', 'dkgx/y/zz', 'dkax/y/zx', 'dkay/zy,zz', 'KA2x/y/z', 'wgx/y/z', 'wax/y/z', 'Total'};
+xtl = {'phiE/N/U', 'dVE/N/U', 'dLat/Lon/Hgt', 'ebx/y/z', 'dbx/y/z', 'dkgx/y/zx', 'dkgx/y/zy', 'dkgx/y/zz', 'dkax/y/zx', 'dkay/zy,zz', 'Ka2x/y/z', 'wgx/y/z', 'wax/y/z', 'Total'};
 plot(pqt(7:9,:)','-.o','linewidth',2); xlim([1,40]); grid on; ylabel('\deltaP / m'); legend('\deltaL', '\delta\lambda', '\deltaH', 'Location','Best');
 title(sprintf('T = %.3f (s);  Distance = %.3f (m);  CEP50 = %.3f (m)',  trj.avp(end,end)-trj.avp(1,end), norm(pp2vn(trj.avp(end,7:9)',trj.avp(1,7:9)',1)), sum(pqt(7:8,end))*0.59));
 set(gca, 'xtick', [2:3:40,40], 'XTicklabel', xtl);

@@ -1,4 +1,4 @@
-function [sigma, tau] = avarimu(imu)
+function [sigma, tau, m] = avarimu(imu)
 % Calculate Allan variance for SIMU gyro & acc.
 %
 % Prototype: avarimu(imu)
@@ -13,6 +13,7 @@ function [sigma, tau] = avarimu(imu)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 14/07/2023
 global glv
+    if size(imu,2)==4, imu=[imu(:,1:3),zeros(length(imu),3),imu(:,end)]; end;  % avarimu(gyro);
     sigma = []; tau = []; Err = []; m = [];
     ts = diff(imu(1:2,end));
     for k=1:3
@@ -32,5 +33,5 @@ global glv
    	subplot(222), plot(imu(:,end), imu(:,4:6));  xygo('\itf ^b / \rmmg');
     title(['Mean: ', sprintf('%.3f; ',[m(4:6),norm(m(4:6))]),' mg']);
    	subplot(224), loglog(tau(:,1), sigma(:,4:6));  xygo('\it\tau \rm/ s', '\it\sigma_A\rm( \tau ) /\rm mg');
-    
+    m = m(:);
 

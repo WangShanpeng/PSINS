@@ -48,9 +48,9 @@ function Ft = etmST(ins)
     Mva=O33; Mva(2)=ins.fn(3); Mva(3)=-ins.fn(2); Mva(4)=-ins.fn(3); Mva(6)=ins.fn(1); Mva(7)=ins.fn(2); Mva(8)=-ins.fn(1); 
     Mvv = Avn*Mav - Awn;
     Mvp = Avn*(Mp1+Map);
-    % g = g0*(1+5.27094e-3*eth.sl2+2.32718e-5*sl4)-3.086e-6*pos(3);
+    % g = glv.g0*(1+5.2790414e-3*eth.sl2+2.32718e-5*sl4)-3.086e-6*pos(3);  % GJB6304-2008,Eq.(B.5)
     g0 = 9.7803267714;  scl = ins.eth.sl*ins.eth.cl;
-    Mvp(3) = Mvp(3)-g0*(5.27094e-3*2+2.32718e-5*4*ins.eth.sl2)*scl; Mvp(9) = Mvp(9)+3.086e-6;  % 26/05/2014, good!!!
+    Mvp(3) = Mvp(3)-g0*(5.2790414e-3*2+2.32718e-5*4*ins.eth.sl2)*scl; Mvp(9) = Mvp(9)+3.086e-6;  % 26/05/2014, good!!!
 %     Mpv = [ 0,       f_RMh, 0;
 %             f_clRNh, 0,     0;
 %             0,       0,     1 ];
@@ -65,6 +65,6 @@ function Ft = etmST(ins)
            O33    Mpv    Mpp     O33      O33
            zeros(6,9)  diag(-1./[ins.tauG;ins.tauA]) ];
     Ft(1:3,1:3)  = Maa+Mav*Avn;
-    Ft(4:6,1:12) = [-askew(ins.eth.gn)-Avn*askew(ins.eth.wnie), -askew(2*ins.eth.wnie+ins.eth.wnen), Avn*Mp1, Avn*ins.Cnb];    Ft(6,7) = Ft(6,7)-g0*(5.27094e-3*2+2.32718e-5*4*ins.eth.sl2)*scl; Ft(6,9) = Ft(6,9)+3.086e-6;
+    Ft(4:6,1:12) = [-askew(ins.eth.gn)-Avn*askew(ins.eth.wnie), -askew(2*ins.eth.wnie+ins.eth.wnen), Avn*Mp1, Avn*ins.Cnb];    Ft(6,7) = Ft(6,7)-g0*(5.2790414e-3*2+2.32718e-5*4*ins.eth.sl2)*scl; Ft(6,9) = Ft(6,9)+3.086e-6;
     Ft(7:9,1:3)  = Mpv*Avn;
     

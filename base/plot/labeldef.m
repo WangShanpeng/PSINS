@@ -12,7 +12,7 @@ function stext = labeldef(stext)
 % 08/03/2014, 07/07/2021
     global glv
     global specl_string
-    if isempty(specl_string)
+    if isempty(specl_string) || nargin<1  % reload
     specl_string = {...  % string cell
         't/s'    '\itt \rm / s';
         't/m'    '\itt \rm / min';
@@ -71,10 +71,12 @@ function stext = labeldef(stext)
         'ebyz',  '\it\epsilon _{y,z}\rm / ( (\circ)/h )';
         'eb',    '\it\epsilon\rm / ( (\circ)/h )';
         'en',    '\it\epsilon\rm / ( (\circ)/h )';
+        'gS',    'gSens / ( (\circ)/h/g )';
         'db',    '\it\nabla\rm / \mu\itg';
         'dKij',  '\delta\itKij\rm / (\prime\prime)';
         'dKii',  '\delta\itKii\rm / ppm';
         'Ka2',   'Ka2 / ug/g^2';
+        'Kap',   'Kap / ppm';
         'dbU',   '\it\nabla \rm_U / \mu\itg';
         'L',     '\itLever\rm / m';
         'dT',    '\delta\it T_{asyn}\rm / ms';
@@ -103,6 +105,7 @@ function stext = labeldef(stext)
         'frq',  '\itf\rm / Hz';
 		'dinst', '\delta\it\theta , \rm\delta\it\psi\rm / ( \prime )';
     };
+        if nargin<1, stext=[]; return; end
     end
     if strcmp(stext,'t')==1
         switch glv.tscale(end)

@@ -54,10 +54,18 @@ function imu = imuadderr(imu, imuerr, db, web, wdb)
         mva = markov1(imuerr.sqa.*sqrt(imuerr.taua/2), imuerr.taua, ts, m);
         drift(:,4:6) = drift(:,4:6) + mva*ts;
     end
-    if min(abs(imuerr.KA2))>0
-        imu(:,4:6) = [ imu(:,4)+imuerr.KA2(1)/ts*imu(:,4).^2, ...
-                       imu(:,5)+imuerr.KA2(2)/ts*imu(:,5).^2, ...
-                       imu(:,6)+imuerr.KA2(3)/ts*imu(:,6).^2 ];
+    if min(abs(imuerr.Ka2))>0
+        imu(:,4:6) = [ imu(:,4)+imuerr.Ka2(1)/ts*imu(:,4).^2, ...
+                       imu(:,5)+imuerr.Ka2(2)/ts*imu(:,5).^2, ...
+                       imu(:,6)+imuerr.Ka2(3)/ts*imu(:,6).^2 ];
+    end
+    if isfield(imuerr, 'Kap')
+        imu(:,4:6) = [ imu(:,4)+imuerr.Kap(1)*abs(imu(:,4)), ...
+                       imu(:,5)+imuerr.Kap(2)*abs(imu(:,5)), ...
+                       imu(:,6)+imuerr.Kap(3)*abs(imu(:,6)) ];
+    end
+    if isfield(imuerr, 'gSens')
+        drift(:,1:3) = drift(:,1:3) + imu(:,4:6)*imuerr.gSens';
     end
     if isfield(imuerr, 'dKg')
         Kg = eye(3)+imuerr.dKg; Ka = eye(3)+imuerr.dKa;

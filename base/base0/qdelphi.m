@@ -4,10 +4,10 @@ function qnb = qdelphi(qpb, phi)
 % quaternion and phi is misalignment angles.
 %
 % Prototype: qnb = qdelphi(qpb, phi)
-% Inputs: qpb - attitude quaternion from body-frame to computed nav-frame
-%         phi - platform misalignment angles from computed nav-frame to
-%               ideal nav-frame
-% Output: qnb - attitude quaternion from body-frame to ideal nav-frame
+% Inputs: qpb - attitude quaternion from computed nav-frame to body-frame
+%         phi - platform misalignment angles from ideal nav-frame to
+%               computed nav-frame
+% Output: qnb - attitude quaternion from ideal nav-frame to body-frame
 %
 % See also  qaddphi, qq2phi, qaddafa, qdelafa, qq2afa, adelphi.
 

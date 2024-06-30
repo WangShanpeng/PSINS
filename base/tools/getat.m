@@ -1,4 +1,4 @@
-function val = getat(array, tk, clm, method)
+function [val,idx] = getat(array, tk, clm, method)
 % Get value at tk from array.
 %
 % Prototype: val = getat(array, tk, method)
@@ -7,10 +7,10 @@ function val = getat(array, tk, clm, method)
 
 % Copyright(c) 2009-2019, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 11/12/2019
+% 11/12/2019, 02/01/2024
     if length(tk)>1
         for k=1:length(tk)
-            val(k,:) = getat(array, tk(k));
+            [val(k,:),idx(k,1)] = getat(array, tk(k));
         end
         return;
     end
@@ -21,3 +21,4 @@ function val = getat(array, tk, clm, method)
         if nargin<4, method = 'nearest'; end
         val = interp1(array(:,end), array(:,clm), tk, method)';
     end
+    if nargout==2, idx=find(array(:,end)>tk,1,'first'); end

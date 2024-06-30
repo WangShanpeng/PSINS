@@ -2,7 +2,7 @@ function qnb = m2qua(Cnb)
 % Convert direction cosine matrix(DCM) to attitude quaternion.
 %
 % Prototype: qnb = m2qua(Cnb)
-% Input: Cnb - DCM from body-frame to navigation-frame
+% Input: Cnb - DCM from navigation-frame to body-frame
 % Output: qnb - attitude quaternion
 %
 % See also  a2mat, a2qua, m2att, q2att, q2mat, attsyn, m2rv.

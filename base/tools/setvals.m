@@ -3,7 +3,7 @@ function varargout = setvals(varargin)
 %
 % Prototype: varargout = setvals(varargin)
 %
-% See also  prealloc, varpack, mat2ele.
+% See also  deal, prealloc, varpack, mat2ele.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

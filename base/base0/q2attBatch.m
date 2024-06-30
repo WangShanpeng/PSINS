@@ -5,7 +5,7 @@ function att = q2attBatch(qnb)
 % Input: qnb - attitude quaternion, nX4 array
 % Output: att - Euler angles att=[pitch, roll, yaw] nX3 array in radians
 %
-% See also  q2att, a2matBatch, amulvBatch.
+% See also  q2att, a2quaBatch, a2matBatch, amulvBatch.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

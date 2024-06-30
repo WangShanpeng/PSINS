@@ -4,6 +4,7 @@
 Copyright(c) 2015-2023, by YanGongmin, All rights reserved.
 Northwestern Polytechnical University, Xi'an, P.R.China.
 Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022, 23/09/2023
+      04/02/2024
 */
 
 #ifndef _PSINS_H
@@ -20,7 +21,7 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17
 #pragma pack(4)
 
 /************** compiling control !!! ***************/
-#define PSINS_MATRIX_MAX_DIM	46
+#define PSINS_MATRIX_MAX_DIM	36
 #define PSINS_IO_FILE
 #define PSINS_IO_FILE_FIND
 #define PSINS_RMEMORY
@@ -31,7 +32,8 @@ Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17
 //#define PSINS_CONSOLE_UART
 //#define PSINS_VC_AFX_HEADER
 //#define PSINS_COMPLEX
-#define PSINS_FAST_CALCULATION
+//#define PSINS_FAST_CALCULATION
+#define PSINS_EXTERN_C_EXAMPLE
 //#define PSINS_FOR_LINUX
 
 #ifdef PSINS_IO_FILE
@@ -92,12 +94,15 @@ typedef unsigned char BYTE;
 #define G0		9.7803267714
 #define MG		(G0/1.0e3)
 #define UG		(G0/1.0e6)		// ug
+#define UGPH	(UG/HUR)		// ug/h
+#define UGPHPSH	(UGPH/SHUR)		// ug/h/sqrt(h)
 #define UGPSHZ	(UG/1)			// ug/sqrt(Hz)
 #define UGPG2	(UG/G0/G0)		// ug/g^2
 #define SECPG	(SEC/G0)		// sec/g
+#define PPM		1.0e-6
 #define RE		6378137.0
 #define FF		(1.0/298.257)
-#define PPM		1.0e-6
+#define WIE		7.2921151467e-5
 
 #ifndef EPS
 #define EPS		(2.220446049e-16)
@@ -176,6 +181,11 @@ typedef unsigned char BYTE;
 #define fUGPSHZ3(X)		fXXX(X*UGPSHZ)
 #define fUGPSHZXXZ(X,Z)	fXXZU(X,Z,UGPSHZ)
 #define fKPP(dpch,dk,dyaw)	fXYZ(dpch*DEG,dk,dyaw*DEG)
+#define fdKPSS(p,s1,s2)		(p)*PPM,(s1)*SEC,(s2)*SEC
+#define fdKSPS(s1,p,s2)		(s1)*SEC,(p)*PPM,(s2)*SEC
+#define fdKSSP(s1,s2,p)		(s1)*SEC,(s2)*SEC,(p)*PPM
+#define fdKSPP(s,p1,p2)		(s)*SEC,(p1)*PPM,(p2)*PPM
+#define fdKPPP(p1,p2,p3)	(p1)*PPM,(p2)*PPM,(p3)*PPM
 #define fdKG1(dkii)			(dkii)*PPM			// dkzz
 #define fdKG3(dkii,dkij)	(dkij)*SEC,(dkij)*SEC,(dkii)*PPM		// dkxz,dkyz,dkzz
 #define fdKG9(dkii,dkij)	(dkii)*PPM,(dkij)*SEC,(dkij)*SEC,(dkij)*SEC,(dkii)*PPM,(dkij)*SEC,(dkij)*SEC,(dkij)*SEC,(dkii)*PPM
@@ -185,7 +195,6 @@ typedef unsigned char BYTE;
 //#define fdKGA(dkii,x1,x2,x3)				fdKG1(dkii)
 //#define fdKGA(dkii,dkij,x2,x3)			fdKG3(dkii,dkij)
 //#define fdKGA(dkii,dkij,x2,x3)			fdKG9(dkii,dkij)
-#define fdKGA(dkgii,dkgij,dkaii,dkaij)	fdKGA15(dkgii,dkgij,dkaii,dkaij)
 #define fdKGA(dkgii,dkgij,dkaii,dkaij)	fdKGA15(dkgii,dkgij,dkaii,dkaij)
 #define fdKa23(dka2)	fXXX(dka2*UGPG2)
 #define fdKapn3(dkapn)	fXXX(dkapn*PPM)
@@ -216,6 +225,12 @@ typedef unsigned char BYTE;
 #define C360CC180(yaw)  ( (yaw)>=PI ? (_2PI-(yaw)) : -(yaw) )   // clockwise 0~360deg -> counter-clockwise +-180deg for yaw
 #define LLH(latitude,longitude,height)	CVect3((latitude)*DEG,(longitude)*DEG,height)
 #define PRY(pitch,roll,yaw)		CVect3((pitch)*DEG,(roll)*DEG,C360CC180((yaw)*DEG))
+#define V3PPP(p1,p2,p3)		CVect3(p1*PPM,p2*PPM,p3*PPM)
+#define V3PSS(p1,s2,s3)		CVect3(p1*PPM,s2*SEC,s3*SEC)
+#define V3SPS(s1,p2,s3)		CVect3(s1*SEC,p2*PPM,s3*SEC)
+#define V3SSP(s1,s2,p3)		CVect3(s1*SEC,s2*SEC,p3*PPM)
+#define V3SPP(s1,p2,p3)		CVect3(s1*SEC,p2*PPM,p3*PPM)
+#define V3dpos(dlat,dlon,dhgt)	CVect3((dlat)/RE,(dlon)/RE,dhgt)
 #define LLHcvt(pllh)	{ double *p=(double*)pllh,tmp=p[0]; p[0]=p[1]*DEG,p[1]=tmp*DEG; }  // lat/lon/hgt convert
 #define PRYcvt(ppry)	{ double *p=(double*)ppry,y=p[2]*DEG; p[0]=p[0]*DEG,p[1]=p[1]*DEG,p[2]=C360CC180(y); }  // pch/rll/yaw convert
 
@@ -230,9 +245,9 @@ extern int	psinsstack0, psinsstacksize;
 #endif
 
 #define disp(i, FRQ, n)  { if((i)%((n)*(FRQ))==0) printf("%d\n", (i)/(FRQ)); } 
-#define dispx(i, FRQ, n)  { disp(i,FRQ,n);  if(kbhit()&&getch()=='x') exit(0); }   // kbhit & getch waste time
+#define dispx(i, FRQ, n)  { disp(i,FRQ,n);  if(kbhit()&&getch()=='x') exit(0); }   // kbhit & getch, waste time!
 
-void sizedisp(int i=0);
+void ClassSizeDisp(int i=0);
 
 // class define
 class CGLV;
@@ -280,6 +295,7 @@ double	unixt2gpst(double ut, int leap=0);
 int*	deci(int i, int *pi=NULL);		// decode decimal to 0~9 array
 BOOL	chkhdr(const char *str, const char *hdr);
 BYTE*	flipud(BYTE *p, int rows, int clmBytes);
+void	deal(double *pf, ...);
 #define crosI(v1,v2)		(v1.j*v2.k-v1.k*v2.j)
 #define crosJ(v1,v2)		(v1.k*v2.i-v1.i*v2.k)
 #define crosK(v1,v2)		(v1.i*v2.j-v1.j*v2.i)
@@ -314,10 +330,10 @@ class CGLV
 public:
 	double Re, f, g0, wie;										// the Earth's parameters
 	double e, e2, ep, ep2, Rp;
-	double mg, ug, deg, min, sec, hur, ppm, ppmpsh;					// commonly used units
+	double mg, ug, deg, min, sec, hur, ppm, ppmpsh;				// commonly used units
 	double dps, dph, dpsh, dphpsh, dph2, dphpg, ugpsh, ugpsHz, ugpg2, mpsh, mpspsh, secpsh;
 
-	CGLV(double Re=6378137.0, double f=(1.0/298.257), double g0=9.7803267714, double wie0=7.2921151467e-5);
+	CGLV(double Re=RE, double f=FF, double g0=G0);
 #ifdef PSINS_IO_FILE
 	clock_t	t0;
 	int toc(BOOL disp=0);
@@ -394,6 +410,8 @@ double crossXY(const CVect3 &v1, const CVect3 &v2);
 CVect3 operator-(const CVect3 &v);				// minus
 CMat3 vxv(const CVect3 &v1, const CVect3 &v2);	// column-vector multiply row-vector, v1*v2'
 CVect3 abs(const CVect3 &v);						// abs for each element
+inline double absp(double val);
+CVect3 absp(const CVect3 &v);
 CVect3 maxabs(const CVect3 &v1, const CVect3 &v2);	// max_abs for each element
 double norm(const CVect3 &v);					// vector norm
 double normlize(CVect3 *v);						// vector normlize
@@ -449,6 +467,7 @@ CVect3 fopp(const CVect3 &a, const CVect3 &b, const CVect3 &c, const CVect3 &d);
 CVect3 tp2att(const CVect3 &a, const CVect3 &b, const CVect3 &c); // triad point to attitude
 CVect3 attract(const CVect3 &v, const CVect3 &th=One31, const CVect3 &center=O31);
 CVect3 ff2muxy(const CVect3 &f0, const CVect3 &f1, const char *dir0=NULL, const char *dir1=NULL);
+CVect3 ff2mu(const CVect3 &f0, const CVect3 &f1, double uz=0.0);
 
 class CQuat
 {
@@ -517,7 +536,7 @@ CMat3 adj(const CMat3 &m);						// 3x3 adjoint matrix
 CMat3 inv(const CMat3 &m);						// 3x3 matrix inverse
 CVect3 diag(const CMat3 &m);						// the diagonal of a matrix
 CMat3 diag(const CVect3 &v);						// diagonal matrix
-CMat3 diag(double ii, double jj, double kk);		// diagonal matrix
+CMat3 diag(double ii, double jj=INF, double kk=INF);	// diagonal matrix
 CMat3 askew(const CMat3 &m, int I=0);				// askew matrix;
 CMat3 dotmul(const CMat3 &m1, const CMat3 &m2);	// m = m1.*m2;
 CMat3 MMT(const CMat3 &m1, const CMat3 &m2=I33);		// m=m1*m2^T
@@ -804,7 +823,8 @@ public:
 	double sl, sl2, sl4, cl, tl, RMh, RNh, clRNh, f_RMh, f_RNh, f_clRNh;
 	CVect3 pos0, pos, vn, wnie, wnen, wnin, wnnin, gn, gcc, *pgn;
 
-	CEarth(double a0=glv.Re, double f0=glv.f, double g0=glv.g0);
+	CEarth(double a0=RE, double f0=FF, double g0=G0);
+	void Init(double a0=RE, double f0=FF, double g0=G0);
 	void Update(const CVect3 &pos, const CVect3 &vn=O31, int isMemsgrade=0);
 	CVect3 vn2dpos(const CVect3 &vn, double ts=1.0) const;
 	void vn2dpos(CVect3 &dpos, const CVect3 &vn, double ts) const;
@@ -1112,6 +1132,8 @@ public:
 	int yawHkRow, navStatus;
 	CVect3 lvGNSS;
 	CAVPInterp avpi;
+	CVect3 *pphi, *pdvn, *pdpos, *peb, *pdb, *plvr, *pdkgz, *pdkaii, *pdkg1, *pdkg2, *pdkg3, *pdka1, *pdka23;
+	double *pdT, *pdkgzz, *pddbz;
 
 	CSINSGNSS(void);
 	CSINSGNSS(int nq0, int nr0, double ts, int yawHkRow0=6);
@@ -1492,6 +1514,18 @@ public:
 	CFileRdWt& operator>>(CMat &m);
 };
 
+class CFImuGnssSync
+{
+public:
+	FILE *fimu, *fgps;
+	float imuBuf32[32];
+	double imuBuf[32], gpsBuf[32], gpsBufNext[32], timu, ts, dT, *tgps, *tgpsNext;
+	int imuLen, gpsLen, res;
+	CFImuGnssSync(const char *imu, int imuLen, double ts, const char *gps, int gpsLen);
+	~CFImuGnssSync();
+	int load(int i=1);
+};
+
 #ifdef PSINS_IO_FILE_FIND
 
 class CFileList:public CFileRdWt  // for batch file processing
@@ -1631,14 +1665,6 @@ public:
 	int Update(int cnt);
 };
 
-#ifdef PSINS_CONSOLE_UART
-
-typedef struct {
-	float hd, t, gx, gy, gz, ax, ay, az, magx, magy, magz, bar, pch, rll, yaw, ve, vn, vu,
-		lon0, lon1, lat0, lat1, hgt, gpsve, gpsvn, gpsvu, gpslon0, gpslon1, gpslat0, gpslat1, gpshgt,
-		gpsstat, gpsdly, tmp, sum;
-} PSINSBoard;
-
 class CUartPP
 {
 public:
@@ -1655,6 +1681,20 @@ public:
 	int push(const unsigned char *buf0, int len);
 	int pop(unsigned char *buf0=(unsigned char*)NULL);
 };
+unsigned char chksum8(const unsigned char *pc, int len);
+unsigned short chksum16(const unsigned short *ps, int len);
+double flt22db(float f1, float f2);
+void db2flt2(double db, float *pf1, float *pf2);
+int iga2flt(float *pf, const double *pwm, const double *pvm=NULL, const double *pgps=NULL, const double *pavp=NULL, const double *pt=NULL);
+
+
+#ifdef PSINS_CONSOLE_UART
+
+typedef struct {
+	float hd, t, gx, gy, gz, ax, ay, az, magx, magy, magz, bar, pch, rll, yaw, ve, vn, vu,
+		lon0, lon1, lat0, lat1, hgt, gpsve, gpsvn, gpsvu, gpslon0, gpslon1, gpslat0, gpslat1, gpshgt,
+		gpsstat, gpsdly, tmp, sum;
+} PSINSBoard;
 
 #include "..\uart\serialport.h"
 
@@ -1679,7 +1719,7 @@ public:
 	void sendUart(void);
 };
 
-#endif // PSINS_UART_PUSH_POP
+#endif // PSINS_CONSOLE_UART
 
 class CBytemani {
 public:
@@ -1704,6 +1744,22 @@ public:
 };
 
 #endif // PSINS_VC_AFX_HEADER
+
+#ifdef PSINS_EXTERN_C_EXAMPLE
+
+// an example called by C-main file, and copy the defines to a C-header file
+#ifdef __cplusplus
+extern "C" {
+#endif
+void psinsInit0(const double *att0, const double *vn0, const double *pos0, double t0);
+void psinsUpdate0(const double *gyro, const double *acc, int n, double ts); // IMU double type
+void psinsUpdatef(const float *gyro, const float *acc, int n, double ts);	// IMU float type
+void psinsOut0(double *att, double *vn, double *pos, double *t);
+#ifdef __cplusplus
+};
+#endif
+
+#endif // PSINS_EXTERN_C_EXAMPLE
 
 void add(CVect3 &res, const CVect3 &v1, const CVect3 &v2);
 void add(CMat3 &res, const CMat3 &m1, const CMat3 &m2);

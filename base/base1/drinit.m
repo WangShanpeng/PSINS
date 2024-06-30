@@ -27,7 +27,7 @@ function dr = drinit(avp0, inst, kod, ts, Td)
     dr.Cbo = a2mat(-inst)*kod;
 	dr.prj = dr.Cbo*[0;1;0]; % from OD to SIMU
 	dr.ts = ts;
-	dr.distance = 0;
+	dr.distance = 0;  dr.distance1 = 0;
 	dr.eth = earth(dr.pos); dr.web = [0;0;0];
     dr.Mpv = [0, 1/dr.eth.RMh, 0; 1/dr.eth.clRNh, 0, 0; 0, 0, 1];
     if nargin<5, Td=0; end

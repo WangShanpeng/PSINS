@@ -6,7 +6,7 @@ function [yaw, incl] = magplot(mag)
 % Outputs: yaw - geomagnetic yaw with pitch=roll=0
 %          incl - geomagnetic inclation with the asumpt. of device pitch=roll=0
 %          
-% See also  magsimu, magyaw, imuplot, dvlplot, baroplot, insplot, inserrplot, kfplot, gpsplot.
+% See also  magsimu, magyaw, magellipfit, imuplot, dvlplot, baroplot, insplot, inserrplot, kfplot, gpsplot.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

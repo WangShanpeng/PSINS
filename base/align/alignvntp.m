@@ -3,7 +3,7 @@ function [att0, attk, xkpk] = alignvntp(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 % Ref. alignvn.
 %    imu = [wm, vm, dp_flag, t]
 %
-% See also  alignsbtp, angaddplot, alignvn.
+% See also  alignsbtp, angaddplot, alignvn, vn2phi.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

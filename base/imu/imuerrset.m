@@ -1,7 +1,7 @@
-function imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGii, dKAii, dKGij, dKAij, KA2, rxyz, dtGA)
+function imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGii, dKAii, dKGij, dKAij, Ka2, rxyz, dtGA)
 % SIMU errors setting, including gyro & acc bias, noise and installation errors, etc.
 %
-% Prototype: imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGii, dKAii, dKGij, dKAij, KA2, rxyz, dtGA)
+% Prototype: imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGii, dKAii, dKGij, dKAij, Ka2, rxyz, dtGA)
 % Inputs: including information as follows
 %     eb - gyro constant bias (deg/h)
 %     db - acc constant bias (ug)
@@ -13,7 +13,7 @@ function imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGi
 %     dKAii - acc scale factor error (ppm)
 %     dKGij - gyro installation error (arcsec)
 %     dKAij - acc installation error (arcsec)
-%     KA2 - acc quadratic coefficient (ug/g^2)
+%     Ka2 - acc quadratic coefficient (ug/g^2)
 %       where, 
 %               |dKGii(1) dKGij(4) dKGij(5)|         |dKAii(1) 0        0       |
 %         dKg = |dKGij(1) dKGii(2) dKGij(6)| , dKa = |dKAij(1) dKAii(2) 0       |
@@ -45,7 +45,7 @@ global glv
     end
     o31 = zeros(3,1); o33 = zeros(3);
     imuerr = struct('eb',o31, 'db',o31, 'web',o31, 'wdb',o31,...
-        'sqg',o31, 'taug',inf(3,1), 'sqa',o31, 'taua',inf(3,1), 'dKg',o33, 'dKa',o33, 'dKga',zeros(15,1),'KA2',o31); 
+        'sqg',o31, 'taug',inf(3,1), 'sqa',o31, 'taua',inf(3,1), 'dKg',o33, 'dKa',o33, 'dKga',zeros(15,1),'Ka2',o31); 
     %% constant bias & random walk
     if ~exist('web', 'var'), web=0; end
     if ~exist('wdb', 'var'), wdb=0; end
@@ -86,8 +86,8 @@ global glv
     imuerr.dKga = [imuerr.dKg(:,1); imuerr.dKg(:,2);   imuerr.dKg(:,3);
                    imuerr.dKa(:,1); imuerr.dKa(2:3,2); imuerr.dKa(3,3)];
     %% acc 2nd scale factor error
-    if exist('KA2', 'var')
-        imuerr.KA2(1:3) = KA2*glv.ugpg2; 
+    if exist('Ka2', 'var')
+        imuerr.Ka2(1:3) = Ka2*glv.ugpg2; 
     end
     %% acc inner-lever-arm error
     if exist('rxyz', 'var')

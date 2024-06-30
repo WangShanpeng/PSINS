@@ -41,7 +41,7 @@ global glv
         figure('Color','White');
         if isempty(str), str = '/ ( (\circ) / h )'; elseif strcmp(str,'mg')==1, str='/ mg'; end
         subplot(211), plot(tau0*(1:N)', y0); grid
-        xlabel('\itt \rm/ s'); ylabel(['\itValue \rm',str]); title(sprintf('Mean: %.6f', mean(y0)));
+        xlabel('\itt \rm/ s'); ylabel(['\itY \rm',str]); title(sprintf('Mean: %.6f', mean(y0)));
         subplot(212), 
         loglog(tau, sigma, '-+', tau, [sigma.*(1+Err),sigma.*(1-Err)], 'r--'); grid
         idx = strfind(str,'/');

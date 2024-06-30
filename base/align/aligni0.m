@@ -13,6 +13,10 @@ function [att0, res] = aligni0(imu, pos, isfig)
 %     [imu, avp0, ts] = imufile('lasergyro.imu');
 %     att = aligni0(imu(1:300/ts,:), avp0(7:9)');
 %
+%     t0=880; t1=940; t2=t1+1000;
+%     att0 = aligni0(datacut(imu,t0,t1), getat(gps(:,4:end),t0));
+%     avp = inspure(datacut(imu,t1,t2), [att0;getat(gps(:,4:end),t1)], 'f');
+%
 % See also  alignfn, alignvn, aligni0vn, aligni0fitp, aligncmps, alignWahba, alignsb, i0fvp.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.

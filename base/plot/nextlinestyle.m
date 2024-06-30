@@ -3,6 +3,7 @@ function str = nextlinestyle(k)
 %
 % str = nextlinestyle(k)
 % Input: k - next style index to add.
+%            -1 for reset, 0 for no-change, 1 for next style
 % Output: str - style string
 %
 % See also  labeldef, xygo.

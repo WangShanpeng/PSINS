@@ -18,6 +18,9 @@ function [fname, m] = dirfile(spc, k)
     for m=1:length(d)
         fname{m,1} = d(m).name;
     end
+    if isempty(d)
+        fname = []; m = 0;
+    end
     if nargin>1; 
         if ischar(k)  % dirfile(spc, outputfile)
             outputfile = k;

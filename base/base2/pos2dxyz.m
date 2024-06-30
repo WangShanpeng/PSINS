@@ -1,10 +1,12 @@
 function [dxyz,ddxyz,od] = pos2dxyz(pos, pos0)
 % Transfer [lat,lon,hgt] to [dx,dy,dz].
 %
-% Prototype: dxyz = pos2dxyz(pos, pos0)
+% Prototype: [dxyz,ddxyz,od] = pos2dxyz(pos, pos0)
 % Inputs: pos - [lat, lon, hgt, t]
 %         pos0 - see as original position
-% Output: dxyz - [dx/East, dy/North, dz/Up] , Cartesian coordinates(E-N-U in meters) relative to pos0
+% Outputs: dxyz - [dx/East, dy/North, dz/Up] , Cartesian coordinates(E-N-U in meters) relative to pos0
+%          ddxyz - xyz increment
+%          od - ODmeter distance increment
 %
 % See also  dxyz2pos, RMRN, pos2dplot, pos3vplot, dpos2dxyz, odsimu.
 

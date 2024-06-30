@@ -1,4 +1,4 @@
-function imu = imuidx(data, idx, gunit, aunit, ts)
+function imu = imuidx(data, idx, gunit, aunit, ts, dir)
 % Extract IMU(Gyro/Acc/T) from a data array.
 %
 % Prototype: imu = imuidx(data, idx, gunit, aunit, ts)
@@ -6,9 +6,10 @@ function imu = imuidx(data, idx, gunit, aunit, ts)
 %         idx - column index of IMU/T
 %         gunit,aunit - gyro- & acc- unit
 %         ts - sampling interval
+%         dir - IMU direction string
 % Output: imu - =[gyro,acc,t] angular- & velocity- increment & time tag
 %
-% See also: imurfu, gpsidx, avpidx, ddidx.
+% See also: imurfu, gpsidx, avpidx, ddidx, imumean.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -25,4 +26,5 @@ global glv
     for k=1:6
         if (idx(k))<0, imu(:,k)=-imu(:,k); end
     end
+    if nargin==6, imu=imurfu(imu,dir); end
     
