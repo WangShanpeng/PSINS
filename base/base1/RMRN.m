@@ -8,6 +8,7 @@ function [RMh, clRNh, RNh] = RMRN(pos)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 15/03/2014
 global glv
+    if size(pos,2)==1, pos=pos'; end
 	sl=sin(pos(:,1)); cl=cos(pos(:,1)); sl2=sl.*sl;
 	sq = 1-glv.e2*sl2; sq2 = sqrt(sq);
 	RMh = glv.Re*(1-glv.e2)./sq./sq2+pos(:,3);

@@ -1,20 +1,22 @@
-function [att, attk, eb, db] = alignsb(imu, pos, isfig)
+function [att, attk, eb, db] = alignsb(imu, pos, yaw0, isfig)
 % SINS coarse align on static base.
 %
-% Prototype: [att, attk, eb, db] = alignsb(imu, pos)
+% Prototype: [att, attk, eb, db] = alignsb(imu, pos, yaw0, isfig)
 % Inputs: imu - SIMU data
 %         pos - initial position
+%         ywo0 - initial yaw
 %         isfig - figure flag
 % Outputs: att, attk - attitude align results Euler angles & quaternion
 %          eb, db - gyro drift & acc bias test
 %
-% See also  dv2atti, alignvn, aligncmps, aligni0, alignsbtp, insupdate.
+% See also  dv2atti, alignvn, aligncmps, aligni0, alignpe, alignsbtp, insupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 03/09/2011, 17/05/2017
 global glv
-    if nargin<3, isfig=1; end
+    if nargin<4, isfig=1; end
+    if nargin<3, yaw0=[]; end
     ts = diff(imu(1:2,end));
     wbib = mean(imu(:,1:3),1)'/ts; fbsf = mean(imu(:,4:6),1)'/ts;
     if norm(wbib)<glv.wie/10, wbib(3)=glv.wie; end
@@ -50,9 +52,10 @@ global glv
         end
     end
 % 17/05/2017
-    wb = wbib/diff(imu(1:2,end));
-    fb = fbsf/diff(imu(1:2,end));
+%     wb = wbib/diff(imu(1:2,end));
+%     fb = fbsf/diff(imu(1:2,end));
+    if ~isempty(yaw0), att(3)=yaw0;  end  % 2024-08-31
     Cnb = a2mat(att);
     wb0 = Cnb'*eth.wnie; gb0 = Cnb'*eth.gn;
-    eb = wb - wb0;  db = fb + gb0;
+    eb = wbib - wb0;  db = fbsf + gb0;
 

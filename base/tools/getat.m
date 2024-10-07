@@ -21,4 +21,4 @@ function [val,idx] = getat(array, tk, clm, method)
         if nargin<4, method = 'nearest'; end
         val = interp1(array(:,end), array(:,clm), tk, method)';
     end
-    if nargout==2, idx=find(array(:,end)>tk,1,'first'); end
+    if nargout==2, idx=find(array(:,end)>=tk,1,'first'); end

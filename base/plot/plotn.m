@@ -8,7 +8,7 @@ function plotn(data, t, isDelMean)
 % Example:
 %    plotn(randn(100,30));
 %
-% See also  dataplot, miniplot, plotpsdn, plotline.
+% See also  pplot, miniplot, plotpsdn, plotline.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

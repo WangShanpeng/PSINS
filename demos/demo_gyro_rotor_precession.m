@@ -3,11 +3,14 @@
 % Copyright(c) 2009-2015, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 28/09/2015
-function demo_gyro_rotor_precession
+function demo_gyro_rotor_precession(My)
     Jx = 0.1*0.01^2;  % kg*m^2
     Jy = 1*Jx; Jz = Jy; J = [Jx; Jy; Jz];
     f = 1; Omega = 2*pi*f;
-    My = 1e-6*9.8*10; % N*m       Please try to modify My and see result...
+    if nargin<1
+        My = 1; % N*m       Please try to modify My and see result...
+    end
+    My = 1e-6*9.8 * My;
     Mx = 0; Mz = 0; M = [Mx;My;Mz];
     ts = 1/f/100;  T = 10;
     afa = (0:pi/20:2*pi)'; cir = 0.5*[0*afa, sin(afa), cos(afa)]; lin = [1,0,0; -1,0,0];

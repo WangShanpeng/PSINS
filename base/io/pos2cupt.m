@@ -1,5 +1,6 @@
 function pos2cupt(fname, pos, lv, dev)
-% name(no_spaces) time(tow,s) lat(dec.deg) lon(dec.deg) hgt(m) lever_x(m) lever_y(m) lever_z(m) std_dev_x(m) std_dev_y(m) std_dev_z(m)
+% name(no_spaces) time(tow,s) lat(dec.deg) lon(dec.deg) hgt(m) ...
+% lever_x(m) lever_y(m) lever_z(m) std_dev_x(m) std_dev_y(m) std_dev_z(m)
 global glv
     if nargin<4, dev = 1; end
     if length(dev)==1; dev=[1;1;1]*dev; end

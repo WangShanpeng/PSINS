@@ -15,7 +15,7 @@ function [att1, dKgz, db] = alignsbtp(imu, pos, Y1Y2, T1T2, isfig)
 %    [imu1, att0] = imustatictp([[1;2;10]*glv.deg; glv.pos0], 0.1, 300, 10*glv.dps, 180*glv.deg, imuerr);
 %    [att, dKgz, db] = alignsbtp(imu1, glv.pos0, [10,190]*glv.deg, [130,170]);
 %
-% See also  alignsb, alignvn, aa2dkg, alignvntp, alignsbtp1.
+% See also  alignsb, alignvn, aa2dkg, alignvntp, alignsbtp1, rotobsan.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

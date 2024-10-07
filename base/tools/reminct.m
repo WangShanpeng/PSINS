@@ -1,7 +1,7 @@
 function [data, idx] = reminct(data)
 % remain data strictly monotonic increasing by time-tag(REMain INCreaseing Time)
 %
-% See also sortt.
+% See also sortt, monoinc.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

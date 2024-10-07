@@ -13,8 +13,8 @@ function res = accstatic(vm, n)
 % 01/08/2017
     ts = diff(vm(1:2,end));
     acc = vm(:,1:3)/ts;
-    b = ones(n,1)/n;
     x = normv(acc(:,1:3));
+    b = ones(n,1)/n;
     y = filter(b,1,[acc(:,1:3),x]);
     m = y;
     for k=n+1:length(y)

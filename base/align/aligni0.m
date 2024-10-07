@@ -17,7 +17,7 @@ function [att0, res] = aligni0(imu, pos, isfig)
 %     att0 = aligni0(datacut(imu,t0,t1), getat(gps(:,4:end),t0));
 %     avp = inspure(datacut(imu,t1,t2), [att0;getat(gps(:,4:end),t1)], 'f');
 %
-% See also  alignfn, alignvn, aligni0vn, aligni0fitp, aligncmps, alignWahba, alignsb, i0fvp.
+% See also  alignfn, alignvn, aligni0vn, alignpe, aligni0fitp, aligncmps, alignWahba, alignsb, i0fvp.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -56,6 +56,7 @@ global glv
                 eth.cl*cwiet,eth.cl*swiet,eth.sl];
             qni0 = m2qua(Cni0);
             qi0ib0 = dv2atti(vi0k(k1,:)', vi0, vib0k(k1,:)', vib0);
+%             qi0ib0 = dv2atti(vi0k(k1,:)', vi0-vi0k(k1,:)', vib0k(k1,:)', vib0-vib0k(k1,:)');
             qnb = qmul(qmul(qni0,qi0ib0),qib0b);
             attkv(ki,:) = q2att(qnb)';    % using vel
             qi0ib0 = dv2atti(pi0k(k1,:)', pi0, pib0k(k1,:)', pib0);

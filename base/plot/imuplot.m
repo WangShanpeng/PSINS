@@ -41,6 +41,12 @@ global glv
         return;
     end
     if length(type)>=7  % err = imuplot(imu1, imu2);
+        if nargin==3, % err = imuplot(imu1, imu2, nn);
+            nn = t0;
+            if length(nn)==1, nn=[nn;nn]; end
+            imu = imumeanplot(imu, nn(1)); close(gcf);
+            type = imumeanplot(type, nn(2)); close(gcf);
+        end
         imuplot(imu);
         imu2 = type;   t = imu2(:,end);  ts = diff(imu2(1:2,end));
         subplot(321), plot(t, imu2(:,1)/ts/dps, 'r'); legend('IMU1','IMU2');  title('X_R Y_F Z_U');

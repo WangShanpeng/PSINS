@@ -7,7 +7,7 @@ function demo_rigid_body_angular_motion
     ts = 0.01;  T = 10;  len = fix(T/ts);
     R = [0.5; 1.5; 4]; M = [0.001; 0; 0]*10; w = [0; 0; 00];  % J=1./R^2 moment of inertia; M = moment of force; % w = initial angular rate
     R = [3.5; 3.5; 1]; M = zeros(3,1); w = [0; 1; 3]; % nutation
-%     R = [0.5; 1.5; 4]; M = zeros(3,1); w = [0.001; 5; 0]; % Dzhanibekov effect
+    R = [0.5; 1.5; 4]; M = zeros(3,1); w = [0.001; 5; 0]; % Dzhanibekov effect
     Cnb = eye(3); % initial attitude
     [x,y,z] = ellipsoid(0,0,0, R(1),R(2),R(3), 16);
     n = length(x); n2 = n*n; m = ceil(n/2);

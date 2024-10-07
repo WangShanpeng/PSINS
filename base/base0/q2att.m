@@ -20,7 +20,14 @@ function att = q2att(qnb)
     C12=2*(q23-q14);
     C22=q11-q22+q33-q44;
     C31=2*(q24-q13); C32=2*(q34+q12); C33=q11-q22-q33+q44;
-    att = [ asin(C32); 
-            atan2(-C31,C33); 
-            atan2(-C12,C22) ];
-    
+    if C32>0.999999  % 2024-08-06
+        C11 = q11+q22-q33-q44;  C13 = 2*(q24+q13);
+        att = [pi/2; atan2(C13,C11); 0];
+    elseif C32<-0.999999
+        C11 = q11+q22-q33-q44;  C13 = 2*(q24+q13);
+        att = [-pi/2; atan2(C13,C11); 0];
+    else
+        att = [ asin(C32); 
+                atan2(-C31,C33); 
+                atan2(-C12,C22) ];
+    end

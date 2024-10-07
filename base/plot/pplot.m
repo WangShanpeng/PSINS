@@ -1,8 +1,8 @@
-function res = dataplot(data, clm, typestr)
-% Data subset plot.
+function res = pplot(data, clm, typestr)
+% PSINS specific plot.
 %
-% Prototype: dataplot(data, typestr)
-% Inputs: data - data to plot, the last column is time tag
+% Prototype: pplot(data, typestr)
+% Inputs: data - data to plot, the last column must be time tag
 %         clm - column index
 %         typestr - type string to show in ylabel
 %

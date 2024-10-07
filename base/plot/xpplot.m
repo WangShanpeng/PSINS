@@ -7,7 +7,7 @@ function xpplot(x, p, clm, unt, untstr, clm1, unt1, untstr1)
 %         unt - unit
 %         untstr = unit string to show in ylabel
 %
-% See also  kfplot, xpclm, dataplot, inserrplot, insserrplot, kffile, rvpplot.
+% See also  kfplot, xpclm, pplot, inserrplot, insserrplot, kffile, rvpplot.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -56,7 +56,7 @@ global glv
         subplot(224), plot(t, sqrt(p(:,4:6))/glv.ug); xygo('db'); title('Std Acc bias')
         return
     end
-    if strcmp(untstr,'lever')
+    if strcmp(untstr,'lv')
         if length(clm)<3, clm=16:18; end
         t = p(:,end); x = x(:,clm); p = p(:,clm);
         subplot(211), plot(t, x(:,1:3)); xygo('lever'); title('Lever arm')
@@ -68,6 +68,15 @@ global glv
         t = p(:,end); x = x(:,clm); p = p(:,clm);
         subplot(211), plot(t, x(:,1)); xygo('dT');
         subplot(212), plot(t, sqrt(p(:,1))); xygo('dT');
+        return
+    end
+    if strcmp(untstr,'lt')
+        if length(clm)<4, clm=16:19; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(221), plot(t, x(:,1:3)); xygo('lever'); title('Lever arm')
+        subplot(223), plot(t, sqrt(p(:,1:3))); xygo('lever'); title('std (Lever arm)')
+        subplot(222), plot(t, x(:,4)); xygo('dT');
+        subplot(224), plot(t, sqrt(p(:,4))); xygo('dT');
         return
     end
     if strcmp(untstr,'dKG1')
@@ -84,6 +93,42 @@ global glv
         subplot(223), plot(t, sqrt(p(:,1:2))/glv.sec); xygo('dKx/yz'); title('Std Install angles')
         subplot(222), plot(t, x(:,3)/glv.ppm); xygo('dKzz'); title('Scale Gyro')
         subplot(224), plot(t, sqrt(p(:,3))/glv.ppm); xygo('dKzz'); title('Std Scale Gyro')
+        return
+    end
+    if strcmp(untstr,'dKGii')
+        if length(clm)<3, clm=20:22; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)/glv.ppm); xygo('dKGii'); title('Scale Gyro')
+        subplot(212), plot(t, sqrt(p(:,1:3))/glv.ppm); xygo('dKGii'); title('Std Scale Gyro')
+        return
+    end
+    if strcmp(untstr,'dKAii')
+        if length(clm)<3, clm=23:25; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:3)/glv.ppm); xygo('dKAii'); title('Scale Acc')
+        subplot(212), plot(t, sqrt(p(:,1:3))/glv.ppm); xygo('dKAii'); title('Std Scale Acc')
+        return
+    end
+    if strcmp(untstr,'dKGAii')
+        if length(clm)<6, clm=20:25; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(221), plot(t, x(:,1:3)/glv.ppm); xygo('dKGii'); title('Scale Gyro')
+        subplot(223), plot(t, sqrt(p(:,1:3))/glv.ppm); xygo('dKGii'); title('Std Scale Gyro')
+        subplot(222), plot(t, x(:,4:6)/glv.ppm); xygo('dKAii'); title('Scale Acc')
+        subplot(224), plot(t, sqrt(p(:,4:6))/glv.ppm); xygo('dKAii'); title('Std Scale Acc')
+        return
+    end
+    if strcmp(untstr,'ebdbdKGAii')
+        if length(clm)<12, clm=[10:15,20:25]; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(421), plot(t, x(:,1:3)/glv.dph); xygo('eb');  title('Gyro drift')
+        subplot(422), plot(t, x(:,4:6)/glv.ug); xygo('db'); title('Acc bias')
+        subplot(423), plot(t, sqrt(p(:,1:3))/glv.dph); xygo('eb'); title('Std Gyro drift')
+        subplot(424), plot(t, sqrt(p(:,4:6))/glv.ug); xygo('db'); title('Std Acc bias')
+        subplot(425), plot(t, x(:,7:9)/glv.ppm); xygo('dKGii'); title('Scale Gyro')
+        subplot(427), plot(t, sqrt(p(:,7:9))/glv.ppm); xygo('dKGii'); title('Std Scale Gyro')
+        subplot(426), plot(t, x(:,10:12)/glv.ppm); xygo('dKAii'); title('Scale Acc')
+        subplot(428), plot(t, sqrt(p(:,10:12))/glv.ppm); xygo('dKAii'); title('Std Scale Acc')
         return
     end
     if strcmp(untstr,'dKG')
@@ -134,6 +179,23 @@ global glv
         subplot(222), plot(t, x(:,2)*1000); xygo('dKod / 0.1%'); title('OD Scale Error')
         subplot(223), plot(t, sqrt(p(:,[1,3]))/glv.deg); xygo('dP,dY / \circ'); title('Std P/Y')
         subplot(224), plot(t, sqrt(p(:,2))*1000); xygo('dKod / 0.1%'); title('Std OD Scale Error')
+        return
+    end
+    if strcmp(untstr,'kplv')
+        if length(clm)<6, clm=16:21; end
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(421), plot(t, x(:,[1,3])/glv.deg); xygo('dP,dY / \circ'); title('Pitch/Yaw Install Angle')
+        subplot(423), plot(t, sqrt(p(:,[1,3]))/glv.deg); xygo('dP,dY / \circ'); title('Std P/Y')
+        subplot(425), plot(t, x(:,2)*1000); xygo('dKod / 0.1%'); title('OD Scale Error')
+        subplot(427), plot(t, sqrt(p(:,2))*1000); xygo('dKod / 0.1%'); title('Std OD Scale Error')
+        subplot(4,2,[2,4]), plot(t, x(:,4:6)); xygo('lever'); title('Lever arm')
+        subplot(4,2,[6,8]), plot(t, sqrt(p(:,4:6))); xygo('lever'); title('std (Lever arm)')
+        return
+    end
+    if strcmp(untstr,'inlv')  % inner lever arm
+        t = p(:,end); x = x(:,clm); p = p(:,clm);
+        subplot(211), plot(t, x(:,1:6)); xygo('lever'); title('Lever arm')
+        subplot(212), plot(t, sqrt(p(:,1:6))); xygo('lever'); title('std (Lever arm)')
         return
     end
     subplot(211), plot(x(:,end), scaleclm(x(:,clm),1./unt)); xygo(sprintf('x / %s',untstr));

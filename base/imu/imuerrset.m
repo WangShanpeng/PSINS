@@ -22,6 +22,8 @@ function imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGi
 %     dtGA - time-asynchrony between gyro & acc, dtGA=Tacc_later-Tgyro_early>0 (ms)
 % Output: imuerr - SIMU error structure array
 %
+% Chinese NOTE：为何用eb,db符号？---ε（epsilon）长得像且读音首字恰好是e, ?（nabla）长得像D（或小写d）；第二字母都是b系投影的。
+%
 % Example:
 %     For inertial grade SIMU, typical errors are:
 %       eb=0.01dph, db=50ug, web=0.001dpsh, wdb=10ugpsHz

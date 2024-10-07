@@ -462,6 +462,41 @@ void Demo_CONSOLE_UART(void)
 #endif // PSINS_CONSOLE_UART
 }
 
+void Demo_COMMON_UART(void)
+{
+#ifdef PSINS_CONSOLE_UART
+//#define UART_SEND_TEST
+#ifdef UART_SEND_TEST
+	// 'u16i16i32f32f32f32u16u16'
+	ushort hd=0x55aa;	short c=1234;	int i=45;	float f1=2.0, f2=3.0, f3=4.0;	ushort a=1, cksm=2;
+	uchar buf[64];
+	CComUart uart;
+	uart.Init(12, 460800);
+	for(int ii=0; ii<5*3600*100; )
+	{
+		i++;  f1=randn(0.0);  f2=randn(0.0);  f3=randn(0.0);
+		int len=makefrm(buf, &hd,2, &c,2, &i,4, &f1,4, &f2,4, &f3,4, &a,2, NULL);
+		*(ushort*)&buf[len] = chksum16((ushort*)&buf[2], (len-2)/2);
+		uart.sendUart(buf, len+2, 100);
+	}
+#else
+	FILE *f=fopen("psinsUartSetting.txt","rt");
+	if(!f) { f=fopen("psinsUartSetting.txt","wt");	fprintf(f, "%s", psinsUartSetting); }
+	fclose(f);
+//	CFileRdWt::Dir(".\\Data\\");
+	CComUart uart;
+	uart.Init("psinsUartSetting.txt");
+	for(int ii=0; ii<240*3600*100; )
+	{
+		if(uart.getUart()) {
+			uart.dispUart(1); ii++;
+		}
+	}
+#endif // UART_SEND_TEST
+#endif // PSINS_CONSOLE_UART
+}
+
+
 void Demo_Cfg(void)
 {
 	short s; int i; float f; double d; CVect3 v; CQuat q; CMat3 m;
@@ -508,32 +543,43 @@ void Demo_CAligni0(void)
 
 void Demo_SysClbt(void)
 {
-	CVect3 pos0=LLH(34.197473, 108.854275, 400.1);
-	CFileRdWt::Dir("E:\\ygm2023\\16\\");
-	CFileRdWt fclbt("clbt.bin"), fins("ins.bin");
-	CSysClbt kf(pos0, 9.79410756, 0);  // 1 for ka2, 0 for kapn
-	CFileIMUClbt fimu("imu_jialin.bin", kf.sins.imu);
+int frq=FRQ100;
+	// glvs; [imu, att]=imupos19([[1;-91;-92]*glv.deg; glv.pos0], 0.01, 20, 70); imuplot(imu);
+	// binfile32('D:\psins240513\data\imupos19.bin', imuclbt(imu));
+	CFileRdWt::Dir("D:\\psins240513\\data\\");
+	CFileRdWt fimu("imupos19.bin", -7), fclbt("clbt.bin"), fins("ins.bin");
+	CVect3 pos0=LLH(34.034310, 108.775427, 450), *pwm, *pvm;	double *pt;
+	deal(fimu.buff, &pwm,0, &pvm,3, &pt,6, NULL);
+	CAligni0 aln;
+	CSysClbt clbt(pos0, 9.795138, 1);  // 1 for ka2, 0 for kapn
 	fimu.savepos();
-	kf.sins.Init(O31, O31, pos0, *fimu.pt);  kf.sins.mvnT=0.2;  kf.sins.isOpenloop=1;
+	clbt.sins.Init(O31, O31, pos0, *pt);  clbt.sins.mvnT=0.2;  clbt.sins.isOpenloop=1;
 	psinslog.LogSet(1);
-	for(int n=0; n<=2; n++)
+	for(int n=0; n<=3; n++)
 	{
-		fimu.restorepos();
-		kf.att0 = fimu.aligni0(110, pos0);
-		kf.NextIter();
-		for(int i=0; i<36000*FRQ; i++)
-		{
-			if(!fimu.load(1)) break;
-			kf.Update((CVect3*)fimu.pGyro, (CVect3*)fimu.pAcc, 1, TS);
-			if(i%50==0) {
-				fclbt<<kf;
-				fins<<kf.sins;
-			}
-			disp(i, FRQ, 100);
+		fimu.restorepos();  clbt.sins.imu.Reset();  printf(" --- Round %d ---\n", n+1);
+		aln.Init(pos0);
+		for(int a=0; a<60*frq; a++) {
+			fimu.loadf32(1);
+			clbt.sins.imu.Update(pwm, pvm, 1, 1.0/frq);
+			aln.Update(&clbt.sins.imu.phim, &clbt.sins.imu.dvbm, 1, 1.0/frq);
 		}
-		kf.FeedbackAll();
-		psinslog<<kf.FBTotal.dd[2]/glv.min<<"\n";
+		fimu.restorepos();
+		clbt.NextIter(aln.qnb0);
+		CVect3 att=q2att(aln.qnb0)/DEG; printf("ATT: %.4f, %.4f, %.4f\n", att.i, att.j, att.k);
+		for(int i=0; i<2*3600*frq; i++)
+		{
+			if(!fimu.loadf32(1)) break;
+			clbt.Update(pwm, pvm, 1, 1.0/frq);
+			if(i%100==0) {
+				fclbt<<clbt;
+				fins<<clbt.sins;
+			}
+			disp(i, FRQ100, 100);
+		}
+		clbt.FeedbackAll();
 	}
+	clbt.Log();
 }
 
 void Demo_GKP(void)
@@ -613,5 +659,43 @@ void Demo_operator_pointer_run_time(void)
 //		VSUB(v,v1,v2);
 	}
 }
+
+char psinsUartSetting[] = 
+"11  460800  0xaa55  0    一个psins串口设置的例子\n"
+"u16  *1     帧头%10.1f\n"
+"i16  *1.23  aaa-%10.2f\n"
+"i32  *1.0   bbb-%10.2f\n"
+"f32  *1.23  陀螺x(°/s)%10.3f\n"
+"f32  /1.23  陀螺y(°/s)%10.3f\n"
+"f32  /1.23  陀螺z(°/s)%10.3f\n"
+"n16  *1.0   保留\n"
+"u16  *1.0   校验%10.2f\n"
+"#\n"
+"\n"
+"----------------------------------- 配置规范 ------------------------------------------\n"
+"示例：\n"
+"COMn  Baudrate  Header  0/1  comments  ---第1行：串口号 波特率 帧头 大/小端模式  注释\n"
+"u16       *1.0   frame_header%10.1f\n  ---第2行：显示帧头信息\n"
+"datatype  scale  printf_format\n       ---第n行：数据类型  比例系数  显示信息\n"
+"datatype  scale  printf_format\n"
+"...\n"
+"#                                      ---最后行：结束符#\n"
+"\n"
+"psinsUartSetting.txt串口配置文件编写规范及注意事项：\n"
+"（1）本软件仅应用于固定帧长格式的二进制串口数据接收，\n"
+"     必须严格按本配置规范编写帧格式，才能正确接收、存储及在控制台窗口输出显示；\n"
+"（2）可先用‘串口助手’之类软件查看串口配置及接收是否正常；\n"
+"（3）第1行第1列数据为串口号，第2列数据为波特率，默认数据位8、停止位1.5、无奇偶校验；\n"
+"（4）第1行第3列数据为帧头，帧头必须为两字节，以0x打头；\n"
+"（5）第1行第4列数据为端模式，1为小端模式，0为大端模式；\n"
+"（6）第1行第5列信息为注释，不能缺省，随便写点什么都行（不留空格），但也不要太长；\n"
+"（7）第n>1行首字符为数类型：i-整型，u-无符号整型，f-浮点型，n-无类型（用于跳过标记）\n"
+"     之后跟8/16/24/32/64分别为数据比特数（除8即为字节数），nxxx意为跳过xxx比特不显示；\n"
+"（8）第n>1行第2列为比例系数，数据前带*号为乘、带/号为除，若为*1也不能省略；\n"
+"（9）第n>1行第3列为窗口显示信息，所有数据均以浮点方式显示，若不写格式符%号则不显示；\n"
+"     第3列显示信息应为完整字符串，中间不得留空格；\n"
+"（10）最后行以首字符#结束帧格式配置；\n"
+"（11）比例系数和显示均不影响数据存储，直接将接收到整帧信息按二进制存储至文件。\n"
+"\n" ;
 
 #endif  // PSINSDemo

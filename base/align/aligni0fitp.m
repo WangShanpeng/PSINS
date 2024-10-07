@@ -13,6 +13,10 @@ function [att0, res] = aligni0fitp(imu, pos, isfig)
 %     imu = imustatic([[0;0;0]*glv.deg;glv.pos0], ts, 1800);  imu([1:10,end-9:end],4:5)=10*ts; % acc disturb at start&end
 %     [att0, res] = aligni0fitp(imu, glv.pos0);
 %     
+%     glvs; ts = 0.1;
+%     imu = imustatic([[0;0;0]*glv.deg;glv.pos0], ts, 300);  imu(length(imu)/2:end,5)=100*glv.ug*ts; % acc disturb from 1/2*T
+%     [att0, res] = aligni0fitp(imu, glv.pos0);
+%     
 % See also  aligni0fitv, aligni0, alignfn, alignvn, aligncmps, alignWahba, alignsb.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
@@ -21,12 +25,12 @@ function [att0, res] = aligni0fitp(imu, pos, isfig)
 global glv
     if nargin<3,  isfig = 1; end
     [nn, ts, nts] = nnts(1, diff(imu(1:2,end)));
-    ratio = 1.0;
+    ratio = 1.0;  phiEN = [0;0;0]; afa = nts/100;
     len = fix(length(imu)/nn)*nn;
     eth = earth(pos);  lat = pos(1);
     qib0b = [1; 0; 0; 0];  qni00 = m2qua(pos2cen(pos(1))'); 
     [vib0, pib0, vib0_1] = setvals(zeros(3,1));
-    [pib0k, pi0k, vi0k, vib0k, fi0k, fib0k, attk, attkv, vn0, vnk, posk] = prealloc(len/nn, 3);  tk = vib0k(:,1);  timu = tk;
+    [pib0k, pi0k, vi0k, vib0k, fi0k, fib0k, attk, attkv, vn0, vnk, posk, phik] = prealloc(len/nn, 3);  tk = vib0k(:,1);  timu = tk;
     k0 = fix(5/ts); % exculde the first 5s
     ki = timebar(nn, len, 'Initial align based on inertial frame & curve-fit.');
     G = glv.g0*eth.cl/glv.wie^2;
@@ -65,6 +69,10 @@ global glv
             qi0ib0 = dv2atti(pi0k(k1,:)', pi0, pib0k(k1,:)', pib0);
             qnb = qmul(qmul(qni0,qi0ib0),qib0b);
             attk(ki,:) = q2att(qnb)';     % using pos
+            fn = qmulv(qnb, dvbm)/nts;
+            phiEN = (1-afa)*phiEN + afa*[-fn(2);fn(1);0]/glv.g0;  phik(ki,:) = phiEN;
+            phiEN = phiEN + [fn(1);fn(2);0]*nts;  phik(ki,:) = phiEN;
+%             attk(ki,:) = q2att(qdelphi(a2qua(attk(ki,1:3)'),phiEN))';
        end
        ki = timebar;
     end
@@ -75,7 +83,7 @@ global glv
     attk(1:k0,:) = repmat(att0',k0,1);
     attkv(1:k0,:) = repmat(attkv(k0+1,:),k0,1);
     attk(:,4) = timu; attkv(:,4) = timu;
-    res = varpack(lat, nts, vib0k, pib0k, fib0k, vi0k, pi0k, fi0k, attk, attkv, att0, vn0, vnk, posk); 
+    res = varpack(lat, nts, vib0k, pib0k, fib0k, vi0k, pi0k, fi0k, attk, attkv, att0, vn0, vnk, posk, phik); 
     att0 = attkv(end,1:3)';
     resdisp('Initial align attitudes (arcdeg)', att0/glv.deg);
     if isfig, ai0plot(timu, attk, attkv, vn0, vnk, posk); end

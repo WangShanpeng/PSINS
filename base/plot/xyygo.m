@@ -5,6 +5,10 @@ function xyygo(ax, xtext, ytext1, ytext2)
 % Inputs: ax - axis handle return from plotyy
 %         xtext, ytext1, ytext2 - text labels to show in figure x-axis & y-axis, 
 %
+% Example
+%   myfig; ax = plotyy(1:10, randn(10,1), 1:10, randn(10,1));
+%   xyygo(ax, 't', 'w', 'f');
+%
 % See also  xygo, labeldef.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.

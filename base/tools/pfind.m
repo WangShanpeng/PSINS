@@ -7,15 +7,16 @@ function funs = pfind(str, tmany)
 % Outupts: funs - function name list
 %
 % Examples
-%   pfind att
-%   pfind att inf
-%   pfind imu 10
+%   pfind att;
+%   pfind att inf;
+%   pfind imu 10;
 %
 % See also pdemo.
 
 % Copyright(c) 2009-2024, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 22/05/2024
+narginchk(1, 2);
 dirs = {
     '', ...
     'base', ...
@@ -45,9 +46,9 @@ for k=1:length(dirs)
     [fname, m] = dirfile(stri);
     for n=1:m,
         fid = fopen(fname{n},'r'); fgetl(fid); tl=fgetl(fid); fclose(fid);      
-        funs{n1,:} = [fname{n}(1:end-2), '      ', tl(2:end)];  n1=n1+1;
+        funs{n1,:} = [fname{n}(1:end-2), '   ', tl(2:end)];  n1=n1+1;
         if n1>toomany, funs{n1,:}='--- Too many functions found ...'; break; end
     end
     if n1>toomany, break; end
 end
-if nargout>0, disp(funs); end
+if nargout==0, disp(funs); end

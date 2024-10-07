@@ -1,5 +1,17 @@
 function pos2bd(poss, fname, dis)
 % trans pos(lat,lon) to Baidu map file 'xxx.html'
+% 
+% Prototype: pos2bd(poss, fname, dis)
+% Inputs: poss - postion array
+%         fname - file name string, default using current time as file name
+%         dis - min distance span to generate trajectory
+% Output: N/A
+%
+% See also  bdpoint
+
+% Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
+% Northwestern Polytechnical University, Xi An, P.R.China
+% 29/06/2022
 global glv
     if nargin<3, dis=10; end
     if nargin<2, fname=['PSINS_BaiduMap_',datestr(now,'HHMMSS'),'.html']; end

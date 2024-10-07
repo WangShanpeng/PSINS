@@ -6,7 +6,15 @@ function [imu, od, gps, gpsyaw, avpr, t0] = ld2528(fname, clm, t0)
 % 	CVect3 posgps; double dop; CVect3 vngps; double yawgps;
 % 	CVect3 pos610, att610, vn610;
 % } FileRecord;
-if clm==25
+if clm==16  % [imu, od, gps, t0] = ld2528(fname, clm, t0)
+    dd = binfile(fname, 16);
+    if nargin<3, t0 = dd(1,8); end
+    t = dd(:,8)-t0;
+    imu = [dd(:,1:6),t];
+    od = [dd(:,7), t];
+    gps = [dd(:,9:11), dd(:,12:15), t];  gps = gps(gps(:,4)>0.1,:);
+    gpsyaw = t0;
+elseif clm==25
     dd = binfile(fname, 25);
     if nargin<3, t0 = dd(1,1); end
     t = dd(:,1)-t0;

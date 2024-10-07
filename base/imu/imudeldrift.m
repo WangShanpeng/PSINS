@@ -7,7 +7,7 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
 %         t0,t1 - assuming a static-base condition time interval
 % Output: imu - new SIMU data with gyro bias deleted
 %
-% See also  delbias, imuadderr, imurepair, imuresample.
+% See also  delbias, imuadderr, imuclbt, imurepair, imuresample.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China

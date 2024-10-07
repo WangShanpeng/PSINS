@@ -31,7 +31,7 @@ function avp = inspure(imu, avp0, href, isfig)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 12/01/2013, 04/09/2014
 global glv
-    [nn, ts, nts] = nnts(4, imu(2,end)-imu(1,end));
+    [nn, ts, nts] = nnts(2, imu(2,end)-imu(1,end));
     if length(avp0)<9, avp0=[avp0(1:3);zeros(3,1);avp0(4:end)]; end  % avp0=[att;pos]
     ins = insinit(avp0, ts);  vn0 = avp0(4:6); pos0 = avp0(7:9);
     if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
@@ -108,6 +108,10 @@ global glv
         end
         avp(ki,:) = [ins.avp; t]';
         ki = timebar;
+    end
+    if k1~=len  % the last IMU record, 2024-07-31
+        ins = insupdate(ins, imu(k1+1:len,1:6));
+        avp(ki,:) = [ins.avp; imu(end,end)]';
     end
     if nargin<4, isfig=1; end
     if isfig==1,

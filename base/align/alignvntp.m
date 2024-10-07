@@ -71,6 +71,7 @@ function kf = avnkfinit(nts, pos, phi0, imuerr, wvn)
     kf.adaptive = 0;
     kf.xconstrain = 0; kf.pconstrain = 0;
     kf.fading = 1;
+    kf = kfinit0(kf, nts);
 
 function avnplot(attk, xkpk)
 global glv

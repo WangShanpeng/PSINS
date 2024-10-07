@@ -4,12 +4,11 @@ function [wvm, Dir] = imurfu(wvm0, dirstr)
 % SIMU outputs does not follow the above convention.
 %
 % Prototype: [wvm, Dir] = imurfu(wvm0, dirstr)
-% Inputs: wvm0 - the user's raw SIMU data
+% Inputs: wvm0 - the user's raw SIMU data, or gyro, acc data
 %         dirstr - raw SIMU X-Y-Z orientations including three characters, 
 %               the orientation abbreviations are:
-%               'U': Upper; 'D': Down; 'R': Right; 'L': Left; 
-%               'F': Front; 'B': Back; 'E': East; 'W': West; 'N': North;
-%               'S': South.
+%               'U': Upper; 'D': Down; 'R': Right; 'L': Left; 'F': Front; 'B': Back;
+%               'E': East; 'W': West; 'N': North; 'S': South.
 % Outputs: wvm - SIMU data with X-Y-Z pointing to R-F-U respectively,
 %               i.e. wvm(:,1:6) = wvm0(:,1:6)*blkdiag(Dir',Dir').
 %          Dir - see above, or Dir==Cnb, wm=Cnb*wm0.

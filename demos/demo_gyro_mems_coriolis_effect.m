@@ -22,5 +22,7 @@
         plot(pt1(1), pt1(2), '*', 'linewidth', 5,  'color', [clr1;clr2;clr2]);
         plot(pt2(1), pt2(2), '*', 'linewidth', 5,  'color', [clr2;clr1;clr1]);
         xlim([-2,2]); ylim([-2,2]); title('MEMS-gyro Coriolis effect'); axis equal;
+        if y>0, legend('base','track','mass','pressure', 'pulling');
+        else,   legend('base','track','mass','pulling', 'pressure');  end
         pause(0.05);
     end

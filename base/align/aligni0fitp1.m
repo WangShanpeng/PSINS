@@ -1,4 +1,4 @@
-function [att0, res] = aligni0fitp(imu, pos, isfig)
+function [att0, res] = aligni0fitp1(imu, pos, isfig)
 % SINS initial align based on inertial frame method & using position curve fit.
 %
 % Prototype: [att0, res] = aligni0fit(imu, pos, isfig)

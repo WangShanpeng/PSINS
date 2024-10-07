@@ -17,8 +17,8 @@ function [att, attr] = m2att(Cnb)
     att = [ asin(Cnb(3,2));
             atan2(-Cnb(3,1),Cnb(3,3)); 
             atan2(-Cnb(1,2),Cnb(2,2)) ];
-    if Cnb(3,2)>0.999999, att(2)=0; att(3)=atan2(Cnb(1,3),Cnb(1,1));
-    elseif Cnb(3,2)<-0.999999, att(2)=0; att(3)=-atan2(Cnb(1,3),Cnb(1,1)); end
+    if Cnb(3,2)>0.999999, att(2)=atan2(Cnb(1,3),Cnb(1,1)); att(3)=0;
+    elseif Cnb(3,2)<-0.999999, att(2)=-atan2(Cnb(1,3),Cnb(1,1)); att(3)=0; end
     if nargout==2  % dual Euler angles
         attr = [ atan2(Cnb(3,2),Cnb(3,3)); 
                  asin(-Cnb(3,1)); 

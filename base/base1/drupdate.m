@@ -42,5 +42,5 @@ function dr = drupdate(dr, imu, dS)
         dr.dpos(2) = dr.dpos(2) + dVN*dr.gck(3)*nts;
         dr.wnc(1) = -dVN*(1+dr.gck(2))/6378137 - dr.dpos(2);
         dr.qnb = qmul(rv2q(-dr.wnc*nts),dr.qnb);
-        dr.avp = [dr.att; dr.vni; dr.pos];
+        dr.avp = [q2att(dr.qnb); dr.vni; dr.pos];
     end

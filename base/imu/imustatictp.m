@@ -12,9 +12,9 @@ function [imu, att] = imustatictp(avp0, ts, T, wz, az, imuerr)
 %
 % Example:
 %   imuerr = imuerrset(0.01,100,0.001,10, 0.001,1000,10,1000, 10,10,10,10);
-%   [imu, att] = imustatictp([[1;2;10]*glv.deg, glv.pos0], 0.01, 300, -10*glv.dps, 180*glv.deg, imuerr); imuplot(imu);
+%   [imu, att] = imustatictp([[1;2;10]*glv.deg; glv.pos0], 0.01, 300, -10*glv.dps, 180*glv.deg, imuerr); imuplot(imu);
 %
-% See also  imustatic, imusway.
+% See also  imustatic, imupos19, alignpetp, alignvntp, imustatic, imusway.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

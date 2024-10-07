@@ -42,15 +42,16 @@
 		case 18: Demo_CVCFileFind(); break;\
 		case 19: Demo_DSP_main(); break; \
 		case 20: Demo_CONSOLE_UART(); break; \
-		case 21: Demo_Cfg(); break; \
-		case 22: Demo_CPolyfit(); break; \
-		case 23: Demo_CAligni0(); break; \
-		case 24: Demo_SysClbt(); break; \
-		case 25: Demo_GKP(); break; \
-		case 26: Demo_CIMUInc(); break; \
-		case 27: Demo_Extern_C_example(); break; \
-		case 28: Demo_Extract_Txt_File(); break; \
-		case 29: Demo_operator_pointer_run_time(); break; \
+		case 21: Demo_COMMON_UART(); break; \
+		case 22: Demo_Cfg(); break; \
+		case 23: Demo_CPolyfit(); break; \
+		case 24: Demo_CAligni0(); break; \
+		case 25: Demo_SysClbt(); break; \
+		case 26: Demo_GKP(); break; \
+		case 27: Demo_CIMUInc(); break; \
+		case 28: Demo_Extern_C_example(); break; \
+		case 29: Demo_Extract_Txt_File(); break; \
+		case 30: Demo_operator_pointer_run_time(); break; \
 		} \
 		exit(0); \
 	}
@@ -75,6 +76,7 @@ void Demo_IMUTempCompensate(void);
 void Demo_CVCFileFind(void);
 void Demo_DSP_main(void);
 void Demo_CONSOLE_UART(void);
+void Demo_COMMON_UART(void);
 void Demo_Cfg(void);
 void Demo_CPolyfit(void);
 void Demo_CAligni0(void);
@@ -292,6 +294,8 @@ public:
 		return (att0 = q2att(aln.qnb));
 	};
 };
+
+extern char psinsUartSetting[];
 
 #endif  // PSINS_IO_FILE
 

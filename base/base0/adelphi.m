@@ -9,7 +9,7 @@ function att1 = adelphi(att, phi)
 %               ideal nav-frame
 % Output: att1 - attitude output
 %
-% See also  qdelphi, qaddphi, qq2phi, qaddafa, qdelafa, qq2afa, aaddmu.
+% See also  qaddphi, qdelphi, qq2phi, qaddafa, qdelafa, qq2afa, aaddmu.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

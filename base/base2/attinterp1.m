@@ -1,5 +1,5 @@
 function [att, rv] = attinterp1(att, t, method)
-% att linear interpolation. 
+% Attitude linear interpolation. 
 %
 % Prototype: att = attinterp1(att, t, method)
 % Inputs: att - input attitude

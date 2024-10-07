@@ -1,8 +1,9 @@
-function [sigma, tau, m] = avarimu(imu)
+function [sigma, tau, m] = avarimu(imu, meanT)
 % Calculate Allan variance for SIMU gyro & acc.
 %
 % Prototype: avarimu(imu)
 % Input: imu - SIMU data
+%        meanT - mean time
 %
 % Example
 %     imu = imustatic(zeros(9,1), 0.01, 3600, imuerrset(0.01,100,0.01,1)); avarimu(imu);
@@ -27,8 +28,14 @@ global glv
         [sigma(:,k), tau(:,k), Err(:,k)] = avar(a, ts, 0, 0);
     end
     myfig;
-   	subplot(221), plot(imu(:,end), imu(:,1:3));  xygo('\it\omega / \rm(\circ)/h');
-    title(['Mean: ', sprintf('%.3f; ',[m(1:3),norm(m(1:3))]), ' \circ/h']);
+    if nargin>1
+        glv.isfig = 0;
+        K = fix(meanT/ts);
+        imu = imumeanplot(imu, K);  imu(:,1:6)=imu(:,1:6)/K;  % in dph,mg
+        glv.isfig = 1;
+    end
+   	subplot(221), plot(imu(:,end), imu(:,1:3));  xygo('\it\omega / \rm(\circ)/h');  if nargin>1, legend(sprintf('T=%.2f', K*ts)); end
+    title(['Mean: ', sprintf('%.3f; ',[m(1:3),norm(m(1:3))]), ' (\circ)/h']);
    	subplot(223), loglog(tau(:,1), sigma(:,1:3));  xygo('\it\tau \rm/ s', '\it\sigma_A\rm( \tau ) /\rm (\circ)/h');
    	subplot(222), plot(imu(:,end), imu(:,4:6));  xygo('\itf ^b / \rmmg');
     title(['Mean: ', sprintf('%.3f; ',[m(4:6),norm(m(4:6))]),' mg']);

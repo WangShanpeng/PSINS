@@ -6,7 +6,7 @@ function [xyz, Cen] = blh2xyz(blh)
 % Input: blh - geographic coordinate blh=[lat;lon;height],
 %               where lat & lon in radians and hegtht in meter
 % Outputs: xyz - ECEF Cartesian coordinate vector, in meters
-%          Cen - transformation matrix from nav-frame to Earth-frame
+%          Cen - transformation matrix from Earth-frame to nav-frame
 %
 % See also  xyz2blh, Dblh2Dxyz, pos2cen.
 
@@ -22,7 +22,7 @@ global glv
     Z = (N*(1-glv.e2)+H)*sB;
     xyz = [X; Y; Z];
     if nargout==2
-        Cen = [ -sL,     cL,    0
-                -sB*cL, -sB*sL, cB
-                 cB*cL,  cB*sL, sB ]';
+        Cen = [ -sL,  -sB*cL,  cB*cL
+                 cL,  -sB*sL,  cB*sL
+                 0,    cB,     sB ];
     end

@@ -14,7 +14,7 @@ function [qnb, att, Cnb] = dv2atti(vn1, vn2, vb1, vb2)
 %       where gn is gravity vector and imu(1,4:6)' is acc specific force output,
 %       while wnie is the Earth angular velocity and imu(1,1:3)' is gyro output.
 %
-% See also  sv2atti, mv2atti, alignsb.
+% See also  sv2atti, mv2atti, dv2om, alignsb.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

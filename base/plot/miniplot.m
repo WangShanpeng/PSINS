@@ -5,7 +5,7 @@ function miniplot(data, str)
 % Inputs: data - data to plot, 
 %         str - flag string
 %
-% See also  dataplot, plotn, insplot, labeldef, mlplot, msplot.
+% See also  pplot, plotn, insplot, labeldef, mlplot, msplot.
 
 % Copyright(c) 2009-2017, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
@@ -85,8 +85,11 @@ global glv
             if sz>4, sz=4; data=data(:,[13:15,end]); end
             sz1=3; data(:,1:sz1)=data(:,1:sz1)/glv.ug;
         case 'L',
-            if sz>4, sz=4; data=data(:,[16:18,end]); end
+            if sz>4, sz=4; data=data(:,[7:9,end]); end
             sz1=3;
+        case 'mu',
+            if sz>4, sz=4; data=data(:,[16:18,end]); end
+            sz1=3; data(:,1:sz1)=data(:,1:sz1)/glv.min;
         case 'dT',
             if sz>2, sz=2; data=data(:,[19,end]); end
             sz1=1;

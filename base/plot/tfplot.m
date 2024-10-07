@@ -10,7 +10,7 @@ function tf = tfplot(tf, flag)
 % Inputs: tf - MINS/SINS data array.
 %         flag - plot flag
 %          
-% See also  igplot, igoplot, igkfplot, igload, odpplot, imuplot, gpsplot, dataplot.
+% See also  igplot, igoplot, igkfplot, igload, odpplot, imuplot, gpsplot, pplot.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

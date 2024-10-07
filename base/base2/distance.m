@@ -13,7 +13,8 @@ function [dist, od] = distance(pos, timax)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 01/12/2020
     if nargin<2, timax=1; end
-    if size(pos,2)>7, pos = pos(:,[7:9,end]); end
+    if size(pos,2)>7, pos = pos(:,[7:9,end]);
+    elseif size(pos,2)==7, pos = pos(:,4:end); end  % vp
     if size(pos,2)==3, pos(:,4) = (1:size(pos,1))'; end
     tmin = diff(pos(1:2,end));
     myfigure;

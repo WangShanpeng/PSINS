@@ -4,7 +4,7 @@
 void main(void)
 {
 //	ClassSizeDisp();
-	psinsdemo(7);
+	psinsdemo(25);
 
 	CFileRdWt::Dir("D:\\ygm2020\\PSINSÍøÕ¾\\¹ßµ¼Êý¾Ý\\", "D:\\psins210207\\VC60\\Data\\");
 	CFileRdWt fins("ins.bin"), fkf("kf.bin");

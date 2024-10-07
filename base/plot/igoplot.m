@@ -12,7 +12,7 @@ function igo = igoplot(igo, flag)
 % Inputs: igo - SINS/GNSS/OD data array.
 %         flag - plot flag
 %          
-% See also  igplot, igoload, igkfplot, odpplot, imuplot, gpsplot, dataplot.
+% See also  igplot, igoload, igkfplot, odpplot, imuplot, gpsplot, pplot.
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -19,6 +19,8 @@ function [att0, attk] = aligncmps(imu, qnb, pos, ctl0, ctl1, isfig)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 23/12/2012
 global glv
+    if nargin<4,  ctl0 = [10,100];    end
+    if nargin<5,  ctl1 = [100,1000];  end
     if nargin<6,  isfig = 1;  end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
     [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));

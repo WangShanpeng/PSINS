@@ -16,13 +16,16 @@ function t = cnt2t(cnt, ts, t0)
     if ~exist('ts', 'var'), ts = 1; end
     if ~exist('t0', 'var'), t0 = ts; end
     dcnt = diff(cnt);
-    m = max(cnt);
-    if m==15
-        dcnt(dcnt==-15) = 1;
-    elseif m==255
-        dcnt(dcnt==-255) = 1;
-    elseif m==65535
-        dcnt(dcnt==-65535) = 1;
+    m = max(cnt);  idx=dcnt<0;
+    if m>10 && m<=15
+%         dcnt(dcnt==-15) = 1;
+        dcnt(idx) = dcnt(idx)+16;
+    elseif m>245 && m<=255
+%         dcnt(dcnt==-255) = 1;
+        dcnt(idx) = dcnt(idx)+256;
+    elseif m>65530 && m<=65535
+%         dcnt(dcnt==-65535) = 1;
+        dcnt(idx) = dcnt(idx)+65536;
     else
         idx = dcnt<0;
         dcnt(idx) = dcnt(1);

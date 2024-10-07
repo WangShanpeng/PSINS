@@ -3,14 +3,17 @@
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 18/07/2021
-    glvs
-    w = 1;   % 0 for static, 1 for clockwise, -1 for counter clockwise
-    t = 0;  dr = 0; ddr = 0.01;  afa = (0:400)'*glv.deg;  K = 0.277;
+function demo_HRG_effect(w)
+    deg = pi/180;  dps = deg/1;
+    if nargin<1
+        w = 1;   % 0 for static, 1 for clockwise, -1 for counter clockwise
+    end
+    t = 0;  dr = 0; ddr = 0.01;  afa = (0:400)'*deg;  K = 0.277;
     hfig = figure;
     while 1
         if ~ishandle(hfig),  break;  end
         clf(hfig);  hold off;
-        t = t+0.1;   afa0 = w*t*glv.dps;
+        t = t+0.1;   afa0 = w*t*dps;
         safa = sin(afa+afa0); cafa = cos(afa+afa0);
         safa1 = sin(afa+afa0*(1-K)); cafa1 = cos(afa+afa0*(1-K));
         plot(1.1*safa, 1.1*cafa, ':m', safa, cafa, 'b'); % HR

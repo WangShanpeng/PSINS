@@ -1,12 +1,12 @@
 function imu = imuclbt(imu, clbt, eb, Ka, db)
-% IMU calibration.
+% IMU calibration, like imu_del_err.
 %
-% Prototype: imu = imuclbt(imu, clbt)
+% Prototype: imu = imuclbt(imu, clbt, eb, Ka, db)
 % Inputs: imu - IMU before calibration 
 %         clbt - calibration struct
 % Output: imu - IMU output after calibration 
 %
-% See also  clbtfile, imuadderr, imulvS, sysclbt, lsclbt, imutclbt, imuasyn.
+% See also  clbtfile, imuadderr, imudeldrift, imulvS, sysclbt, lsclbt, imutclbt, imuasyn.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi'an, P.R.China
@@ -20,12 +20,18 @@ global glv
         clbt.eb = [0.1; 0.2; 0.3]*glv.dph;
         clbt.Ka = eye(3) - diag([10;20;30]*glv.ppm) + ...
             [0, 0, 0; 10, 0, 0; 20, 30, 0]*glv.sec;
-        clbt.db = [10; 20; 30]*glv.ug;
+        clbt.db = [100; 200; 300]*glv.ug;
         clbt.Ka2 = [10; 20; 30]*glv.ugpg2;
         clbt.rx = [1;2;3]/100; clbt.ry = [4;5;6]/100; clbt.rz = zeros(3,1);
-        clbt.tGA = 0.001;
+        clbt.tGA = 0.005;
     end
     [m, n] = size(clbt);
+    if m==3 && n==1  % imuclbt(imu, eb, db)
+        if nargin<3, eb=[0;0;0]; end
+        db = eb;  eb = clbt;  edbts = [eb;db]*ts;
+        for k=1:6, imu(:,k) = imu(:,k)-edbts(k); end
+        return;
+    end
     if m==3 && n==3  % imuclbt(imu, Kg, eb, Ka, db)
         Kg = clbt;
         if ~exist('eb','var'), eb=zeros(3,1); end
