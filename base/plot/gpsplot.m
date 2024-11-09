@@ -13,6 +13,14 @@ function gpsplot(vpGPS, ts)
 % 19/02/2014
 global glv
     [m,n] = size(vpGPS);
+    if n==8 || n==5  % 14/9/2024
+        gpsplot(vpGPS(:,[1:end-2,end]));
+        satNum = fix(vpGPS(:,end-1));  DOP = (vpGPS(:,end-1)-satNum)*1000;
+        myfig,
+        subplot(211), plot(vpGPS(:,end), satNum);  xygo('satNum');
+        subplot(212), plot(vpGPS(:,end), DOP);  xygo('DOP');
+        return;
+    end
     if nargin<2, ts=1; end
     if mod(n,3)==0, vpGPS = [vpGPS,(1:length(vpGPS))'*ts]; end
     t = vpGPS(:,end);

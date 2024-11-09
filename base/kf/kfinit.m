@@ -94,7 +94,7 @@ switch(psinsdef.kfinit)
         [davp, imuerr, lever, dT, r0] = setvals(varargin);
         kf.Qt = diag([imuerr.web; imuerr.wdb; zeros(9+3+1+15+3,1)])^2;
         kf.Rk = diag(r0)^2;
-        kf.Pxk = diag([davp; imuerr.eb; imuerr.db; lever; dT; imuerr.dKga; davp(4:6)]*10)^2;
+        kf.Pxk = diag([davp; imuerr.eb; imuerr.db; lever; dT; imuerr.dKga; davp(4:6)]*1.0)^2;
         kf.Hk = kfhk(ins);
         kf.xtau(1:psinsdef.kffk,1) = 0;
     otherwise,

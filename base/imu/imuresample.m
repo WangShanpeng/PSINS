@@ -24,7 +24,7 @@ function imu = imuresample(imu0, ts, t1, method, temflag)
     if nargin==3, 
         if ischar(t1), method=t1; t1=fix(t0(1)); end 
     end
-    t1 = ceil(t0(1)/ts)*ts;
+    t1 = ceil(t1/ts)*ts-ts;
 %     if nargin<3,  t1=fix(t0(1));  end
 %     if t1<t0(1), t1=t1+fix((t0(1)-t1)/ts)*ts;  end
 %     if t1-ts>=t0(1),  t1=t1-ts;  end

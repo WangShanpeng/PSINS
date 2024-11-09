@@ -10,7 +10,7 @@ function yaw = yawadd(yaw, dyaw, s)
 % Example
 %    figure,  plot(yawadd((1:0.1:10)',1))
 %
-% See also  yawcvt, att2c.
+% See also  yawcvt, att2c, yawbias.
 
 % Copyright(c) 2009-2022, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

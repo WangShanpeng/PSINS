@@ -17,7 +17,7 @@ function incl = a2incl(att)
         Cnb = a2matBatch(att);
         incl = [ acos(Cnb(:,9)), -atan2(Cnb(:,3),Cnb(:,6)) ];
         if size(att,2)>3
-            incl = [incl(:,[1,1,2]), att(:,4:end)];
+            incl = [incl(:,[1,1,2]), att(:,4:end)];  % [incl,incl,incl_yaw,t]
         end
     end
     

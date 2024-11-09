@@ -5,7 +5,7 @@ function bdpoint(app)
 % Input: app - Windows application program case, msedge/chrome/firefox etc.
 % Output: N/A
 %
-% See also  pos2bd.
+% See also  pos2bd, poscu.
 
 % Copyright(c) 2009-2024, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

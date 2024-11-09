@@ -11,7 +11,7 @@ function insplot(avp, ptype, varargin)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 06/10/2013, 09/11/2018
 global glv
-    t = avp(:,end);
+    t = avp(:,end)/glv.tscale(end);
     n = size(avp,2);
     if nargin<2
         if n==2,     ptype = 'y';  % yaw

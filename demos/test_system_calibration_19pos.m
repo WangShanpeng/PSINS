@@ -39,7 +39,3 @@ clbtfile(clbt);
 % clbtfile(clbt, 'clbt19.bin');
 % binfile('imu19.bin', [imu1,imu1(:,end)]);
 
-imuplot(imu1,imu);
-avp = inspure(imu, [att0;pos0], 'f');
-avp1 = inspure(imu1, [att0;pos0], 'f');
-avpcmpplot(avp,avp1,'avp');

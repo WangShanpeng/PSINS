@@ -20,6 +20,10 @@ global glv
     if nargin<1, n=0; end
     if ischar(n), name=['\demos\*',n,'*.m']; n=n1; else, name='\demos\*.m'; end
     [fnames,m] = dirfile([glv.rootpath,name]);
+    if m<1
+        fprintf('\tNo demo file found.\n');
+        return;
+    end
     if n==0
         for k=1:m
             fnames{k}=sprintf('%3d  %s',k,fnames{k});

@@ -28,10 +28,10 @@ function [att0, attk, xkpk] = alignvn(imu, qnb, pos, phi0, imuerr, wvn, isfig)
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/06/2011
 global glv
-    if nargin<4,  phi0 = [1.5; 1.5; 3]*glv.deg;  end
-    if nargin<5,  imuerr = imuerrset(0.01, 100, 0.001, 1);  end
-    if nargin<6,  wvn = 0.01;  end;  if length(wvn)==1, wvn=repmat(wvn,3,1); end
     if nargin<7,  isfig = 1; end
+    if nargin<6,  wvn = 0.01;  end;  if length(wvn)==1, wvn=repmat(wvn,3,1); end
+    if nargin<5,  imuerr = imuerrset(0.01, 100, 0.001, 1);  end
+    if nargin<4,  phi0 = [1.5; 1.5; 3]*glv.deg;  end
     if length(qnb)==3, qnb=a2qua(qnb); end  %if input qnb is Eular angles.
     [nn, ts, nts] = nnts(2, diff(imu(1:2,end)));
     len = fix(length(imu)/nn)*nn;

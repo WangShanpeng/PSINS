@@ -16,6 +16,7 @@ global glv
     ts = diff(imu(1:2,end));
     if nargin<3, dph=0; end
     if nargin<2, n=fix(1.0/diff(imu(1:2,end))); end
+    if n<1, dph=n; n=fix(1.0/diff(imu(1:2,end))); end  % imumeanplot(imu, dph);
     imu = [meann(imu(:,1:end-1),n)*n,imu(n:n:end,end)];
     if glv.isfig==0, return; end
     imuplot(imu,dph);

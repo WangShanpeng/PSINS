@@ -28,9 +28,9 @@ function [data, idx, m, s] = datacut(data0, t1, t2, co)
         return;
     end
     if nargin<3, t2=data0(end,end); end
-    if co(1)=='[', i1 = find(data0(:,end)>=t1, 1, 'first');
+    if co(1)=='[', i1 = find(data0(:,end)>=t1, 1, 'first');  % left bound
     else           i1 = find(data0(:,end)> t1, 1, 'first');  end
-    if co(2)==']', i2 = find(data0(:,end)<=t2, 1, 'last');
+    if co(2)==']', i2 = find(data0(:,end)<=t2, 1, 'last');   % right bound
     else           i2 = find(data0(:,end)< t2, 1, 'last');   end
     idx = (i1:i2)';
     data = data0(idx,:);

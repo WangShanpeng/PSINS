@@ -14,5 +14,6 @@ function [data, idx] = datadel(data0, t1, t2)
     if nargin<3, t2=data0(end,end); end
     i1 = find(data0(:,end)>=t1, 1, 'first');
     i2 = find(data0(:,end)<=t2, 1, 'last');
-    idx = [1:i1,i2:length(data0)]';
+    idx = [1:(i1-1),(i2+1):length(data0)]';
     data = data0(idx,:);
+

@@ -1,7 +1,7 @@
 function [posdr,posdr0,posdr1] = PipeLine(imuod, t, pos, yaw0, inst, kod, Td)
 % 输入参数：
 %   imuod = [gx,gy,gz, ax,ay,az, od, t];  gx,gy,gz 角增量/rad（右前上）; ax,ay,az 速度增量/(m/s); od 里程计距离增量/m; t 时间/s
-%   t = [t0, t1, t2];  t0 起始时间，确保之后10s静止;  t1 往程末端时间，确保前后20s都静止;  t2 回程末了时间
+%   t = [t0, t1, t2];  t0 起始时间，确保之后10s静止;  t1 往程末端时间，确保前后10s都静止;  t2 回程末了时间
 %   pos = [pos0; pos1]  pos0 起始位置（纬经rad，高m）; pos1 往程末端位置
 %   yaw0 初始方位角/rad 北偏西为正 -pi -> pi
 %   inst 惯导安装偏差 [俯仰偏差; 0; 方位偏差]/rad,  默认为 [0;0;0]
@@ -22,6 +22,8 @@ function [posdr,posdr0,posdr1] = PipeLine(imuod, t, pos, yaw0, inst, kod, Td)
     imuod(:,[1:6,8]) = imudeldrift(imuod(:,[1:6,8]), t1-10,t1+10);
     avp = drpure(datacut(imuod,t0,t2), [att;pos0], inst, kod, Td); close(gcf); % insplot(avp);
     pos1DR = getat(avp,t1);
+%     eth = earth(pos1);  Mpv = [0, 1/eth.RMh, 0; 1/eth.clRNh, 0, 0; 0, 0, 1];
+%     pos1 = pos1 + Mpv*a2mat(pos1DR(1:3)')*[0;-0.6;0];  % device length compensation
     [inst1, kod] = drcalibrate(avp(1,7:9)', pos1, pos1DR(7:9));
     avp = drpure(datacut(imuod,t0,t2), [att-inst1;pos0], inst, kod, Td); % insplot(avp);
     %%

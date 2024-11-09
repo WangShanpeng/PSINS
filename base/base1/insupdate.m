@@ -13,6 +13,7 @@ function ins = insupdate(ins, imu)
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 22/03/2008, 12/01/2013, 18/03/2014, 09/09/2014
+global glv
     nn = size(imu,1);
     nts = nn*ins.ts;  nts2 = nts/2;  ins.nts = nts;
     [phim, dvbm] = cnscl(imu,0);    % coning & sculling compensation
@@ -29,6 +30,7 @@ function ins = insupdate(ins, imu)
     ins.fn = qmulv(ins.qnb, ins.fb);
 %     ins.an = qmulv(rv2q(-ins.eth.wnin*nts2),ins.fn) + ins.eth.gcc;
     ins.an = rotv(-ins.eth.wnin*nts2, ins.fn) + ins.eth.gcc;  ins.anbar = 0.9*ins.anbar + 0.1*ins.an;
+%    ins.an(1:2)=ins.an(1:2)-2*0.207*glv.ws*ins.vn(1:2);
     vn1 = ins.vn + ins.an*nts;
     %% (2)position updating
 %     ins.Mpv = [0, 1/ins.eth.RMh, 0; 1/ins.eth.clRNh, 0, 0; 0, 0, 1];

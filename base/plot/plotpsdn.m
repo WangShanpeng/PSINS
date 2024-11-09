@@ -16,5 +16,5 @@ function plotpsdn(data, ts)
     if nargin<2, ts=1; end
     for k=1:size(data,2), data(:,k)=abs(fft(data(:,k)-mean(data(:,k)))); end
     data = log10(data(2:fix(length(data)/2),:));
-    frq = 1/ts/2/length(data)*(1:length(data));
+    frq = 1/ts/2/length(data)*(1:length(data))';
     plotn(data, frq); xlabel('freq / Hz'); ylabel('log10');

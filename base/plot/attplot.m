@@ -13,7 +13,12 @@ global glv
 	myfig; nextlinestyle(-1);
     for k=1:nargin
         att = varargin{k};
-        subplot(311), plot(att(:,end), att(:,1)/glv.deg, nextlinestyle(1)), xygo('p');
-        subplot(312), plot(att(:,end), att(:,2)/glv.deg, nextlinestyle(0)), xygo('r');
-        subplot(313), plot(att(:,end), att(:,3)/glv.deg, nextlinestyle(0)), xygo('y');
+        if size(att,2)==3, % roll==0
+            subplot(211), plot(att(:,end), att(:,1)/glv.deg, nextlinestyle(1)), xygo('p');
+            subplot(212), plot(att(:,end), att(:,2)/glv.deg, nextlinestyle(0)), xygo('y');
+        else
+            subplot(311), plot(att(:,end), att(:,1)/glv.deg, nextlinestyle(1)), xygo('p');
+            subplot(312), plot(att(:,end), att(:,2)/glv.deg, nextlinestyle(0)), xygo('r');
+            subplot(313), plot(att(:,end), att(:,3)/glv.deg, nextlinestyle(0)), xygo('y');
+        end
     end

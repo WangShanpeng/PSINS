@@ -3,14 +3,20 @@ function inserrplot(err, ptype)
 %
 % Prototype: inserrplot(err, ptype)
 % Inputs: err - may be [phi], [phi,dvn], [phi,dvn,dpos],
-%                      [phi,dvn,dpos,eb,db], etc.
+%               [phi,dvn,dpos,eb,db], etc.  NOTE: the last column may be 
+%               latitude, such as [dlat, dlon, dh, t, lat]
 %         ptype - plot type define
-%          
-% See also  insserrplot, insplot, kfplot, rvpplot, gpsplot.
+% Example
+%   avp0 = avpset([1;2;30], [0;0;0], glv.pos0];
+%   avp = inspurest(avp0, 5, 2*24*3600, imuerrset(0.01,50));
+%   [davp, L] = avpcmpplot(avp0, avp);
+%   inserrplot([davp(:,7:end),L],'p');
+%
+% See also  avpcmpplot, insserrplot, insplot, kfplot, rvpplot, gpsplot.
 
-% Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
+% Copyright(c) 2009-2024, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 06/10/2013
+% 06/10/2013, 11/10/2024
 global glv
     t = err(:,end)/tscaleget();
     n = size(err,2)-1;
@@ -140,5 +146,12 @@ global glv
             subplot(212), plot(t, [err(:,4:5)*glv.Re,err(:,6)]); xygo('dP'); mylegend('dlat','dlon','dH');
         case 'p',
             myfigure;
-            plot(t, [err(:,1:2)*glv.Re,err(:,3)]); xygo('dP'); mylegend('dlat','dlon','dH');
+            if size(err,2)==5
+                t = err(:,4)/(24*3600); % in day
+                dp = [err(:,1),err(:,2).*cos(err(:,5))]*glv.Re;
+                ax = plotyy(t, [dp,normv(dp)]/glv.nm, t,err(:,5)/glv.deg);
+                xyygo(ax, '\itt\rm / day', '\delta \itP\rm / nmile', '\itL\rm / \circ');  mylegend('dlat','dlon','dR');
+            elseif size(err,2)==4
+                plot(t, [err(:,1:2)*glv.Re,err(:,3)]); xygo('dP'); mylegend('dlat','dlon','dH');
+            end
     end

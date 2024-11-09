@@ -6,7 +6,7 @@ function res = maxn(scr, n, dim)
 %         n - element number to be averaged
 %         dim - =1 max along rows, =2 max along columns
 %
-% See also  meann, sumn, avar.
+% See also  max2, meann, sumn, avar.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

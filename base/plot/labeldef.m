@@ -19,6 +19,7 @@ function stext = labeldef(stext)
         't/h'    '\itt \rm / h';
         't/d'    '\itt \rm / d';
         'phi',   '\it\phi\rm / ( \prime )';
+        'phi-sec',   '\it\phi\rm / ( \prime\prime )';
         'phiE',  '\it\phi\rm_E / ( \prime\prime )';
         'phiN',  '\it\phi\rm_N / ( \prime\prime )';
         'phiU',  '\it\phi\rm_U / ( \prime )';
@@ -60,6 +61,7 @@ function stext = labeldef(stext)
         'dlon',  '\delta\it \lambda\rm / m';
         'dH',    '\delta\it H\rm / m';
         'dP',    '\delta\it P\rm / m';
+        'dR',    '\delta\it R\rm / m';
         'lat',   '\itL\rm / ( \circ )';
         'lon',   '\it\lambda\rm / ( \circ )';
         'hgt',   '\ith\rm / ( m )';

@@ -17,7 +17,7 @@ function [imu, avp0, ts] = imufile(fname, imu, avp0, ts, scales, infostr)
 %    Create: imufile(fname, imu, avp0, ts, scales, infostr)
 %    Read:   [imu, avp0, ts] = imufile(fname)
 %
-% See also  avpfile, binfile, trjfile, imuresample, imuplot, importdata.
+% See also  avpfile, binfile, trjfile, imuresample, imuplot, importdata, imuzip.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

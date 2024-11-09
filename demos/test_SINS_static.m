@@ -1,5 +1,5 @@
 % Long-time SINS pure inertial navigation simulation on static base.
-% See also  test_SINS_trj, test_SINS, test_SINS_GPS_153.
+% See also  test_SINS_trj, test_SINS, test_SINS_GPS_153, test_SINS_static_verify.
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 17/06/2011

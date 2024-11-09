@@ -9,7 +9,7 @@ function avp = avpset(att, vn, pos, isdeg)
 %        isdeg - unit deg flag
 % Output: avp=[attitude; velocity; position]
 % 
-% See also  posset, avpchk, avperrset, avpadderr, insupdate.
+% See also  posset, pry, llh, avpchk, avperrset, avpadderr, insupdate.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

@@ -15,9 +15,10 @@ function imuerr = imuerrset(eb, db, web, wdb, sqrtR0G, TauG, sqrtR0A, TauA, dKGi
 %     dKAij - acc installation error (arcsec)
 %     Ka2 - acc quadratic coefficient (ug/g^2)
 %       where, 
-%               |dKGii(1) dKGij(4) dKGij(5)|         |dKAii(1) 0        0       |
-%         dKg = |dKGij(1) dKGii(2) dKGij(6)| , dKa = |dKAij(1) dKAii(2) 0       |
-%               |dKGij(2) dKGij(3) dKGii(3)|         |dKAij(2) dKAij(3) dKAii(3)|
+%                |dKGii(1) dKGij(4) dKGij(5)|         |dKAii(1) 0        0       |
+%         dKg  = |dKGij(1) dKGii(2) dKGij(6)| , dKa = |dKAij(1) dKAii(2) 0       |
+%                |dKGij(2) dKGij(3) dKGii(3)|         |dKAij(2) dKAij(3) dKAii(3)|
+%         dKga = [dKg(:,1); dKg(:,2); dKg(:,3);  dKa(:,1); dKa(2:3,2); dKa(3,3)];
 %     rxyz - acc inner-lever-arm, =[rx;ry;rz] (cm)
 %     dtGA - time-asynchrony between gyro & acc, dtGA=Tacc_later-Tgyro_early>0 (ms)
 % Output: imuerr - SIMU error structure array

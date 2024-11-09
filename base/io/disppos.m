@@ -16,7 +16,7 @@ global glv
         idx = find(pos(:,end)<t,1,'first');
         if isempty(idx), idx=1; end
         t = pos(idx,end);  pos = pos(idx,end-3:end-1);
-        fprintf('\tLLH,T=[%.8f, %.8f, %.4f], %.4f\n', pos(1)/glv.deg, pos(2)/glv.deg, pos(3), t);
+        fprintf('\tLLH,T = [ %.8f, %.8f, %.4f ], %.4f\n', pos(1)/glv.deg, pos(2)/glv.deg, pos(3), t);
     else
-        fprintf('\tLLH=[%.8f, %.8f, %.4f]\n', pos(1)/glv.deg, pos(2)/glv.deg, pos(3));
+        fprintf('\tLLH = [ %.8f, %.8f, %.4f ]\n', pos(1)/glv.deg, pos(2)/glv.deg, pos(3));
     end

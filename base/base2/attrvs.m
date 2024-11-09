@@ -16,7 +16,7 @@ function [att0, attk] = attrvs(imu, att1, pos)
 %     [att0, iatt] = attrvs(datacut(imu,10,90), getat(att,90), avp0(7:9));
 %     avpcmpplot(att, iatt, 'a', 'phi');
 %
-% See also  attpure.
+% See also  attpure, inspurervs.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

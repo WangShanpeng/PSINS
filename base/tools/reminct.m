@@ -1,7 +1,12 @@
 function [data, idx] = reminct(data)
 % remain data strictly monotonic increasing by time-tag(REMain INCreaseing Time)
 %
-% See also sortt, monoinc.
+% Prototype:  [data, idx] = monoinc(data)
+% Input: data - input data, the last column is time tag
+% Outputs: data - output data
+%          idx - increasing data index
+%
+% See also inct, sortt, monoinc.
 
 % Copyright(c) 2009-2021, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

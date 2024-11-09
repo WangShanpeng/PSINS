@@ -1,10 +1,10 @@
 
 /* PSINS(Precise Strapdown Inertial Navigation System) C++ algorithm hearder file PSINS.h
 
-Copyright(c) 2015-2023, by YanGongmin, All rights reserved.
+Copyright(c) 2015-2024, by YanGongmin, All rights reserved.
 Northwestern Polytechnical University, Xi'an, P.R.China.
 Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022, 23/09/2023
-      16/06/2024
+      16/09/2024
 */
 
 #ifndef _PSINS_H
@@ -347,8 +347,12 @@ public:
 	double e, e2, ep, ep2, Rp;
 	double mg, ug, deg, min, sec, hur, ppm, ppmpsh;				// commonly used units
 	double dps, dph, dpsh, dphpsh, dph2, dphpg, ugpsh, ugpsHz, ugpg2, mpsh, mpspsh, secpsh;
+	double T0;													// PSINS start time T0
 
 	CGLV(double Re=RE, double f=FF, double g0=G0);
+	inline void SetT0(double T0) { this->T0 = T0; }
+	inline double GetT0(void) { return this->T0; }
+	inline double Elasped(double t) { return t-this->T0; }
 #ifdef PSINS_IO_FILE
 	clock_t	t0;
 	int toc(BOOL disp=0);
@@ -684,6 +688,8 @@ public:
 	CVect3 GetClmVect3(int i, int j) const;				// get i...(i+2)-row&j-column from matrix
 	void SetDiagVect3(int i, int j, const CVect3 &v);	// m(i,j)=v.i, m(i+1,j+1)=v.j, m(i+2,j+2)=v.k;
 	CVect3 GetDiagVect3(int i, int j=-1) const;			// return CVect3(m(i,j), m(i+1,j+1), m(i+2,j+2))
+	void GetDiagf(int i, int n, double *pf) const;
+	void SetDiagf(int i, int n, double *pf);
 	void SetAskew(int i, int j, const CVect3 &v);		// set i...(i+2)-row&j...(j+2)-comumn from askew CVect3
 	void SetMat3(int i, int j, const CMat3 &m);			// set i...(i+2)-row&j...(j+2)-comumn from CMat3
 	void SetMat3(int i, int j, const CMat3 &m, const CMat3 &m1);

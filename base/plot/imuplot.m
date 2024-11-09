@@ -166,5 +166,9 @@ global glv
             subplot(326), plot(t, imu(:,6)/g0,  tlost,imu(lost,6)/g0,'ro');  xygo('fz');
         end
         lost = find(lost)+1;
+        if ~isempty(lost)  % 2024-09-22
+            ang = sum(abs(imu(lost,1:3)),1)*ts;  subplot(321), title(['|lost angles|(arcmin): ', sprintf('%.3f ',ang/glv.min)]);
+            myfig, plot(tlost, imu(lost,1:3)*ts/glv.sec, 'o--');  xygo('lost angles / arcsec');
+        end
     end
 

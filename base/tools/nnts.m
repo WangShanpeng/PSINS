@@ -17,4 +17,7 @@ function [nn, ts, nts] = nnts(nn, ts)
 % 27/03/2014
 
 %     nn = nn; ts = ts;
+    if length(ts)>1  % nnts(nn, t);
+        ts = mean(diff(ts(:,end)));
+    end
     nts = nn*ts;

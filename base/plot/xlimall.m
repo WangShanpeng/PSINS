@@ -15,6 +15,9 @@ function xlimall(x0, x1, fign)
         if length(x0)<2, x1=x0;      x0=0;
         else             x1=x0(2);   x0=x0(1);   end
     end
+    if x0>x1  % [x0-x1, x0+x1]
+        x00 = x0-x1; x1 = x0+x1; x0=x00;
+    end
     ax = findall(h, 'type', 'axes');
     for k=1:length(ax)
         if isempty(get(ax(k),'Tag')), xlim(ax(k), [x0, x1]); end  % not for legend

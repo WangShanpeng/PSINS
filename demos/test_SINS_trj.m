@@ -5,7 +5,7 @@
 % 10/06/2011, 10/02/2014
 glvs
 ts = 0.01;       % sampling interval
-avp0 = [[0;0;0]; [0;0;0]; glv.pos0]; % init avp
+avp0 = [[0;0;0]; [0;0;0]; [29*glv.deg; 106*glv.deg; 450]]; % init avp
 % trajectory segment setting
 xxx = [];
 seg = trjsegment(xxx, 'init',         0);

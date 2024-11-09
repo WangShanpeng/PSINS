@@ -8,7 +8,7 @@ function [x, b1] = delbias(x, b, clm)
 % Outputs: x_out - output data with no bias
 %          b1 - bias output
 %
-% See also  deltrend, imudeldrift, mulsf, adddt, sumn, meann.
+% See also  deltrend, imudeldrift, mulsf, adddt, sumn, meann, maddv.
 
 % Copyright(c) 2009-2016, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

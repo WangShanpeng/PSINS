@@ -5,6 +5,8 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
 % Prototype: [imu, eb] = imudeldrift(imu, t0, t1, avp, yaw0)
 % Inputs: imu - raw SIMU data
 %         t0,t1 - assuming a static-base condition time interval
+%         avp - [att,vn,pos] array
+%         yaw0 - yaw at [t0,t1]
 % Output: imu - new SIMU data with gyro bias deleted
 %
 % See also  delbias, imuadderr, imuclbt, imurepair, imuresample.
@@ -19,8 +21,7 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
         avp = [att(1:2);yaw0; zeros(3,1); pos];
         wbib = imustatic(avp, 1, 1);
         wbib = wbib(1,1:3)'*ts;
-    end
-    if nargin>3  % [imu, eb] = imudeldrift(imu, t0, t1, avp);
+    elseif nargin>3  % [imu, eb] = imudeldrift(imu, t0, t1, avp);
         if size(avp,2)>1,  avp = getat(avp,t0);   end
         wbib = imustatic(avp, 1, 1);
         wbib = wbib(1,1:3)'*ts;
@@ -38,8 +39,8 @@ function [imu, eb, db] = imudeldrift(imu, t0, t1, avp, yaw0)
             eb = t0*ts; db = [0;0;0];
         elseif length(t0)==6,  % [imu, eb, db] = imudeldrift(imu, [eb;db]);
             eb = t0(1:3)*ts; db = t0(4:6)*ts;
-        else  % [imu, eb, db] = imudeldrift(imu, avp, t0);
-            ebdb = getat(t0(:,10:end),t1); %t0=avp;
+        else  % [imu, eb, db] = imudeldrift(imu, avped, t0);
+            ebdb = getat(t0(:,10:end),t1); %t0=avped;
             eb = ebdb(1:3)*ts; db = ebdb(4:6)*ts;
         end
     end

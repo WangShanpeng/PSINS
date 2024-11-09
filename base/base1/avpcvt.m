@@ -10,7 +10,7 @@ function avp = avpcvt(avp, deg2rad)
 %               if deg2rad==0; att/lat/lon in deg, 
 %               where yaw ranging [0,360]*deg clockwise
 %
-% See also  avpidx, yawcvt.
+% See also  avpidx, yawcvt, avp2avp.
 
 % Copyright(c) 2009-2020, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

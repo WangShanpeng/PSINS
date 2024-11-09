@@ -1,10 +1,10 @@
 
 /* PSINS(Precise Strapdown Inertial Navigation System) C++ algorithm source file PSINS.cpp
 
-Copyright(c) 2015-2023, by YanGongmin, All rights reserved.
+Copyright(c) 2015-2024, by YanGongmin, All rights reserved.
 Northwestern Polytechnical University, Xi'an, P.R.China.
 Date: 17/02/2015, 19/07/2017, 11/12/2018, 27/12/2019, 12/12/2020, 22/11/2021, 17/10/2022, 23/08/2023
-      16/06/2024
+      16/09/2024
 */
 
 #include "PSINS.h"
@@ -49,6 +49,7 @@ CGLV::CGLV(double Re, double f, double g0)
     mpspsh = 1/1/sqrt(hur);
     ppmpsh = ppm/sqrt(hur);
     secpsh = sec/sqrt(hur);
+	T0 = 0.0;
 #ifdef PSINS_IO_FILE
 	t0 = clock();
 #endif
@@ -1883,6 +1884,18 @@ CVect3 CMat::GetDiagVect3(int i, int j) const
 	v.j = *p;  p += clm+1;
 	v.k = *p;
 	return v;
+}
+
+void CMat::GetDiagf(int i, int n, double *pf) const
+{
+	const double *pm=&dd[i*clm+i];
+	for(n=i+n; i<n; i++, pf++,pm+=clm+1) *pf=*pm;  // i ... (i+n-1)
+}
+
+void CMat::SetDiagf(int i, int n, double *pf)
+{
+	double *pm=&dd[i*clm+i];
+	for(n=i+n; i<n; i++, pf++,pm+=clm+1) *pm=*pf;  // i ... (i+n-1)
 }
 
 void CMat::SetAskew(int i, int j, const CVect3 &v)

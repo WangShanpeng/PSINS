@@ -1,7 +1,7 @@
-function ck = colororder(k)
+function ck = pcolororder(k)
 % Get the k-th colororder in the current axis.
 %
-% Prototype: ck = colororder(k)
+% Prototype: ck = pcolororder(k)
 %
 % See also  xxx.
 

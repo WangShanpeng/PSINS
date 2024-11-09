@@ -7,7 +7,7 @@ function pos = posset(pos0, lon, hgt, isdeg)
 %           or pos0=[lat; lon; hgt].
 % Output: pos=[pos0(1)*arcdeg; pos0*arcdeg; dpos0(3)]
 % 
-% See also  avpset, poserrset.
+% See also  avpset, llh, poserrset.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

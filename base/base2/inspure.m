@@ -25,13 +25,14 @@ function avp = inspure(imu, avp0, href, isfig)
 %     att0 = aligni0(datacut(imu,t0,t1), getat(gps(:,4:end),t0));
 %     avp = inspure(datacut(imu,t1,t2), [att0;getat(gps(:,4:end),t1)], 'f');
 %
-% See also  insinstant, attpure, trjsimu, insupdate, drpure, nhcpure, insopenav.
+% See also  insinstant, attpure, inspurest, insupdate, drpure, nhcpure, insopenav, inspurervs.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
 % 12/01/2013, 04/09/2014
 global glv
-    [nn, ts, nts] = nnts(2, imu(2,end)-imu(1,end));
+    [nn, ts, nts] = nnts(2, imu(:,end));
+    if abs(norm(avp0(1:4))-1)<1e-6, avp0(1:3)=q2att(avp0(1:4)); avp0(4)=[]; end % avp0=[qnb; ...]
     if length(avp0)<9, avp0=[avp0(1:3);zeros(3,1);avp0(4:end)]; end  % avp0=[att;pos]
     ins = insinit(avp0, ts);  vn0 = avp0(4:6); pos0 = avp0(7:9);
     if ~isempty(glv.dgn), ins.eth = attachdgn(ins.eth, glv.dgn); end
@@ -106,7 +107,7 @@ global glv
         else
             error('No SINS-pure type matched!');
         end
-        avp(ki,:) = [ins.avp; t]';
+        avp(ki,:) = [ins.avp; t]';   %  avp(ki,1:3) = sum(imu(k:k1, 4:6))+ins.eth.gn'*0.01;
         ki = timebar;
     end
     if k1~=len  % the last IMU record, 2024-07-31

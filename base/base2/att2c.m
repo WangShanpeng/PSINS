@@ -8,7 +8,7 @@ function attc = att2c(att)
 % Input: att - raw Euler angle data
 % Output: attc - continuous Euler angle output
 %
-% See also  iatt2c, angle2c, ap2avp, yawcvt, pos2c.
+% See also  iatt2c, angle2c, ap2avp, yawcvt, yawadd, yawbias, pos2c.
 
 % Copyright(c) 2009-2014, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China

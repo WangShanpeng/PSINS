@@ -11,7 +11,7 @@ function posdr = drfusion(posdr1, posdr2, isinv, ext)
 
 % Copyright(c) 2009-2023, by Gongmin Yan, All rights reserved.
 % Northwestern Polytechnical University, Xi An, P.R.China
-% 15/02/2023
+% 15/02/2023, 17/08/2024
     if nargin<4, ext=1; end
     if nargin<3, isinv=0; end
     if isinv==1, posdr2=flipud(posdr2); end
@@ -37,5 +37,6 @@ function posdr = drfusion(posdr1, posdr2, isinv, ext)
     subplot(121), plot(xyz1(:,1), xyz1(:,2), xyz2(:,1), xyz2(:,2), xyz(:,1), xyz(:,2)); xygo('E / m', 'N / m'); legend('DRforward', 'DRbackward', 'DRfusion');
         hold on, plot(xyz1(1,1), xyz1(1,2), 'o', xyz1(end,1), xyz1(end,2), 'o');
     subplot(122), plot(dist, pos1(:,3), dist, pos2(:,3), dist, h); xygo('dist / m', 'h / m');
+        hold on, plot(dist(1), h(1), 'o', dist(end), h(end), 'o');
 %     pos2dplot(posdr1, posdr2, posdr);  legend('Start', 'DR1', 'DR2', 'DRfusion');
 %     myfig, plot(dist, pos1(:,3), dist, pos2(:,3), dist, h); xygo('dist / m', 'h / m');
